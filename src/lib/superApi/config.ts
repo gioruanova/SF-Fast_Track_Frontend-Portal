@@ -9,41 +9,7 @@ export const SUPER_API = {
   
   // gestion de empresa
   COMPANY_CREATE: `${config.apiUrl}/${slugs.superApi}/companies`, // POST crea una nueva empresa
-  // {
-    //   "company_unique_id": "dsdsds",
-  //   "company_nombre": "Mi Empresa S.A.",
-  //   "company_phone": "12345678s90",
-  //   "company_email": "seeee@miempresa.com",
-  //   "limite_operadores": 10,
-  //   "limite_profesionales": 5,
-  //   "limite_especialidades": 4,
-  //   "reminder_manual": false
-  // }
-  
-  
   COMPANY_EDIT: `${config.apiUrl}/${slugs.superApi}/companies/{id}`, // PUT Edita una empresa
-//   {
-//     // "company_telegram": "2222"
-//     // ,
-//     // "company_unique_id": "123456789"
-//     // ,
-//     "company_nombre": "Empresa-1"
-//     // ,
-//     // "company_phone": "111-111-111"
-//     // ,
-//     // "company_email": "contacto@empresauno.com"
-//     // ,
-//     // "company_whatsapp": "123456789"
-//     // ,
-//     // "company_estado": true
-//     // ,
-//     // "limite_operadores": 3
-//     // ,
-//     // "limite_profesionales": 10
-//     // ,
-//     // "reminder_manual": 1
-    
-// }
 
 
 // Gestion de usuarios

@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/auth/login-form";
 import { InstallButton } from "@/components/pwa/InstallButton";
 import Image from "next/image";
 

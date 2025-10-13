@@ -1,103 +1,50 @@
 import {
-  Building2,
+  BriefcaseBusiness,
   Users,
   Mail,
   Hammer,
   SquareCheck,
+  House
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
 
 export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] => [
   {
+    title: "Inicio",
+    url: "/dashboard/owner",
+    icon: House,
+
+  },
+  {
     title: "Mi Organizacion",
-    url: "/company",
-    icon: Building2,
-    items: [
-      {
-        title: "Datos Organizacion",
-        url: "/company/info",
-      },
-      {
-        title: "Configuración",
-        url: "/company/settings",
-      },
-    ],
+    url: "/dashboard/owner/mi-empresa",
+    icon: BriefcaseBusiness,
+
   },
   {
     title: `${config?.plu_heading_reclamos}`,
-    url: "/owner/reclamos",
+    url: "/dashboard/owner/reclamos",
     icon: SquareCheck,
-    items: [
-      {
-        title: `Ver ${config?.plu_heading_reclamos}`,
-        url: "/owner/reclamos",
-      },
-      {
-        title: `Crear ${config?.sing_heading_reclamos}`,
-        url: "/owner/reclamos/create",
-      },
-      {
-        title: `Gestionar ${config?.sing_heading_reclamos}`,
-        url: "/owner/reclamos/manage",
-      },
-      {
-        title: ` ${config?.plu_heading_reclamos} por ${config?.sing_heading_profesional}`,
-        url: "/owner/reclamos/manage",
-      },
-      {
-        title: `Buscar  ${config?.sing_heading_reclamos}`,
-        url: "/owner/reclamos/buscar",
-      },
 
-    ],
   },
   {
     title: "Usuarios",
-    url: "/users",
+    url: "/dashboard/owner/users",
     icon: Users,
-    items: [
-      {
-        title: "Ver todos",
-        url: "/employees",
-      },
-      {
-        title: "Agregar Usuario",
-        url: "/employees/create",
-      },
-    ],
+
   },
   {
     title: `${config?.plu_heading_especialidad}`,
-    url: "/owner/especialidades",
+    url: "/dashboard/owner/especialidades",
     icon: Hammer,
-    items: [
-      {
-        title: `Ver ${config?.plu_heading_especialidad}`,
-        url: "/owner/especialidades",
-      },
-      {
-        title: `Crear ${config?.sing_heading_especialidad}`,
-        url: "/owner/especialidades/create",
-      },
 
-    ],
   },
   {
     title: `${config?.plu_heading_solicitante}`,
-    url: "/owner/clientess",
+    url: "/dashboard/owner/clientess",
     icon: Hammer,
-    items: [
-      {
-        title: `Ver ${config?.plu_heading_solicitante}`,
-        url: "/owner/clientes",
-      },
-      {
-        title: `Nuevo ${config?.sing_heading_solicitante}`,
-        url: "/owner/clientes/create",
-      },
 
-    ],
   },
 
 ];
@@ -105,7 +52,7 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
 export const ownerTeamData = (companyName: string): TeamData[] => [
   {
     name: companyName,
-    logo: Building2,
+    logo: BriefcaseBusiness,
     plan: "Owner",
   },
 ];
@@ -114,23 +61,9 @@ export const ownerProjects: ProjectData[] = [
 
   {
     title: "Mensajes",
-    url: "/owner/mensajes",
+    url: "/dashboard/owner/mensajes",
     icon: Mail,
-    items: [
-      {
-        title: "Ver mensajes",
-        url: "/owner/mensajes",
-      },
-      {
-        title: "Crear mensaje empresa",
-        url: "/owner/mensajes/all",
-      },
-      {
-        title: "Crear mensaje usuario",
-        url: "/owner/mensajes/crear-mensaje-usuario",
-      },
 
-    ],
   },
 
 

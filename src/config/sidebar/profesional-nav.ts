@@ -1,5 +1,5 @@
 import {
-
+  House,
   Mail,
   SquareCheck,
 } from "lucide-react";
@@ -9,17 +9,17 @@ import { CompanyConfigData } from "@/types/company";
 
 export const getProfesionalNavItems = (config: CompanyConfigData | null): NavItem[] => [
   {
+    title: "Inicio",
+    url: "/dashboard/profesional",
+    icon: House,
+
+  },
+  {
     title: `${config?.plu_heading_reclamos}`,
     url: "/reclamos",
     icon: SquareCheck,
     isActive: true,
-    items: [
-      {
-        title: `Ver ${config?.plu_heading_reclamos}`,
-        url: "/reclamos/mis-reclamos",
-      },
 
-    ],
   },
 ];
 
