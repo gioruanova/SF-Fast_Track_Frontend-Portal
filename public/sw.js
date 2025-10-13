@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fasttrack-pwa-v1';
+const CACHE_NAME = 'fasttrack-pwa-v2';
 
 // Recursos a cachear
 const urlsToCache = [
@@ -33,6 +33,18 @@ self.addEventListener('activate', (event) => {
 
 // Fetch: usamos estrategia "network first, fallback a cache"
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // NO cachear peticiones a la API (deben incluir cookies)
+  if (url.pathname.startsWith('/publicApi') || 
+      url.pathname.startsWith('/customersApi') || 
+      url.pathname.startsWith('/superApi') ||
+      url.hostname !== self.location.hostname) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
+  // Para otros recursos (estáticos), usar cache
   event.respondWith(
     fetch(event.request)
       .catch(() => caches.match(event.request))

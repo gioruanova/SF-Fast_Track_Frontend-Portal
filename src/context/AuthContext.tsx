@@ -105,28 +105,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const loginResponse = await apiClient.post(PUBLIC_API.LOGIN, loginData);
 
       if (loginResponse.data.success) {
-        const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
+        try {
+          const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
 
-        if (profileResponse.data && profileResponse.data.user_id) {
-          setUser(profileResponse.data);
+          if (profileResponse.data && profileResponse.data.user_id) {
+            setUser(profileResponse.data);
 
-          if (isCompanyUser(profileResponse.data)) {
-            await fetchCompanyConfig();
+            if (isCompanyUser(profileResponse.data)) {
+              await fetchCompanyConfig();
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            router.push("/dashboard");
+          } else {
+            throw new Error("No se pudieron obtener los datos del usuario");
           }
-
-          await new Promise(resolve => setTimeout(resolve, 100));
-          router.push("/dashboard");
-        } else {
-          throw new Error("No se pudieron obtener los datos del usuario");
+        } catch (profileErr) {
+          const profileError = profileErr as { response?: { status?: number; data?: { error?: string } } };
+          
+          if (profileError.response?.status === 401) {
+            throw new Error("Error de autenticación. Por favor, intenta nuevamente.");
+          } else if (profileError.response?.data?.error) {
+            throw new Error(profileError.response.data.error);
+          } else {
+            throw new Error("Error al obtener datos del usuario");
+          }
         }
       } else {
         throw new Error(loginResponse.data.message || "Error al iniciar sesión");
       }
     } catch (err) {
       const error = err as { message?: string; response?: { data?: { message?: string }; status?: number } };
-      let errorMessage = "Error al iniciar sesión";
+      let errorMessage = error.message || "Error al iniciar sesión";
 
-      if (error.message === "Network Error" || !error.response) {
+      if (error.message === "Network Error" || (!error.response && !error.message)) {
         errorMessage = "No se pudo conectar con el servidor. Verifica tu conexión.";
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
