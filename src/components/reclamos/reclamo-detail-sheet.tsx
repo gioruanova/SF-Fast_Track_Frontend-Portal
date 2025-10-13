@@ -166,7 +166,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-2xl overflow-y-auto">
+      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <span className={`h-3 w-3 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
