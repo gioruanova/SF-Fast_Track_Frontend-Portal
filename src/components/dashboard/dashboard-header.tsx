@@ -19,12 +19,13 @@ interface BreadcrumbItem {
 
 interface DashboardHeaderProps {
   breadcrumbs: BreadcrumbItem[];
+  rightContent?: React.ReactNode;
 }
 
-export function DashboardHeader({ breadcrumbs }: DashboardHeaderProps) {
+export function DashboardHeader({ breadcrumbs, rightContent }: DashboardHeaderProps) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 z-50 bg-sidebar md:bg-card border-b border-border">
-      <div className="flex items-center gap-2 px-4">
+      <div className="flex items-center gap-2 px-4 flex-1">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"
@@ -48,6 +49,11 @@ export function DashboardHeader({ breadcrumbs }: DashboardHeaderProps) {
             ))}
           </BreadcrumbList>
         </Breadcrumb>
+        {rightContent && (
+          <div className="ml-auto pr-4">
+            {rightContent}
+          </div>
+        )}
       </div>
     </header>
   );

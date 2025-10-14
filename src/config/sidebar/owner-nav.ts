@@ -30,6 +30,10 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
     icon: SquareCheck,
     items: [
       {
+        title: `Generar ${config?.sing_heading_reclamos}`,
+        url: "#",
+      },
+      {
         title: "En curso",
         url: "/dashboard/owner/trabajar-reclamos",
       },
@@ -55,7 +59,7 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
 
   {
     title: `${config?.plu_heading_solicitante}`,
-    url: "/dashboard/owner/clientess",
+    url: "/dashboard/owner/clientes",
     icon: Briefcase,
   },
 

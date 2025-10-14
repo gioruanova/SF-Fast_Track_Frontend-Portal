@@ -2,6 +2,7 @@
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { ProfesionalDashboard } from "@/components/dashboard/profesional/profesional-dashboard";
+import { GestionarEstadoDisponibilidad } from "@/components/features/shared/gestionar-estado-disponibilidad";
 import { useAuth } from "@/context/AuthContext";
 import { isCompanyUser } from "@/types/auth";
 
@@ -12,12 +13,16 @@ export default function ProfesionalDashboardPage() {
     return null;
   }
 
+  const isCompanyActive = user.company_status === 1;
+
   return (
     <>
-      <DashboardHeader breadcrumbs={[{ label: "Dashboard" }]} />
+      <DashboardHeader 
+        breadcrumbs={[{ label: "Dashboard" }]} 
+        rightContent={isCompanyActive ? <GestionarEstadoDisponibilidad /> : undefined}
+      />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">
-
         <ProfesionalDashboard user={user} />
       </div>
     </>

@@ -35,13 +35,12 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
               {user.company_name}
               <span className="text-muted-foreground">•</span>
               <span className="flex items-center gap-1.5">
-              Estado Suscripcion:
+                Estado Suscripcion:
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold uppercase ${
-                    isCompanyActive
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold uppercase ${isCompanyActive
                       ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                       : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}
+                    }`}
                 >
                   {isCompanyActive ? 'Activa' : 'Inactiva'}
                 </span>
@@ -49,6 +48,7 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
             </CardDescription>
           </CardHeader>
         </Card>
+
 
         {isCompanyActive ? (
           <>

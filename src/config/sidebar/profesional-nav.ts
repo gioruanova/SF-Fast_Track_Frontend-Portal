@@ -59,7 +59,7 @@ export const profesionalProjects: ProjectData[] = [
 
   {
     title: "Tutoriales",
-    url: "/dashboard/owner/tutoriales",
+    url: "/dashboard/profesional/tutoriales",
     icon: GraduationCap,
   },
 ];

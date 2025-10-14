@@ -23,7 +23,11 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
     icon: SquareCheck,
     items: [
       {
-        title:  "En curso",
+        title: `Generar ${config?.sing_heading_reclamos}`,
+        url: "#",
+      },
+      {
+        title: "En curso",
         url: "/dashboard/operador/trabajar-reclamos",
       },
       {
@@ -44,7 +48,7 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
   },
   {
     title: `${config?.plu_heading_solicitante}`,
-    url: "/dashboard/owner/clientess",
+    url: "/dashboard/operador/clientes",
     icon: Briefcase,
 
   },

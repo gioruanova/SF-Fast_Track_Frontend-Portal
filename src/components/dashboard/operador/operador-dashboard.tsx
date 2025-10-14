@@ -49,6 +49,7 @@ export function OperadorDashboard({ user }: OperadorDashboardProps) {
           </CardHeader>
         </Card>
 
+
         {isCompanyActive ? (
           <>
             <CompanyStatsOverview />

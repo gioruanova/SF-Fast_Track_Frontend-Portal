@@ -340,7 +340,7 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
                   />
                 </div>
 
-                <div>
+                <div className="gap-2 flex flex-col">
                   <Label htmlFor="limite_especialidades">Límite Especialidades</Label>
                   <Input
                     id="limite_especialidades"
