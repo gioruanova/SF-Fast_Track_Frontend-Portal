@@ -30,7 +30,13 @@ export default function LoginPage() {
           width={1920}
           height={1080}
         />
-      
+
+        // TODO: Quitar esto para produccion
+        <h1 className="text-8xl font-bold text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col italic" style={{ textShadow: '2px 2px 8px indigo' }}>
+          <span className="font-bold">Fast</span>
+          <span className="font-normal">Track</span>
+        </h1>
+        // TODO: {/* Quitar esto para produccion */}
       </div>
     </div>
   );
