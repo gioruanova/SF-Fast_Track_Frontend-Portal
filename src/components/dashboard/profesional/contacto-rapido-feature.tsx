@@ -203,7 +203,7 @@ export function ContactoRapido({
                                                             target={method.label === "Email" ? undefined : "_blank"}
                                                             rel="noopener noreferrer"
                                                         >
-                                                            <ExternalLink className="h-4 w-4 mr-1" />
+                                                            <ExternalLink className="h-4 w-4 mr-0" />
                                                             Contactar
                                                         </a>
                                                     </Button>

@@ -161,12 +161,12 @@ export function OwnerLogsActivity() {
           >
             {isCollapsed ? (
               <>
-                <ChevronDown className="h-4 w-4 mr-2" />
+                <ChevronDown className="h-4 w-4 mr-0" />
                 Expandir
               </>
             ) : (
               <>
-                <ChevronUp className="h-4 w-4 mr-2" />
+                <ChevronUp className="h-4 w-4 mr-0" />
                 Colapsar
               </>
             )}
@@ -186,7 +186,7 @@ export function OwnerLogsActivity() {
                       size="sm"
                       onClick={handleMarkAllAsRead}
                     >
-                      <Check className="h-4 w-4 mr-2" />
+                      <Check className="h-4 w-4 mr-0" />
                       Marcar todo como leído
                     </Button>
                   )}
@@ -196,7 +196,7 @@ export function OwnerLogsActivity() {
                       size="sm"
                       onClick={handleMarkAllAsUnread}
                     >
-                      <X className="h-4 w-4 mr-2" />
+                      <X className="h-4 w-4 mr-0" />
                       Marcar todo como no leído
                     </Button>
                   )}
@@ -207,7 +207,7 @@ export function OwnerLogsActivity() {
                       onClick={() => setShowDeleteDialog(true)}
                       className="text-destructive hover:text-destructive bg-indigo-900 hover:bg-indigo-800"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
+                      <Trash2 className="h-4 w-4 mr-0" />
                       Borrar todos
                     </Button>
                   )}

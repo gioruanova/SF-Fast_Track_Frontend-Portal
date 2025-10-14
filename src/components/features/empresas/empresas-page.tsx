@@ -204,8 +204,8 @@ export function EmpresasPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <CardTitle className="text-2xl">Gestión de Empresas</CardTitle>
               <Button onClick={handleCreate}>
-                <Plus className="h-4 w-4 mr-2" />
-                Crear Empresa
+                <Plus className="h-4 w-4 mr-0" />
+                Nueva empresa
               </Button>
             </div>
           </CardHeader>

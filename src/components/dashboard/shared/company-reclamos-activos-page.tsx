@@ -225,7 +225,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                 {downloadingType === 'active' ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-4 w-4 mr-0" />
                 )}
                 En curso
               </Button>
@@ -238,7 +238,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                 {downloadingType === 'all' ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-4 w-4 mr-0" />
                 )}
                 Todos
               </Button>
@@ -352,7 +352,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                           size="sm"
                           onClick={() => handleViewDetails(reclamo)}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
+                          <Eye className="h-4 w-4 mr-0" />
                           Ver
                         </Button>
                       </TableCell>

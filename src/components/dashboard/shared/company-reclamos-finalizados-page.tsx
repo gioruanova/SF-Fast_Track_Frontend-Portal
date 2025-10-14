@@ -222,7 +222,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                 {downloadingType === 'inactive' ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-4 w-4 mr-0" />
                 )}
                 Cerrados/as
               </Button>
@@ -236,7 +236,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                 {downloadingType === 'all' ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-4 w-4 mr-0" />
                 )}
                 Todos
               </Button>
@@ -350,7 +350,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                           size="sm"
                           onClick={() => handleViewDetails(reclamo)}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
+                          <Eye className="h-4 w-4 mr-0" />
                           Ver
                         </Button>
                       </TableCell>

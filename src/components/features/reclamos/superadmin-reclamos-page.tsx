@@ -283,7 +283,7 @@ export function SuperadminReclamosPage() {
                           size="sm"
                           onClick={() => handleViewDetails(reclamo)}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
+                          <Eye className="h-4 w-4 mr-0" />
                           Ver
                         </Button>
                       </TableCell>

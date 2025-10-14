@@ -145,12 +145,12 @@ export function ReclamosChart() {
           >
             {isCollapsed ? (
               <>
-                <ChevronDown className="h-4 w-4 mr-2" />
+                <ChevronDown className="h-4 w-4 mr-0" />
                 Expandir
               </>
             ) : (
               <>
-                <ChevronUp className="h-4 w-4 mr-2" />
+                <ChevronUp className="h-4 w-4 mr-0" />
                 Colapsar
               </>
             )}

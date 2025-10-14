@@ -131,12 +131,12 @@ export function SuperadminUpcomingReclamos() {
           >
             {isCollapsed ? (
               <>
-                <ChevronDown className="h-4 w-4 mr-2" />
+                <ChevronDown className="h-4 w-4 mr-0" />
                 Expandir
               </>
             ) : (
               <>
-                <ChevronUp className="h-4 w-4 mr-2" />
+                <ChevronUp className="h-4 w-4 mr-0" />
                 Colapsar
               </>
             )}
@@ -249,7 +249,7 @@ export function SuperadminUpcomingReclamos() {
                           variant="default"
                           onClick={() => handleOpenSheet(reclamo)}
                         >
-                          <Eye className="h-4 w-4 mr-2" />
+                          <Eye className="h-4 w-4 mr-0" />
                           Ver Detalle
                         </Button>
                       </div>
