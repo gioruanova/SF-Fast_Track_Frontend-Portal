@@ -133,7 +133,29 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
       onClose();
     } catch (error) {
       console.error("Error actualizando reclamo:", error);
-      toast.error("Error al actualizar el reclamo");
+      
+      if (axios.isAxiosError(error) && error.response) {
+        const errorMessage = error.response.data?.error || error.response.data?.message;
+        const status = error.response.status;
+
+        if (status === 400) {
+          if (errorMessage?.includes('nota de cierre') || errorMessage?.includes('nota es necesaria')) {
+            toast.error("La nota de cierre es requerida para este estado.");
+          } else if (errorMessage?.includes('ya esta cerrado')) {
+            toast.error("Este reclamo ya está cerrado y no puede ser modificado.");
+          } else {
+            toast.error(errorMessage || "Datos inválidos. Verifica la información.");
+          }
+        } else if (status === 404) {
+          toast.error("El reclamo no fue encontrado o no tienes acceso a él.");
+        } else if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+        } else {
+          toast.error(errorMessage || "Error al actualizar el reclamo.");
+        }
+      } else {
+        toast.error("Error de conexión. Verifica tu conexión a internet.");
+      }
     } finally {
       setIsSubmitting(false);
     }

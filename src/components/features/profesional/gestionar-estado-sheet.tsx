@@ -46,7 +46,20 @@ export function GestionarEstadoSheet() {
             setEstado(response.data === true);
         } catch (error) {
             console.error("Error obteniendo estado:", error);
-            toast.error("Error al obtener el estado");
+            
+            if (axios.isAxiosError(error) && error.response) {
+                const status = error.response.status;
+                
+                if (status === 500) {
+                    toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+                } else if (status === 404) {
+                    toast.error("No se pudo obtener tu estado actual.");
+                } else {
+                    toast.error("Error al obtener el estado.");
+                }
+            } else {
+                toast.error("Error de conexión. Verifica tu conexión a internet.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -66,7 +79,27 @@ export function GestionarEstadoSheet() {
             toast.success(newValue ? "Ahora estás habilitado para recibir reclamos" : "Ahora estás deshabilitado para recibir reclamos");
         } catch (error) {
             console.error("Error cambiando estado:", error);
-            toast.error("Error al cambiar el estado");
+            
+            if (axios.isAxiosError(error) && error.response) {
+                const errorMessage = error.response.data?.error || error.response.data?.message;
+                const status = error.response.status;
+
+                if (status === 400) {
+                    if (errorMessage?.includes('ya estaba habilitado')) {
+                        toast.error("Ya estás habilitado para recibir trabajos.");
+                    } else if (errorMessage?.includes('ya estaba deshabilitado')) {
+                        toast.error("Ya estás deshabilitado para recibir trabajos.");
+                    } else {
+                        toast.error(errorMessage || "No se pudo cambiar el estado.");
+                    }
+                } else if (status === 500) {
+                    toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+                } else {
+                    toast.error(errorMessage || "Error al cambiar el estado.");
+                }
+            } else {
+                toast.error("Error de conexión. Verifica tu conexión a internet.");
+            }
         } finally {
             setIsSwitching(false);
         }

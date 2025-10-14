@@ -72,7 +72,18 @@ export function OwnerLogsActivity() {
       toast.success("Logs marcados como leídos");
     } catch (error) {
       console.error("Error marcando logs como leídos:", error);
-      toast.error("Error al marcar logs como leídos");
+      
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        
+        if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+        } else {
+          toast.error("Error al marcar logs como leídos.");
+        }
+      } else {
+        toast.error("Error de conexión. Verifica tu conexión a internet.");
+      }
     }
   };
 
@@ -83,7 +94,18 @@ export function OwnerLogsActivity() {
       toast.success("Logs marcados como no leídos");
     } catch (error) {
       console.error("Error marcando logs como no leídos:", error);
-      toast.error("Error al marcar logs como no leídos");
+      
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        
+        if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+        } else {
+          toast.error("Error al marcar logs como no leídos.");
+        }
+      } else {
+        toast.error("Error de conexión. Verifica tu conexión a internet.");
+      }
     }
   };
 
@@ -95,7 +117,18 @@ export function OwnerLogsActivity() {
       setShowDeleteDialog(false);
     } catch (error) {
       console.error("Error eliminando logs:", error);
-      toast.error("Error al eliminar los logs");
+      
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        
+        if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+        } else {
+          toast.error("Error al eliminar los logs.");
+        }
+      } else {
+        toast.error("Error de conexión. Verifica tu conexión a internet.");
+      }
     }
   };
 

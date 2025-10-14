@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Lock, Unlock, Search } from "lucide-react";
+import { Plus, Edit, Lock, Unlock, Search, X } from "lucide-react";
 import { EmpresaFormSheet } from "@/components/features/empresas/empresa-form-sheet";
 import {
   AlertDialog,
@@ -154,7 +154,21 @@ export function EmpresasPage() {
       setCompanyToToggle(null);
     } catch (error) {
       console.error("Error cambiando estado:", error);
-      toast.error("Error al cambiar el estado de la empresa");
+      
+      if (axios.isAxiosError(error) && error.response) {
+        const errorMessage = error.response.data?.error || error.response.data?.message;
+        const status = error.response.status;
+        
+        if (status === 404) {
+          toast.error("Empresa no encontrada.");
+        } else if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+        } else {
+          toast.error(errorMessage || "Error al cambiar el estado de la empresa.");
+        }
+      } else {
+        toast.error("Error de conexión. Verifica tu conexión a internet.");
+      }
     }
   };
 
@@ -204,17 +218,28 @@ export function EmpresasPage() {
                   placeholder="Buscar por nombre o ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 pr-9"
                 />
+                {searchTerm && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-muted"
+                    onClick={() => setSearchTerm("")}
+                    title="Limpiar búsqueda"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
               <Select value={filterEstado} onValueChange={setFilterEstado}>
-                <SelectTrigger className="w-full md:w-[200px]">
+                <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
                   <SelectValue placeholder="Filtrar por estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="active">Activas</SelectItem>
-                  <SelectItem value="inactive">Inactivas</SelectItem>
+                  <SelectItem value="all" className="cursor-pointer">Todas</SelectItem>
+                  <SelectItem value="active" className="cursor-pointer">Activas</SelectItem>
+                  <SelectItem value="inactive" className="cursor-pointer">Inactivas</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -226,9 +251,9 @@ export function EmpresasPage() {
                     <TableHead className="w-[60px]">ID</TableHead>
                     <TableHead className="min-w-[140px]">CUIT/CUIL</TableHead>
                     <TableHead className="min-w-[200px]">Empresa</TableHead>
-                    <TableHead className="w-[110px]">Estado</TableHead>
+                    <TableHead className="w-[110px] text-center">Estado</TableHead>
                     <TableHead className="hidden md:table-cell w-[80px] text-center">Usuarios</TableHead>
-                    <TableHead className="w-[140px] text-right">Acciones</TableHead>
+                    <TableHead className="w-[140px] text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -258,9 +283,9 @@ export function EmpresasPage() {
                             </a>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
+                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
                               company.company_estado === 1
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                 : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -272,8 +297,8 @@ export function EmpresasPage() {
                         <TableCell className="hidden md:table-cell text-center font-medium">
                           {userCounts[company.company_id] || 0}
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                        <TableCell className="text-center">
+                          <div className="flex justify-center gap-2">
                             <Button
                               size="sm"
                               variant="outline"

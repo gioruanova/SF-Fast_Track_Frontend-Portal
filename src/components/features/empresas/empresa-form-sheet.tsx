@@ -189,25 +189,27 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
 
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error guardando empresa:", error);
       
       if (axios.isAxiosError(error) && error.response) {
-        const errorMessage = error.response.data?.message || error.response.data?.error;
-        
-        if (errorMessage && (
-          errorMessage.toLowerCase().includes('unique') || 
-          errorMessage.toLowerCase().includes('duplicate') ||
-          errorMessage.toLowerCase().includes('ya existe') ||
-          errorMessage.toLowerCase().includes('already exists')
-        )) {
-          toast.error("El CUIT/CUIL ingresado ya está registrado. Por favor, ingresa uno diferente.");
-        } else if (error.response.status === 400) {
-          toast.error(errorMessage || "Datos inválidos. Verifica la información ingresada.");
-        } else if (error.response.status === 409) {
-          toast.error("El CUIT/CUIL ya está en uso por otra empresa.");
+        const errorMessage = error.response.data?.error || error.response.data?.message;
+        const status = error.response.status;
+
+        if (status === 409) {
+          if (errorMessage?.includes('company_unique_id')) {
+            toast.error("El CUIT/CUIL ingresado ya está registrado en otra empresa.");
+          } else if (errorMessage?.includes('email')) {
+            toast.error("El email ingresado ya está registrado en otra empresa.");
+          } else {
+            toast.error(errorMessage || "Ya existe un registro con estos datos.");
+          }
+        } else if (status === 400) {
+          toast.error(errorMessage || "Todos los campos son requeridos. Verifica la información.");
+        } else if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
         } else {
-          toast.error("Error al guardar la empresa. Intenta nuevamente.");
+          toast.error(errorMessage || "Error al guardar la empresa.");
         }
       } else {
         toast.error("Error de conexión. Verifica tu conexión a internet.");

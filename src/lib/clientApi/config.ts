@@ -9,7 +9,7 @@ export const CLIENT_API = {
   GET_LOGS: `${config.apiUrl}/${slugs.customersApi}/globalLogs`, // trae todos los logs
   LOGS_READ: `${config.apiUrl}/${slugs.customersApi}/globalLogs/read`, // marca logs  como leidos
   LOGS_NOT_READ: `${config.apiUrl}/${slugs.customersApi}/globalLogs/unread`, // marca logs  como no leidos
-  LOG_DELETE: `${config.apiUrl}/${slugs.customersApi}/globalLogs/globalLogs`, // elimina logs
+  LOG_DELETE: `${config.apiUrl}/${slugs.customersApi}/globalLogs`, // elimina logs
   
   
   // Gestion de reclamos owner/operador
