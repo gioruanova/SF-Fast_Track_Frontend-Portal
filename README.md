@@ -1,5 +1,5 @@
 <!-- Banner principal -->
-<h1 align="center" style="color:#1a73e8; font-size:3rem;">🚀 Fast Track Frontend</h1>
+<h1 align="center" style="color:#1a73e8; font-size:3rem;">🚀 Fast Track Frontend - Portal Clientes</h1>
 <p align="center"><b>Aplicación web para gestión de incidencias y tareas</b></p>
 <p align="center">Proyecto Seminario Final de Carrera</p>
 <p align="center">Autor: <b>Jorge Ruanova</b></p>
@@ -7,7 +7,7 @@
 <hr/>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.0-blue" />
+  <img src="https://img.shields.io/badge/version-2.0.5-blue" />
   <img src="https://img.shields.io/badge/build-passing-brightgreen" />
   <br/>
   <a href="https://fastrack-portal.vercel.app/" target="_blank">
@@ -35,6 +35,9 @@ Aplicación web progresiva (PWA) para la gestión de incidencias y tareas, desar
 |-------------|----------------------------|
 | ![Radix UI](https://img.shields.io/badge/Radix_UI-161618?logo=radix-ui&logoColor=white) | Componentes accesibles headless |
 | ![shadcn/ui](https://img.shields.io/badge/shadcn/ui-000000?logo=shadcnui&logoColor=white) | Componentes reutilizables |
+| ![Sonner](https://img.shields.io/badge/Sonner-000000?logo=react&logoColor=white) | Toast notifications elegantes |
+| ![Recharts](https://img.shields.io/badge/Recharts-FF6B6B?logo=chart.js&logoColor=white) | Gráficos y visualización de datos |
+| ![Embla Carousel](https://img.shields.io/badge/Embla_Carousel-8B5CF6?logo=react&logoColor=white) | Carruseles y sliders |
 | ![Lucide Icons](https://img.shields.io/badge/Lucide-F56565?logo=lucide&logoColor=white) | Iconografía moderna |
 
 ### 📱 PWA & Funcionalidades
@@ -42,7 +45,7 @@ Aplicación web progresiva (PWA) para la gestión de incidencias y tareas, desar
 |-------------|----------------------------|
 | ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white) | Progressive Web App |
 | ![Service Worker](https://img.shields.io/badge/Service_Worker-4285F4?logo=google-chrome&logoColor=white) | Funcionalidad offline |
-| ![Web Manifest](https://img.shields.io/badge/Manifest-FF6F00?logo=web&logoColor=white) | Instalable en dispositivos |
+| ![Manifest](https://img.shields.io/badge/Manifest-FF6F00?logo=todoist&logoColor=white) | Instalable en dispositivos |
 
 ### 🔒 Gestión de estado y autenticación
 | Tecnología   | Descripción                |
