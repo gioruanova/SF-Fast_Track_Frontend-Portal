@@ -12,24 +12,49 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+
+  // Validación solo al enviar el formulario
+  const validateForm = () => {
+    const errors: { email?: string; password?: string } = {};
+
+    if (!formData.email.trim()) {
+      errors.email = "El email es requerido";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "El formato del email no es válido";
+    }
+
+    if (!formData.password.trim()) {
+      errors.password = "La contraseña es requerida";
+    } else if (formData.password.length < 6) {
+      errors.password = "La contraseña debe tener al menos 6 caracteres";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
+    // Validar formulario antes de enviar
+    if (!validateForm()) {
       return;
     }
 
     try {
       await login(formData.email, formData.password);
-    } catch (err) {
-      console.error("Login failed:", err);
+    } catch {
+      // El error ya se maneja en AuthContext, no necesitamos hacer nada aquí
     }
   };
 
@@ -39,6 +64,14 @@ export function LoginForm({
       ...prev,
       [name]: value,
     }));
+    
+    // Limpiar errores de validación cuando el usuario empiece a escribir
+    if (validationErrors[name as keyof typeof validationErrors]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
   };
 
   return (
@@ -50,12 +83,6 @@ export function LoginForm({
             Ingresa tus datos para comenzar a operar
           </p>
         </div>
-        
-        {error && (
-          <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
-            {error}
-          </div>
-        )}
         
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -69,7 +96,11 @@ export function LoginForm({
             autoComplete="email"
             required 
             disabled={isLoading}
+            className={validationErrors.email ? "border-destructive focus:border-destructive" : ""}
           />
+          {validationErrors.email && (
+            <p className="text-sm text-destructive mt-1">{validationErrors.email}</p>
+          )}
         </Field>
         
         <Field>
@@ -84,7 +115,7 @@ export function LoginForm({
               autoComplete="current-password"
               required 
               disabled={isLoading}
-              className="pr-10"
+              className={`pr-10 ${validationErrors.password ? "border-destructive focus:border-destructive" : ""}`}
             />
             <button
               type="button"
@@ -99,10 +130,18 @@ export function LoginForm({
               )}
             </button>
           </div>
+          {validationErrors.password && (
+            <p className="text-sm text-destructive mt-1">{validationErrors.password}</p>
+          )}
         </Field>
         
         <Field>
-          <Button type="submit" disabled={isLoading} className="relative" variant="default">
+          <Button 
+            type="submit" 
+            disabled={isLoading || Object.keys(validationErrors).length > 0 || !formData.email.trim() || !formData.password.trim()} 
+            className="relative" 
+            variant="default"
+          >
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

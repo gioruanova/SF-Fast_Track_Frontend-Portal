@@ -3,7 +3,7 @@ import { config, slugs } from "../config";
 export const SUPER_API = {
   GET_USERS: `${config.apiUrl}/${slugs.superApi}/users`, // traer todos los usuarios
   GET_COMPANIES: `${config.apiUrl}/${slugs.superApi}/companies`, // traer todas las empresas
-  GET_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades`, // traer todas las especialidades
+  
   GET_RECLAMOS: `${config.apiUrl}/${slugs.superApi}/reclamos`, // trae todos los reclamos
   GET_LOGS: `${config.apiUrl}/${slugs.superApi}/globalLogs`, // trae todos los logs
 
@@ -11,7 +11,14 @@ export const SUPER_API = {
   COMPANY_CREATE: `${config.apiUrl}/${slugs.superApi}/companies`, // POST crea una nueva empresa
   COMPANY_EDIT: `${config.apiUrl}/${slugs.superApi}/companies/{id}`, // PUT Edita una empresa
 
-  
+  // gestion especialidades
+  GET_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades`, // traer todas las especialidades
+  CREATE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades`, // crea una especialidad
+  EDIT_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/{id_especialidad}`, // edita una especialidad
+  ENABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/unblock/{especialidadId}`, // PUT activa una especialidad
+  DISABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/block/{especialidadId}`, // PUT desactiva una especialidad
+
+
 
   // Gestion de usuarios
   USERS_CREATE: `${config.apiUrl}/${slugs.superApi}/users`, // POST crea un usuario nuevo (requiere empresa)
@@ -52,5 +59,7 @@ export const SUPER_API = {
   // {
   //   "new_password":"789789"
   // }
+
+  //en este endpoint restore pongamoslo como "cambiar contraseña" y por default la contraseña sea autocompletada (visible) Fast + los ultimos 4 digitos del user_dni
 
 };

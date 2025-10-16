@@ -3,10 +3,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { toast } from "sonner";
 import { config } from "@/lib/config";
 import { PUBLIC_API } from "@/lib/publicApi/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
-import { User, LoginRequest, AuthContextType, isCompanyUser } from "@/types/auth";
+import { User, AuthContextType, isCompanyUser } from "@/types/auth";
 import { CompanyConfigData } from "@/types/company";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,7 +24,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [companyConfig, setCompanyConfig] = useState<CompanyConfigData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchCompanyConfig = async () => {
@@ -45,13 +45,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      setError(null);
 
       const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
 
-      if (profileResponse.data && profileResponse.data.user_id) {
+      if (profileResponse.data?.user_id) {
         setUser(profileResponse.data);
-
         if (isCompanyUser(profileResponse.data)) {
           await fetchCompanyConfig();
         }
@@ -60,26 +58,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       const error = err as { response?: { status?: number } };
+      
+      // Intentar refresh token si es error de autenticación
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         try {
           const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
-
+          
           if (refreshResponse.data.success) {
             await new Promise(resolve => setTimeout(resolve, 200));
-
-            try {
-              const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-
-              if (profileResponse.data && profileResponse.data.user_id) {
-                setUser(profileResponse.data);
-
-                if (isCompanyUser(profileResponse.data)) {
-                  await fetchCompanyConfig();
-                }
-              } else {
-                setUser(null);
+            const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
+            
+            if (profileResponse.data?.user_id) {
+              setUser(profileResponse.data);
+              if (isCompanyUser(profileResponse.data)) {
+                await fetchCompanyConfig();
               }
-            } catch {
+            } else {
               setUser(null);
             }
           } else {
@@ -96,59 +90,84 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Función auxiliar para manejo de errores
+  const getErrorMessage = (error: unknown): string => {
+    // Errores de validación del frontend (seguros) - no tienen response
+    const errorObj = error as { message?: string; response?: { data?: { code?: string }; status?: number }; code?: string };
+    
+    if (errorObj.message && !errorObj.response) {
+      return errorObj.message;
+    }
+
+    // Errores de red
+    if (errorObj.message === "Network Error" || (!errorObj.response && !errorObj.message)) {
+      return "No se pudo conectar con el servidor. Verifica tu conexión a internet.";
+    }
+
+    // Errores seguros del backend (códigos específicos)
+    const safeErrorCodes = ["MISSING_CREDENTIALS", "INVALID_EMAIL_FORMAT", "INVALID_PASSWORD_LENGTH", "VALIDATION_ERROR"];
+    if (errorObj.response?.data?.code && safeErrorCodes.includes(errorObj.response.data.code)) {
+      const errorMessages: Record<string, string> = {
+        "MISSING_CREDENTIALS": "Email y contraseña son requeridos",
+        "INVALID_EMAIL_FORMAT": "El formato del email no es válido",
+        "INVALID_PASSWORD_LENGTH": "La contraseña debe tener al menos 6 caracteres",
+        "VALIDATION_ERROR": "Datos ingresados inválidos"
+      };
+      return errorMessages[errorObj.response.data.code];
+    }
+
+    // Error 400 (datos inválidos) - seguro
+    if (errorObj.response?.status === 400) {
+      return "Datos de entrada inválidos";
+    }
+
+    // Error 401 (credenciales incorrectas) - mensaje específico pero seguro
+    if (errorObj.response?.status === 401) {
+      return "Credenciales incorrectas";
+    }
+
+    // Todos los demás errores son sensibles - mensaje genérico
+    return "Ha habido un error. Póngase en contacto con su administrador";
+  };
+
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      setError(null);
 
-      const loginData: LoginRequest = { email, password };
-      const loginResponse = await apiClient.post(PUBLIC_API.LOGIN, loginData);
+      // Validaciones del frontend
+      if (!email.trim()) throw new Error("El email es requerido");
+      if (!password.trim()) throw new Error("La contraseña es requerida");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("El formato del email no es válido");
+      if (password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres");
+
+      const loginResponse = await apiClient.post(PUBLIC_API.LOGIN, { email, password });
 
       if (loginResponse.data.success) {
         try {
           const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-
-          if (profileResponse.data && profileResponse.data.user_id) {
+          
+          if (profileResponse.data?.user_id) {
             setUser(profileResponse.data);
-
             if (isCompanyUser(profileResponse.data)) {
               await fetchCompanyConfig();
             }
-
             await new Promise(resolve => setTimeout(resolve, 100));
             router.push("/dashboard");
           } else {
-            throw new Error("No se pudieron obtener los datos del usuario");
+            throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
-        } catch (profileErr) {
-          const profileError = profileErr as { response?: { status?: number; data?: { error?: string } } };
-          
-          if (profileError.response?.status === 401) {
-            throw new Error("Error de autenticación. Por favor, intenta nuevamente.");
-          } else if (profileError.response?.data?.error) {
-            throw new Error(profileError.response.data.error);
-          } else {
-            throw new Error("Error al obtener datos del usuario");
-          }
+        } catch {
+          // Si falla el perfil, usar el mensaje genérico
+          throw new Error("Ha habido un error. Póngase en contacto con su administrador");
         }
       } else {
-        throw new Error(loginResponse.data.message || "Error al iniciar sesión");
+        throw new Error("Ha habido un error. Póngase en contacto con su administrador");
       }
     } catch (err) {
-      const error = err as { message?: string; response?: { data?: { message?: string }; status?: number } };
-      let errorMessage = error.message || "Error al iniciar sesión";
-
-      if (error.message === "Network Error" || (!error.response && !error.message)) {
-        errorMessage = "No se pudo conectar con el servidor. Verifica tu conexión.";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.status === 401) {
-        errorMessage = "Credenciales incorrectas";
-      } else if (error.response?.status === 500) {
-        errorMessage = "Error del servidor. Intenta más tarde.";
-      }
-
-      setError(errorMessage);
+      const errorMessage = getErrorMessage(err);
+      toast.error(errorMessage, {
+        position: "bottom-left",
+      });
       throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -160,12 +179,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await apiClient.get(PUBLIC_API.LOGOUT);
       setUser(null);
       setCompanyConfig(null);
-      setError(null);
       router.push("/login");
     } catch {
       setUser(null);
       setCompanyConfig(null);
-      setError(null);
       router.push("/login");
     }
   };
@@ -182,7 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     refreshCompanyConfig,
     isLoading,
-    error,
+    error: null, // Ya no usamos error state, solo toasts
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

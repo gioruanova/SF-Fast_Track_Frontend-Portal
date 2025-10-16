@@ -121,3 +121,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos personalizados para toasts de error */
+[data-sonner-toast][data-type="error"] {
+  background-color: #fca5a5 !important;
+  color: #7f1d1d !important;
+  border: 1px solid #fca5a5 !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-icon] {
+  color: #7f1d1d !important;
+}
+
+/* Estilos personalizados para toasts de success */
+[data-sonner-toast][data-type="success"] {
+  background-color: #86efac !important;
+  color: #14532d !important;
+  border: 1px solid #86efac !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-icon] {
+  color: #14532d !important;
+}

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Lock, Unlock, Search, X } from "lucide-react";
+import { Plus, Edit, Lock, Unlock, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { EmpresaFormSheet } from "@/components/features/empresas/empresa-form-sheet";
 import {
   AlertDialog,
@@ -59,9 +59,16 @@ interface CompanyData {
   reminder_manual: boolean;
 }
 
+interface UserCounts {
+  owners: number;
+  operadores: number;
+  profesionales: number;
+}
+
 export function EmpresasPage() {
   const [companies, setCompanies] = useState<CompanyData[]>([]);
-  const [userCounts, setUserCounts] = useState<Record<number, number>>({});
+  const [userCounts, setUserCounts] = useState<Record<number, UserCounts>>({});
+  const [especialidadesCounts, setEspecialidadesCounts] = useState<Record<number, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterEstado, setFilterEstado] = useState<string>("all");
@@ -69,13 +76,16 @@ export function EmpresasPage() {
   const [selectedCompany, setSelectedCompany] = useState<CompanyData | null>(null);
   const [showToggleDialog, setShowToggleDialog] = useState(false);
   const [companyToToggle, setCompanyToToggle] = useState<{ id: number; estado: number } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchCompanies = async () => {
     try {
       setIsLoading(true);
-      const [companiesRes, usersRes] = await Promise.all([
+      const [companiesRes, usersRes, especialidadesRes] = await Promise.all([
         apiClient.get(SUPER_API.GET_COMPANIES),
         apiClient.get(SUPER_API.GET_USERS),
+        apiClient.get(SUPER_API.GET_ESPECIALIDADES),
       ]);
 
       interface CompanyApiResponse {
@@ -101,13 +111,39 @@ export function EmpresasPage() {
 
       setCompanies(companiesData);
 
-      const counts: Record<number, number> = {};
-      usersRes.data.forEach((user: { company_id: number }) => {
-        if (user.company_id) {
-          counts[user.company_id] = (counts[user.company_id] || 0) + 1;
+      const counts: Record<number, UserCounts> = {};
+      
+      usersRes.data.forEach((user: { company_id: number; user_role: string }) => {
+        // Solo contar usuarios que tienen company_id y no son superadmin
+        if (user.company_id && user.user_role !== "superadmin") {
+          if (!counts[user.company_id]) {
+            counts[user.company_id] = { owners: 0, operadores: 0, profesionales: 0 };
+          }
+          
+          switch (user.user_role) {
+            case "owner":
+              counts[user.company_id].owners++;
+              break;
+            case "operador":
+              counts[user.company_id].operadores++;
+              break;
+            case "profesional":
+              counts[user.company_id].profesionales++;
+              break;
+          }
         }
       });
+      
       setUserCounts(counts);
+
+      // Contar especialidades por empresa
+      const especialidadesCounts: Record<number, number> = {};
+      especialidadesRes.data.forEach((especialidad: { company_id: number }) => {
+        if (especialidad.company_id) {
+          especialidadesCounts[especialidad.company_id] = (especialidadesCounts[especialidad.company_id] || 0) + 1;
+        }
+      });
+      setEspecialidadesCounts(especialidadesCounts);
     } catch (error) {
       console.error("Error obteniendo empresas:", error);
     } finally {
@@ -125,12 +161,23 @@ export function EmpresasPage() {
       .includes(searchTerm.toLowerCase()) ||
       company.company_id.toString().includes(searchTerm);
 
-    const matchesEstado = filterEstado === "all" ||
+    const matchesEstado = filterEstado === "all" || 
       (filterEstado === "active" && company.company_estado === 1) ||
       (filterEstado === "inactive" && company.company_estado === 0);
 
     return matchesSearch && matchesEstado;
   });
+
+  // Calcular paginado
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCompanies = filteredCompanies.slice(startIndex, endIndex);
+
+  // Resetear página cuando cambien los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterEstado]);
 
   const handleToggleEstado = (companyId: number, currentEstado: number) => {
     setCompanyToToggle({ id: companyId, estado: currentEstado });
@@ -252,19 +299,20 @@ export function EmpresasPage() {
                     <TableHead className="min-w-[140px]">CUIT/CUIL</TableHead>
                     <TableHead className="min-w-[200px]">Empresa</TableHead>
                     <TableHead className="w-[110px] text-center">Estado</TableHead>
-                    <TableHead className="hidden md:table-cell w-[80px] text-center">Usuarios</TableHead>
+                    <TableHead className="hidden md:table-cell w-[120px] text-start">Usuarios</TableHead>
+                    <TableHead className="hidden lg:table-cell w-[100px] text-center">Especialidades</TableHead>
                     <TableHead className="w-[140px] text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCompanies.length === 0 ? (
+                  {paginatedCompanies.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         No se encontraron empresas
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredCompanies.map((company) => (
+                    paginatedCompanies.map((company) => (
                       <TableRow key={company.company_id}>
                         <TableCell className="font-mono text-sm text-muted-foreground">
                           {company.company_id}
@@ -294,8 +342,31 @@ export function EmpresasPage() {
                             {company.company_estado === 1 ? 'Activa' : 'Inactiva'}
                           </span>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-center font-medium">
-                          {userCounts[company.company_id] || 0}
+                        <TableCell className="hidden md:table-cell text-center">
+                          <div className="flex flex-col gap-1 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Owners:</span>
+                              <span className="font-medium">{userCounts[company.company_id]?.owners || 0}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Operadores:</span>
+                              <span className="font-medium">{userCounts[company.company_id]?.operadores || 0}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Profesionales:</span>
+                              <span className="font-medium">{userCounts[company.company_id]?.profesionales || 0}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="font-medium text-lg">
+                              {especialidadesCounts[company.company_id] || 0}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              de {company.limite_especialidades}
+                            </span>
+                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex justify-center gap-2">
@@ -329,8 +400,48 @@ export function EmpresasPage() {
               </Table>
             </div>
 
-            <div className="text-sm text-muted-foreground">
-              Mostrando {filteredCompanies.length} de {companies.length} empresas
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Mostrando {startIndex + 1}-{Math.min(endIndex, filteredCompanies.length)} de {filteredCompanies.length} empresas
+              </div>
+              
+              {totalPages > 1 && (
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Anterior
+                  </Button>
+                  
+                  <div className="flex items-center space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Siguiente
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

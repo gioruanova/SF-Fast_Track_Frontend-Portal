@@ -6,7 +6,8 @@ import {
   House,
   Mail,
   GraduationCap,
-  Landmark
+  Landmark,
+  ShieldUser
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
@@ -27,11 +28,11 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
         url: "#",
       },
       {
-        title: "En curso",
+        title: `${config?.plu_heading_reclamos} en curso`,
         url: "/dashboard/operador/trabajar-reclamos",
       },
       {
-        title: "Ver Historial",
+        title: `Historial de ${config?.plu_heading_reclamos?.toLowerCase()}`,
         url: "/dashboard/operador/historial-reclamos",
       },
     ],
@@ -40,6 +41,12 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
     title: `${config?.plu_heading_especialidad}`,
     url: "/dashboard/operador/especialidades",
     icon: Wrench,
+  },
+  {
+    title: `${config?.plu_heading_profesional}`,
+    url: "/dashboard/operador/profesionales",
+    icon: ShieldUser,
+
   },
   {
     title: "Usuarios",

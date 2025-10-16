@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Search, X, Building2 } from "lucide-react";
+import { Eye, Search, X, Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detail-sheet";
 import { toast } from "sonner";
 import axios from "axios";
@@ -73,6 +73,8 @@ export function SuperadminReclamosPage() {
   const [filterCompany, setFilterCompany] = useState<string>("all");
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchData = useCallback(async () => {
     try {
@@ -125,6 +127,17 @@ export function SuperadminReclamosPage() {
 
     setFilteredReclamos(filtered);
   }, [searchTerm, filterEstado, filterCompany, reclamos]);
+
+  // Calcular paginado
+  const totalPages = Math.ceil(filteredReclamos.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
+
+  // Resetear página cuando cambien los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterEstado, filterCompany]);
 
   const handleViewDetails = (reclamo: ReclamoData) => {
     setSelectedReclamo(reclamo);
@@ -193,9 +206,9 @@ export function SuperadminReclamosPage() {
                 <SelectValue placeholder="Filtrar por estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="all" className="cursor-pointer">Todos los estados</SelectItem>
                 {estadosUnicos.map((estado) => (
-                  <SelectItem key={estado} value={estado}>
+                  <SelectItem key={estado} value={estado} className="cursor-pointer">
                     <div className="flex items-center gap-2">
                       <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado]}`}></span>
                       {estado}
@@ -211,9 +224,9 @@ export function SuperadminReclamosPage() {
                 <SelectValue placeholder="Filtrar por empresa" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las empresas</SelectItem>
+                <SelectItem value="all" className="cursor-pointer">Todas las empresas</SelectItem>
                 {empresasUnicas.map((empresa) => (
-                  <SelectItem key={empresa} value={empresa}>
+                  <SelectItem key={empresa} value={empresa} className="cursor-pointer">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-3 w-3" />
                       {empresa}
@@ -249,7 +262,7 @@ export function SuperadminReclamosPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReclamos.map((reclamo) => (
+                  {paginatedReclamos.map((reclamo) => (
                     <TableRow key={reclamo.reclamo_id}>
                       <TableCell className="font-medium">#{reclamo.reclamo_id}</TableCell>
                       <TableCell>
@@ -293,6 +306,51 @@ export function SuperadminReclamosPage() {
               </Table>
             </div>
           )}
+
+          {/* Información y controles de paginación */}
+          <div className="flex items-center justify-between mt-6">
+            <div className="text-sm text-muted-foreground">
+              Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} reclamos
+            </div>
+            
+            {totalPages > 1 && (
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </Button>
+                
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 

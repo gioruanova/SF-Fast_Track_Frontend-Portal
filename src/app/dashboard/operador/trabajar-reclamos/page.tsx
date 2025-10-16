@@ -18,7 +18,7 @@ export default function TrabajarReclamosPage() {
       <DashboardHeader 
         breadcrumbs={[
           { label: "Dashboard", href: "/dashboard/operador" },
-          { label: `Trabajar ${companyConfig?.plu_heading_reclamos || "Reclamos"}` }
+          { label: `${companyConfig?.plu_heading_reclamos || "Reclamos"} en curso` }
         ]} 
       />
       

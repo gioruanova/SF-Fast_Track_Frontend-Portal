@@ -348,8 +348,9 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                             key={estado.value}
                             value={estado.value}
                             disabled={estado.value === reclamo.reclamo_estado}
+                            className="cursor-pointer"
                           >
-                            <div className="flex items-center gap-2 cursor-pointer">
+                            <div className="flex items-center gap-2">
                               <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado.value]}`}></span>
                               {estado.label}
                               {estado.value === reclamo.reclamo_estado && " (Actual)"}
