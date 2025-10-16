@@ -8,7 +8,6 @@ import { isCompanyUser } from "@/types/auth";
 
 export default function TrabajarReclamosPage() {
   const { user, companyConfig } = useAuth();
-
   if (!user || !isCompanyUser(user) || user.user_role !== "owner") {
     return null;
   }

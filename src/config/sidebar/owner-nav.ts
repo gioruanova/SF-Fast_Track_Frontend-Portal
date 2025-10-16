@@ -36,11 +36,11 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
       },
       {
         title: `${config?.plu_heading_reclamos} en curso`,
-        url: "/dashboard/operador/trabajar-reclamos",
+        url: "/dashboard/owner/trabajar-reclamos",
       },
       {
         title: `Historial de ${config?.plu_heading_reclamos?.toLowerCase()}`,
-        url: "/dashboard/operador/historial-reclamos",
+        url: "/dashboard/owner/historial-reclamos",
       },
     ],
 

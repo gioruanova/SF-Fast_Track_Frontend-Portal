@@ -15,7 +15,11 @@ export default function OperadorLayout({
 
   useEffect(() => {
     if (!isLoading && user) {
-      if (!isCompanyUser(user) || user.user_role !== "operador") {
+      // Solo redirigir si estamos realmente en una ruta del operador
+      const currentPath = window.location.pathname;
+      const isOperadorRoute = currentPath.startsWith('/dashboard/operador');
+      
+      if (isOperadorRoute && (!isCompanyUser(user) || user.user_role !== "operador")) {
         router.replace("/dashboard");
       }
     }

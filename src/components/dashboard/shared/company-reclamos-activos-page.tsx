@@ -212,16 +212,16 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
   const estadosUnicos = Array.from(new Set(reclamos.map(r => r.reclamo_estado)));
 
   return (
-    <>
+    <div className="flex flex-1 flex-col gap-4">
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <CardTitle className="text-2xl">
-                {companyConfig?.plu_heading_reclamos || "Reclamos"} Activos
+                {companyConfig?.plu_heading_reclamos ?? "Reclamos"} Activos
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Gestiona todos los {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso
+                Gestiona todos los {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} en curso
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                 disabled={downloadingType !== null || reclamos.length === 0}
                 variant="default"
                 size="sm"
-                title={`Descargar reporte de ${companyConfig?.plu_heading_reclamos} en curso`}
+                title={`Descargar reporte de ${companyConfig?.plu_heading_reclamos ?? "Reclamos"} en curso`}
               >
                 {downloadingType === 'active' ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -430,7 +430,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
         userRole={userRole}
         onUpdate={handleUpdate}
       />
-    </>
+    </div>
   );
 }
 

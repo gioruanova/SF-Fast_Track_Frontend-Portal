@@ -208,16 +208,16 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
   const estadosUnicos = Array.from(new Set(reclamos.map(r => r.reclamo_estado)));
 
   return (
-    <>
+    <div className="flex flex-1 flex-col gap-4">
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <CardTitle className="text-2xl">
-                Historial de {companyConfig?.plu_heading_reclamos || "Reclamos"}
+                Historial de {companyConfig?.plu_heading_reclamos ?? "Reclamos"}
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Todos los {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} finalizados
+                Todos los {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} finalizados
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                 disabled={downloadingType !== null || reclamos.length === 0}
                 variant="default"
                 size="sm"
-                title={`Descargar reporte de ${companyConfig?.plu_heading_reclamos} ya finalizados/as`}
+                title={`Descargar reporte de ${companyConfig?.plu_heading_reclamos ?? "Reclamos"} ya finalizados/as`}
               >
                 {downloadingType === 'inactive' ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -428,7 +428,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
         userRole={userRole}
         onUpdate={handleUpdate}
       />
-    </>
+    </div>
   );
 }
 

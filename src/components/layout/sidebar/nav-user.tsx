@@ -1,9 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import {
   BadgeCheck,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
 } from "lucide-react"
 
@@ -28,10 +28,12 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthContext"
 import { isSuperAdmin, isCompanyUser } from "@/types/auth"
+import { UserProfileSheet } from "@/components/features/profile/user-profile-sheet"
 
 export function NavUser() {
   const { user, logout } = useAuth()
   const { isMobile } = useSidebar()
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   if (!user) return null
 
@@ -74,34 +76,15 @@ export function NavUser() {
   }
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg">
-                  {getInitials(getDisplayName())}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{getDisplayName()}</span>
-                <span className="truncate text-xs">{user.user_email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+    <>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarFallback className="rounded-lg">
                     {getInitials(getDisplayName())}
@@ -110,37 +93,56 @@ export function NavUser() {
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{getDisplayName()}</span>
                   <span className="truncate text-xs">{user.user_email}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {getRoleInfo()}
-                  </span>
                 </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Mi Perfil
-              </DropdownMenuItem>
-              {isCompanyUser(user) && (
-                <DropdownMenuItem >
-                  <CreditCard />
-                  Información de Empresa
+                <ChevronsUpDown className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
+            >
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarFallback className="rounded-lg">
+                      {getInitials(getDisplayName())}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{getDisplayName()}</span>
+                    <span className="truncate text-xs">{user.user_email}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {getRoleInfo()}
+                    </span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
+                  <BadgeCheck />
+                  Mi Perfil
                 </DropdownMenuItem>
-              )}
-              {/* <DropdownMenuItem>
-                <Bell />
-                Notificaciones
-              </DropdownMenuItem> */}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut />
-              Cerrar Sesión
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+                {/* <DropdownMenuItem>
+                  <Bell />
+                  Notificaciones
+                </DropdownMenuItem> */}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut />
+                Cerrar Sesión
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+
+      <UserProfileSheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+        <div />
+      </UserProfileSheet>
+    </>
   )
 }

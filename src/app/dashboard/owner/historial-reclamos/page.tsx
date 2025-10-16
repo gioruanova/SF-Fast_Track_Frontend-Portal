@@ -9,19 +9,21 @@ import { isCompanyUser } from "@/types/auth";
 export default function HistorialReclamosPage() {
   const { user, companyConfig } = useAuth();
 
+
+
   if (!user || !isCompanyUser(user) || user.user_role !== "owner") {
     return null;
   }
 
   return (
     <>
-      <DashboardHeader 
+      <DashboardHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/dashboard/owner" },
-          { label: `Historial ${companyConfig?.plu_heading_reclamos || "Reclamos"}` }
-        ]} 
+          { label: `Historial ${companyConfig?.plu_heading_reclamos ?? "Reclamos"}` }
+        ]}
       />
-      
+
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">
         <DashboardProvider>
           <CompanyReclamosFinalizadosPage userRole="owner" />
