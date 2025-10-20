@@ -53,9 +53,24 @@ export const CLIENT_API = {
   RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
 
 
-  UPDATE_COMPANY: `${config.apiUrl}/${slugs.customersApi}/company`, // PUT edita informacion parcial de la empresa (solo owner)
-  UPDATE_COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`, // PUT edita configuracion de la empresa
+  UPDATE_COMPANY: `${config.apiUrl}/${slugs.customersApi}/company`, 
+  UPDATE_COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
   FEEDBACK: `${config.apiUrl}/${slugs.customersApi}/platform/feedback`,
   COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
   ESTADO_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/workload/estado`,
+
+
+  DELETE_MENSAJE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/messages/{platform_message_id}`,
+  
+  CREATE_MENSAJE_PLATFORM_FOR_COMPANY: `${config.apiUrl}/${slugs.customersApi}/platform/messages`, 
+  CREATE_MENSAJE_PLATFORM_FOR_USER: `${config.apiUrl}/${slugs.customersApi}/platform/messages/user/{user_id}`, 
+  
+  GET_MESSAGES_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/messages`, 
+  DELETE_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/single-message/{platform_message_id}`, 
+  MARK_AS_READ_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/message/read/{specific_message_id}`,
+  MARK_AS_UNREAD_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/message/unread/{specific_message_id}`, 
+
+
+
+
 };

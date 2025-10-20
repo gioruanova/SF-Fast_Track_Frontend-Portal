@@ -164,7 +164,7 @@ export function PlatformMessagesManagement() {
                </SelectTrigger>
                <SelectContent>
                  <SelectItem value="all" className="cursor-pointer">Todos los usuarios</SelectItem>
-                 <SelectItem value="company" className="cursor-pointer">Usuarios de una empresa</SelectItem>
+                 <SelectItem value="company" className="cursor-pointer">Administradores de la empresa</SelectItem>
                  <SelectItem value="user" className="cursor-pointer">Usuario específico</SelectItem>
                </SelectContent>
              </Select>

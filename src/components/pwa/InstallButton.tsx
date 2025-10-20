@@ -58,7 +58,7 @@ export const InstallButton = () => {
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       await deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
+      await deferredPrompt.userChoice;
       setShowButton(false);
       setDeferredPrompt(null);
     } else if (isIOS || isMacSafari) {

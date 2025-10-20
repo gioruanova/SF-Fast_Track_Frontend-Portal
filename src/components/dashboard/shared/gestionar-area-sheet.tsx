@@ -103,7 +103,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       };
       
       
-      const response = await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
+      await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
       
       
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asignada correctamente`);
@@ -148,7 +148,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       const url = CLIENT_API.EDITAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
       
       
-      const response = await apiClient.put(url, payload);
+      await apiClient.put(url, payload);
       
       
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} actualizada correctamente`);
@@ -184,7 +184,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       const url = CLIENT_API.ELIMINAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
       
       
-      const response = await apiClient.delete(url);
+      await apiClient.delete(url);
       
       
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} eliminada correctamente`);

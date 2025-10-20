@@ -242,15 +242,6 @@ export function OwnerUsuariosPage() {
     return roleMapping[role] || role
   }
 
-  // mapear display name a role
-  const getRoleFromDisplayName = (displayName: string) => {
-    const displayMapping: Record<string, string> = {
-      [companyConfig?.sing_heading_operador || "Operador"]: "operador",
-      [companyConfig?.sing_heading_profesional || "Profesional"]: "profesional",
-      [companyConfig?.sing_heading_owner || "Owner"]: "owner"
-    }
-    return displayMapping[displayName] || displayName
-  }
 
   const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {

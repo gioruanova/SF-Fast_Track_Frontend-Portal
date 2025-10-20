@@ -19,6 +19,8 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useUnreadMessagesCount } from "@/hooks/useUnreadMessagesCount"
+import { NotificationBadge } from "@/components/ui/notification-badge"
 
 export function NavMain({
   items,
@@ -38,6 +40,7 @@ export function NavMain({
 }) {
   const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
+  const { unreadCount } = useUnreadMessagesCount();
 
   const handleNavigation = (url: string) => {
     router.push(url);
@@ -52,6 +55,12 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => {
           const hasSubItems = item.items && item.items.length > 0;
+          const isMessagesItem = item.title.toLowerCase().includes('mensaje') || item.url.includes('mensaje');
+          const isPlatformMessagesItem = item.title.toLowerCase().includes('plataforma') || item.url.includes('plataforma');
+          
+          // Para superadmin: solo mostrar badge en "Mensajes publicos", no en "Mensajes Plataforma"
+          // Para otros roles: mostrar badge en cualquier mensaje
+          const shouldShowBadge = isMessagesItem && unreadCount > 0 && !isPlatformMessagesItem;
 
           if (!hasSubItems) {
             return (
@@ -62,7 +71,8 @@ export function NavMain({
                   className="cursor-pointer"
                 >
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span className="flex-1">{item.title}</span>
+                  {shouldShowBadge && <NotificationBadge count={unreadCount} />}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             );
@@ -79,7 +89,8 @@ export function NavMain({
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title} className="cursor-pointer">
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    <span className="flex-1">{item.title}</span>
+                    {shouldShowBadge && <NotificationBadge count={unreadCount} />}
                     <ChevronRight className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>

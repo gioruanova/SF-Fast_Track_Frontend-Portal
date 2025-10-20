@@ -13,7 +13,6 @@ export default function ProfesionalesPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // si la empresa esta inactiva, redirigir al dashboard
     if (companyConfig?.company?.company_estado === 0) {
       router.push("/dashboard/operador");
     }
@@ -23,7 +22,6 @@ export default function ProfesionalesPage() {
     return null;
   }
 
-  // si la empresa esta inactiva, no renderizar nada
   if (companyConfig?.company?.company_estado === 0) {
     return null;
   }

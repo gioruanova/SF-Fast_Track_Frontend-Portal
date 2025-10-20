@@ -87,11 +87,17 @@ export function PublicMessagesManagement() {
         SUPER_API.READ_PUBLIC_MESSAGES.replace('{message_id}', messageId.toString())
       );
 
-      setMessages(prev =>
-        prev.map(msg =>
+      setMessages(prev => 
+        prev.map(msg => 
           msg.message_id === messageId ? { ...msg, message_read: 1 } : msg
         )
       );
+      
+      // Refrescar el contador del sidebar
+      if (typeof window !== 'undefined' && window.refreshUnreadCount) {
+        window.refreshUnreadCount();
+      }
+      
       toast.success('Mensaje marcado como leído');
     } catch (error) {
       console.error('Error marking as read:', error);
@@ -105,11 +111,17 @@ export function PublicMessagesManagement() {
         SUPER_API.UNREAD_PUBLIC_MESSAGES.replace('{message_id}', messageId.toString())
       );
 
-      setMessages(prev =>
-        prev.map(msg =>
+      setMessages(prev => 
+        prev.map(msg => 
           msg.message_id === messageId ? { ...msg, message_read: 0 } : msg
         )
       );
+      
+      // Refrescar el contador del sidebar
+      if (typeof window !== 'undefined' && window.refreshUnreadCount) {
+        window.refreshUnreadCount();
+      }
+      
       toast.success('Mensaje marcado como no leído');
     } catch (error) {
       console.error('Error marking as unread:', error);
@@ -124,6 +136,12 @@ export function PublicMessagesManagement() {
       );
 
       setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
+      
+      // Refrescar el contador del sidebar
+      if (typeof window !== 'undefined' && window.refreshUnreadCount) {
+        window.refreshUnreadCount();
+      }
+      
       toast.success('Mensaje eliminado correctamente');
     } catch (error) {
       console.error('Error deleting message:', error);

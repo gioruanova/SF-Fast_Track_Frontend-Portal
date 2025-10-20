@@ -1,22 +1,35 @@
 "use client";
-
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { ProfessionalPlatformMessagesManagement } from "@/components/dashboard/shared/professional-platform-messages-management";
 
 export default function ProfesionalMensajesPage() {
+  const { companyConfig } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (companyConfig?.company?.company_estado === 0) {
+      router.push("/dashboard/profesional");
+    }
+  }, [companyConfig, router]);
+
+
+  if (companyConfig?.company?.company_estado === 0) {
+    return null;
+  }
   return (
     <>
-      <DashboardHeader 
+      <DashboardHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/dashboard/profesional" },
           { label: "Mensajes" }
-        ]} 
+        ]}
       />
-      
+
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">
-        <div className="rounded-lg border bg-card p-8 text-center">
-          <h2 className="text-2xl font-semibold mb-2">Mensajes</h2>
-          <p className="text-muted-foreground">Aca el profesional va a poder ver todos sus mensajes y mensajes generales enviados por la empresa o la plataforma</p>
-        </div>
+        <ProfessionalPlatformMessagesManagement />
       </div>
     </>
   );
