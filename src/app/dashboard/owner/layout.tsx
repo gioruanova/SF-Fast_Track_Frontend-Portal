@@ -16,7 +16,7 @@ export default function OwnerLayout({
 
   useEffect(() => {
     if (!isLoading && user) {
-      // Solo redirigir si estamos realmente en una ruta del owner
+      // solo redirigir si estamos realmente en una ruta del owner
       const isOwnerRoute = pathname.startsWith('/dashboard/owner');
       
       if (isOwnerRoute && (!isCompanyUser(user) || user.user_role !== "owner")) {

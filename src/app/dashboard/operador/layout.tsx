@@ -16,7 +16,7 @@ export default function OperadorLayout({
 
   useEffect(() => {
     if (!isLoading && user) {
-      // Solo redirigir si estamos realmente en una ruta del operador
+      // solo redirigir si estamos realmente en una ruta del operador
       const isOperadorRoute = pathname.startsWith('/dashboard/operador');
       
       if (isOperadorRoute && (!isCompanyUser(user) || user.user_role !== "operador")) {

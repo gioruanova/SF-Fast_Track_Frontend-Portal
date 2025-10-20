@@ -10,13 +10,11 @@ export default function OwnerMensajesPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Si la empresa está inactiva, redirigir al dashboard
     if (companyConfig?.company?.company_estado === 0) {
       router.push("/dashboard/owner");
     }
   }, [companyConfig, router]);
 
-  // Si la empresa está inactiva, no renderizar nada
   if (companyConfig?.company?.company_estado === 0) {
     return null;
   }

@@ -88,7 +88,6 @@ function SidebarProvider({
     [setOpenProp, open]
   )
 
-  // Función para alternar el sidebar
   const toggleSidebar = React.useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
   }, [isMobile, setOpen, setOpenMobile])

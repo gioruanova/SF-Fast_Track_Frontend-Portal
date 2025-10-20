@@ -95,7 +95,6 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
     }
   }
 
-  // Función para mapear role a display name
   const getRoleDisplayName = (role: string) => {
     const roleMapping: Record<string, string> = {
       owner: companyConfig?.sing_heading_owner || "Owner",
