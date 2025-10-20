@@ -63,6 +63,11 @@ export const CLIENT_API = {
   RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
 
 
+  //gestion empresa (owner)
+  UPDATE_COMPANY: `${config.apiUrl}/${slugs.customersApi}/company`, // PUT edita informacion parcial de la empresa (solo owner)
+  UPDATE_COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`, // PUT edita configuracion de la empresa
+
+
   // General
   FEEDBACK: `${config.apiUrl}/${slugs.customersApi}/platform/feedback`,
   COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
