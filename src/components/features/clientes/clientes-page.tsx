@@ -36,6 +36,7 @@ interface ClientesPageProps {
 }
 
 export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
+  // userRole se usa para validación de tipos, la lógica de permisos se maneja en el layout
   const { companyConfig } = useAuth()
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -296,7 +297,8 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
 
   const totalPages = Math.ceil(filteredClientes.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedClientes = filteredClientes.slice(startIndex, startIndex + itemsPerPage)
+  const endIndex = startIndex + itemsPerPage
+  const paginatedClientes = filteredClientes.slice(startIndex, endIndex)
 
   return (
     <>
@@ -417,11 +419,12 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
               </Table>
 
               {/* Paginación */}
-              {totalPages > 1 && (
-                <div className="flex flex-col gap-4 mt-4">
-                  <p className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
-                    Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, filteredClientes.length)} de {filteredClientes.length} {companyConfig?.sing_heading_solicitante?.toLowerCase()}
-                  </p>
+              <div className="flex flex-col gap-4 mt-4">
+                <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
+                  Mostrando {startIndex + 1}-{Math.min(endIndex, filteredClientes.length)} de {filteredClientes.length} {companyConfig?.plu_heading_solicitante?.toLowerCase()}
+                </div>
+
+                {totalPages > 1 && (
                   <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
                     <Button
                       variant="outline"
@@ -431,10 +434,23 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                       className="text-xs md:text-sm px-2 md:px-3"
                     >
                       <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                      <span className="hidden sm:inline ml-1">Anterior</span>
                     </Button>
-                    <span className="text-xs md:text-sm px-2">
-                      Página {currentPage} de {totalPages}
-                    </span>
+
+                    <div className="flex flex-wrap items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
+                        >
+                          {page}
+                        </Button>
+                      ))}
+                    </div>
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -442,11 +458,12 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                       disabled={currentPage === totalPages}
                       className="text-xs md:text-sm px-2 md:px-3"
                     >
+                      <span className="hidden sm:inline mr-1">Siguiente</span>
                       <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
                     </Button>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
         </CardContent>

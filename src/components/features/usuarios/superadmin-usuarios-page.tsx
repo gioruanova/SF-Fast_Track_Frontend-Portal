@@ -358,7 +358,7 @@ export function SuperadminUsuariosPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all" className="cursor-pointer">Todos los roles</SelectItem>
-                <SelectItem value="owner" className="cursor-pointer">Propietarios</SelectItem>
+                <SelectItem value="owner" className="cursor-pointer">Owner</SelectItem>
                 <SelectItem value="operador" className="cursor-pointer">Operadores</SelectItem>
                 <SelectItem value="profesional" className="cursor-pointer">Profesionales</SelectItem>
               </SelectContent>
@@ -587,7 +587,7 @@ export function SuperadminUsuariosPage() {
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="owner" className="cursor-pointer">Propietario</SelectItem>
+                  <SelectItem value="owner" className="cursor-pointer">Owner</SelectItem>
                   <SelectItem value="operador" className="cursor-pointer">Operador</SelectItem>
                   <SelectItem value="profesional" className="cursor-pointer">Profesional</SelectItem>
                 </SelectContent>

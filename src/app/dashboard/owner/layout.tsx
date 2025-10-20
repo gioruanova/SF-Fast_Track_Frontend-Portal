@@ -23,7 +23,7 @@ export default function OwnerLayout({
         router.replace("/dashboard");
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router, pathname]);
 
   if (isLoading) {
     return (

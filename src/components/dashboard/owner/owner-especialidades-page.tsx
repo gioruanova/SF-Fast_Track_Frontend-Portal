@@ -250,9 +250,9 @@ export function OwnerEspecialidadesPage() {
                             onClick={() => handleToggleEstado(especialidad.id_especialidad, especialidad.estado_especialidad)}
                           >
                             {especialidad.estado_especialidad === 1 ? (
-                              <PowerOff className="h-4 w-4" />
+                              <PowerOff className="h-4 w-4 text-red-500" />
                             ) : (
-                              <Power className="h-4 w-4" />
+                              <Power className="h-4 w-4 text-green-500" />
                             )}
                           </Button>
                         </div>

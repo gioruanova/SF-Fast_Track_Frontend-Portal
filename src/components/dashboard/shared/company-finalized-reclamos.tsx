@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Calendar, User, Eye, ArrowRight } from "lucide-react";
@@ -52,18 +52,19 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  // Crear apiClient con la configuración correcta de autenticación
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  const fetchReclamos = async () => {
+  const fetchReclamos = useCallback(async () => {
     try {
       setIsLoading(true);
+      
+      // Crear cliente API dentro del callback para evitar dependencias
+      const apiClient = axios.create({
+        baseURL: config.apiUrl,
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
       const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
       setAllReclamos(response.data);
 
@@ -78,11 +79,11 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchReclamos();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, fetchReclamos]);
 
   const handleOpenSheet = (reclamo: ReclamoData) => {
     setSelectedReclamo(reclamo);

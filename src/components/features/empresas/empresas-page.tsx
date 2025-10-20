@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,18 +71,19 @@ export function EmpresasPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Crear apiClient con la configuración correcta de autenticación
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
       setIsLoading(true);
+      
+      // Crear cliente API dentro del callback para evitar dependencias
+      const apiClient = axios.create({
+        baseURL: config.apiUrl,
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
       const [companiesRes, usersRes, especialidadesRes] = await Promise.all([
         apiClient.get(SUPER_API.GET_COMPANIES),
         apiClient.get(SUPER_API.GET_USERS),
@@ -150,11 +151,11 @@ export function EmpresasPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCompanies();
-  }, []);
+  }, [fetchCompanies]);
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSearch = company.company_nombre
@@ -191,6 +192,15 @@ export function EmpresasPage() {
     try {
       const endpoint = SUPER_API.COMPANY_EDIT.replace("{id}", companyToToggle.id.toString());
       const newEstado = companyToToggle.estado === 1 ? false : true;
+
+      // Crear cliente API dentro de la función
+      const apiClient = axios.create({
+        baseURL: config.apiUrl,
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       await apiClient.put(endpoint, {
         company_estado: newEstado,
