@@ -6,9 +6,12 @@ const getApiUrl = () => {
   }
   
   // En el cliente, usar los valores del entorno
-  return process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" 
-    ? process.env.NEXT_PUBLIC_API_URL_DEV || 'http://localhost:3001'
-    : process.env.NEXT_PUBLIC_API_URL_PROD || 'http://localhost:3001';
+  if (process.env.NEXT_PUBLIC_ENVIRONMENT === "dev") {
+    return process.env.NEXT_PUBLIC_API_URL_DEV || 'http://localhost:3001';
+  }
+  
+  // En producción, usar rutas relativas (Vercel maneja los rewrites)
+  return '';
 };
 
 export const config = {
