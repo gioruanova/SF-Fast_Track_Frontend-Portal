@@ -1,5 +1,7 @@
 "use client";
+import { useEffect } from "react";
 
+import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardProvider } from "@/context/DashboardContext";
 import { CompanyProfesionalesPage } from "@/components/dashboard/shared/company-profesionales-page";
@@ -8,8 +10,20 @@ import { isCompanyUser } from "@/types/auth";
 
 export default function ProfesionalesPage() {
   const { user, companyConfig } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Si la empresa está inactiva, redirigir al dashboard
+    if (companyConfig?.company?.company_estado === 0) {
+      router.push("/dashboard/owner");
+    }
+  }, [companyConfig, router]);
 
   if (!user || !isCompanyUser(user) || user.user_role !== "owner") {
+    return null;
+  }
+
+  if (companyConfig?.company?.company_estado === 0) {
     return null;
   }
 

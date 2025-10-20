@@ -29,7 +29,6 @@ interface User {
   updated_at: string
 }
 
-// Interfaces eliminadas ya que no se usan
 
 export function OperadorUsuariosPage() {
   const { companyConfig, user } = useAuth()
@@ -41,7 +40,7 @@ export function OperadorUsuariosPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  // Estados para sheets
+  // estados para sheets
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false)
   const [isPasswordSheetOpen, setIsPasswordSheetOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -71,7 +70,7 @@ export function OperadorUsuariosPage() {
     try {
       setIsLoading(true)
       const response = await apiClient.get(CLIENT_API.GET_USERS)
-      // Filtrar operadores y profesionales (no owners)
+      // filtrar operadores y profesionales (no owners)
       const usuariosPermitidos = (response.data || []).filter((user: User) => 
         user.user_role === "profesional" || user.user_role === "operador"
       )
@@ -149,7 +148,7 @@ export function OperadorUsuariosPage() {
       user_dni: user.user_dni,
       user_phone: user.user_phone,
       user_email: user.user_email,
-      user_role: "profesional", // Siempre profesional al editar (no se puede cambiar)
+      user_role: "profesional", // siempre profesional al editar (no se puede cambiar)
       user_password: ""
     })
     setIsUserSheetOpen(true)
@@ -164,7 +163,7 @@ export function OperadorUsuariosPage() {
           user_dni: userFormData.user_dni,
           user_phone: userFormData.user_phone,
           user_email: userFormData.user_email
-          // No incluir user_role ni user_password si está vacío
+          // no incluir user_role ni user_password si esta vacio
         }
         if (userFormData.user_password) {
           editData.user_password = userFormData.user_password
@@ -204,7 +203,7 @@ export function OperadorUsuariosPage() {
   }
 
   const filteredUsers = users.filter(userItem => {
-    // Excluir el usuario logueado
+    // excluir el usuario logueado
     if (user && userItem.user_id === user.user_id) {
       return false
     }
@@ -226,7 +225,7 @@ export function OperadorUsuariosPage() {
   const endIndex = startIndex + itemsPerPage
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
 
-  // Función para mapear role a display name
+  // funcion para mapear role a display name
   const getRoleDisplayName = (role: string) => {
     const roleMapping: Record<string, string> = {
       operador: companyConfig?.sing_heading_operador || "Operador",

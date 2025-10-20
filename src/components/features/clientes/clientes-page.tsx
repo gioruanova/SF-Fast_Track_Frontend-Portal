@@ -36,7 +36,7 @@ interface ClientesPageProps {
 }
 
 export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
-  // userRole se usa para validación de tipos, la lógica de permisos se maneja en el layout
+  // userrole se usa para validacion de tipos, la logica de permisos se maneja en el layout
   const { companyConfig } = useAuth()
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -44,7 +44,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  // Configurar cliente API
+  // configurar cliente api
   const apiClient = axios.create({
     baseURL: config.apiUrl,
     withCredentials: true,
@@ -53,7 +53,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
     },
   })
 
-  // Estados de modales
+  // estados de modales
   const [isClienteSheetOpen, setIsClienteSheetOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
@@ -118,7 +118,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   }
 
   const handleSaveCliente = async () => {
-    // Validar campos requeridos
+    // validar campos requeridos
     if (!clienteFormData.cliente_complete_name ||
       !clienteFormData.cliente_dni ||
       !clienteFormData.cliente_phone ||
@@ -127,7 +127,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
       return
     }
 
-    // Validar domicilio si es requerido
+    // validar domicilio si es requerido
     if (companyConfig?.requiere_domicilio) {
       if (!clienteFormData.cliente_direccion ||
         clienteFormData.cliente_lat === 0 ||
@@ -139,10 +139,10 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
 
     try {
       if (isEditing && editingCliente) {
-        // Solo campos modificados
+        // solo campos modificados
         const updateData: Partial<typeof clienteFormData> = {}
         
-        // Comparar con datos originales
+        // comparar con datos originales
         if (clienteFormData.cliente_complete_name !== editingCliente.cliente_complete_name) {
           updateData.cliente_complete_name = clienteFormData.cliente_complete_name
         }
@@ -165,7 +165,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
           updateData.cliente_lng = clienteFormData.cliente_lng
         }
 
-        // Solo enviar si hay cambios
+        // solo enviar si hay cambios
         if (Object.keys(updateData).length > 0) {
           await apiClient.put(CLIENT_API.UPDATE_CLIENTE.replace('{cliente_id}', editingCliente.cliente_id.toString()), updateData)
           toast.success(`${companyConfig?.sing_heading_solicitante} actualizado correctamente`)
@@ -192,16 +192,16 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   const handleToggleClienteStatus = async (cliente: Cliente) => {
     try {
       if (cliente.cliente_active) {
-        // Desactivar cliente
+        // desactivar cliente
         await apiClient.put(CLIENT_API.DESACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString()))
         toast.success(`${companyConfig?.sing_heading_solicitante} desactivado correctamente`)
       } else {
-        // Activar cliente
+        // activar cliente
         await apiClient.put(CLIENT_API.ACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString()))
         toast.success(`${companyConfig?.sing_heading_solicitante} activado correctamente`)
       }
       
-      // Recargar la lista de clientes
+      // recargar la lista de clientes
       fetchClientes()
     } catch (error: unknown) {
       const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
@@ -565,7 +565,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                   <div className="mt-2 w-full h-32 border rounded-lg overflow-hidden">
                     <OSMMapSelector
                       key={`${clienteFormData.cliente_lat}-${clienteFormData.cliente_lng}`}
-                      onLocationSelect={() => { }} // No hacer nada, solo mostrar
+                      onLocationSelect={() => { }} // no hacer nada, solo mostrar
                       initialPosition={[clienteFormData.cliente_lat, clienteFormData.cliente_lng]}
                       readOnly={true}
                       height="128px"

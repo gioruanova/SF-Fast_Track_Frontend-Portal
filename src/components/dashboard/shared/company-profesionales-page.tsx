@@ -77,7 +77,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
       setIsLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_USERS);
       
-      // Filtrar solo profesionales
+      // filtrar solo profesionales
       const profesionalesData = response.data.filter((user: ProfesionalData) => 
         user.user_role === "profesional"
       );
@@ -107,13 +107,13 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
     return matchesSearch && matchesEstado;
   });
 
-  // Calcular paginado
+  // calcular paginado
   const totalPages = Math.ceil(filteredProfesionales.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedProfesionales = filteredProfesionales.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);

@@ -23,7 +23,7 @@ export function LoginForm({
     password?: string;
   }>({});
 
-  // Validación solo al enviar el formulario
+  // validacion solo al enviar el formulario
   const validateForm = () => {
     const errors: { email?: string; password?: string } = {};
 
@@ -46,7 +46,7 @@ export function LoginForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validar formulario antes de enviar
+    // validar formulario antes de enviar
     if (!validateForm()) {
       return;
     }
@@ -54,7 +54,7 @@ export function LoginForm({
     try {
       await login(formData.email, formData.password);
     } catch {
-      // El error ya se maneja en AuthContext, no necesitamos hacer nada aquí
+      // el error ya se maneja en authcontext, no necesitamos hacer nada aca
     }
   };
 
@@ -65,7 +65,7 @@ export function LoginForm({
       [name]: value,
     }));
     
-    // Limpiar errores de validación cuando el usuario empiece a escribir
+    // limpiar errores de validacion cuando el usuario empiece a escribir
     if (validationErrors[name as keyof typeof validationErrors]) {
       setValidationErrors(prev => ({
         ...prev,

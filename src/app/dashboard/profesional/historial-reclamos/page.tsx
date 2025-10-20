@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardProvider } from "@/context/DashboardContext";
 import { useAuth } from "@/context/AuthContext";
@@ -8,8 +10,21 @@ import { ProfesionalReclamosFinalizadosPage } from "@/components/dashboard/profe
 
 export default function HistorialReclamosPage() {
   const { user, companyConfig } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Si la empresa está inactiva, redirigir al dashboard
+    if (companyConfig?.company?.company_estado === 0) {
+      router.push("/dashboard/profesional");
+    }
+  }, [companyConfig, router]);
 
   if (!user || !isCompanyUser(user) || user.user_role !== "profesional") {
+    return null;
+  }
+
+  // Si la empresa está inactiva, no renderizar nada
+  if (companyConfig?.company?.company_estado === 0) {
     return null;
   }
 

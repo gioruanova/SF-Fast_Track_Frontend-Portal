@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import InstallIcon from "./InstallIcon";
 import { InstallInstructionsModal } from "./InstallInstructionsModal";
-// import { useSearchParams } from "next/navigation";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -12,12 +11,11 @@ type BeforeInstallPromptEvent = Event & {
 
 declare global {
   interface Navigator {
-    standalone?: boolean; // solo iOS
+    standalone?: boolean; // solo ios
   }
 }
 
 export const InstallButton = () => {
-  // const searchParams = useSearchParams();
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showButton, setShowButton] = useState(false);
@@ -38,9 +36,9 @@ export const InstallButton = () => {
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches || isIOSStandalone();
 
-    if (isStandalone) return; // si ya está instalada, no mostrar nada
+    if (isStandalone) return; // si ya esta instalada, no mostrar nada
 
-    // Android / Windows / Chrome
+    // android / windows / chrome
     const handler = (e: BeforeInstallPromptEvent) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -48,7 +46,7 @@ export const InstallButton = () => {
     };
     window.addEventListener("beforeinstallprompt", handler as EventListener);
 
-    // iOS / macOS Safari: mostrar botón siempre
+    // ios / macos safari: mostrar boton siempre
     if (ios || macSafari) {
       setShowButton(true);
     }
@@ -56,20 +54,11 @@ export const InstallButton = () => {
     return () => window.removeEventListener("beforeinstallprompt", handler as EventListener);
   }, []);
 
-  // --- FORZAR MODAL PARA TEST ---
-  // useEffect(() => {
-  //   const forceInstall = searchParams.get("forceInstall");
-  //   if (forceInstall === "ios") {
-  //     setShowModal(true);
-  //     setShowButton(false);
-  //   }
-  // }, [searchParams]);
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log("Install outcome:", outcome);
       setShowButton(false);
       setDeferredPrompt(null);
     } else if (isIOS || isMacSafari) {

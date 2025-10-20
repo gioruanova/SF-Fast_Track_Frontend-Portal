@@ -31,7 +31,6 @@ interface User {
   updated_at: string
 }
 
-// Interfaces eliminadas ya que no se usan
 
 export function OwnerUsuariosPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -43,7 +42,7 @@ export function OwnerUsuariosPage() {
   const itemsPerPage = 5
   const { companyConfig, user } = useAuth()
 
-  // Estados para sheets
+  // estados para sheets
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false)
   const [isPasswordSheetOpen, setIsPasswordSheetOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -197,7 +196,7 @@ export function OwnerUsuariosPage() {
   }
 
   const filteredUsers = users.filter(userItem => {
-    // Excluir el usuario logueado
+    // excluir el usuario logueado
     if (user && userItem.user_id === user.user_id) {
       return false
     }
@@ -233,7 +232,7 @@ export function OwnerUsuariosPage() {
     )
   }
 
-  // Función para mapear role a display name
+  // mapear role a display name
   const getRoleDisplayName = (role: string) => {
     const roleMapping: Record<string, string> = {
       operador: companyConfig?.sing_heading_operador || "Operador",
@@ -243,7 +242,7 @@ export function OwnerUsuariosPage() {
     return roleMapping[role] || role
   }
 
-  // Función para mapear display name a role
+  // mapear display name a role
   const getRoleFromDisplayName = (displayName: string) => {
     const displayMapping: Record<string, string> = {
       [companyConfig?.sing_heading_operador || "Operador"]: "operador",

@@ -37,13 +37,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={projects} label="Otras acciones" />
         )}
 
-        {user.user_role === "profesional" && (
+        {user.user_role === "profesional" && companyConfig?.company?.company_estado === 1 && (
           <GestionarEstadoSheet />
         )}
 
 
       </SidebarContent>
-      {(user.user_role === "owner" || user.user_role === "profesional" || user.user_role === "operador") && (
+      {((user.user_role === "owner" || user.user_role === "profesional" || user.user_role === "operador") && companyConfig?.company?.company_estado === 1) && (
         <FeedbackSheet />
       )}
 

@@ -31,7 +31,7 @@ export function OwnerCompanySettingsCard() {
   const [editingValue, setEditingValue] = useState<string>("");
   const [isSavingField, setIsSavingField] = useState(false);
 
-
+  
   const values = useMemo(() => ({
     company_phone: companyConfig?.company?.company_phone || "",
     company_email: companyConfig?.company?.company_email || "",
@@ -96,6 +96,7 @@ export function OwnerCompanySettingsCard() {
                       {companyStatus}
                     </Badge>
                   </div>
+                  {companyConfig?.company?.company_estado === 0 ? <span className="text-sm text-red-500">Su suscripcion se encuentra cancelada. Por favor contacte al administrador</span> : null}
                   <p className="text-muted-foreground text-sm truncate">
                     ID: {companyConfig?.company?.company_unique_id || "-"}
                   </p>

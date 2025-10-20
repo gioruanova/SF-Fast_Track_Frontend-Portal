@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Button } from './button'
 
-// Tipos para Leaflet (carga dinámica)
+// tipos para leaflet (carga dinamica)
 declare global {
     interface Window {
         L: typeof import('leaflet')
@@ -40,56 +40,56 @@ export function OSMMapSelector({
             if (!mapRef.current || !window.L) return
 
             try {
-                // Limpiar mapa anterior
+                // limpiar mapa anterior
                 if (mapInstanceRef.current) {
                     mapInstanceRef.current.remove()
                     mapInstanceRef.current = null
                 }
 
-                // Limpiar contenedor
+                // limpiar contenedor
                 if (mapRef.current) {
                     mapRef.current.innerHTML = ''
                 }
 
-                // Configurar tiles de OpenStreetMap
+                // configurar tiles de openstreetmap
                 const defaultCenter = position || [-34.6037, -58.3816] // Buenos Aires
                 const zoom = 13
 
-                // Crear mapa con Leaflet
+                // crear mapa con leaflet
                 const map = window.L.map(mapRef.current).setView(defaultCenter, zoom)
                 mapInstanceRef.current = map
 
-                // Agregar capa de tiles
+                // agregar capa de tiles
                 window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors',
                     maxZoom: 19,
                 }).addTo(map)
 
-                // Agregar marcador
+                // agregar marcador
                 const marker = window.L.marker(defaultCenter, {
                     draggable: !readOnly
                 }).addTo(map)
 
-                // Configurar eventos de click
+                // configurar eventos de click
                 if (!readOnly) {
                     map.on('click', (e: L.LeafletMouseEvent) => {
                         try {
                             const newPos: [number, number] = [e.latlng.lat, e.latlng.lng]
                             marker.setLatLng(newPos)
                             setPosition(newPos)
-                            // Actualizar dirección con geocodificación
+                            // actualizar direccion con geocodificacion
                             reverseGeocode(newPos)
                         } catch (err) {
                             console.error('Error handling map click:', err)
                         }
                     })
 
-                    // Configurar eventos de arrastre
+                    // configurar eventos de arrastre
                     marker.on('dragend', (e: L.DragEndEvent) => {
                         try {
                             const newPos: [number, number] = [e.target.getLatLng().lat, e.target.getLatLng().lng]
                             setPosition(newPos)
-                            // Actualizar dirección con geocodificación
+                            // actualizar direccion con geocodificacion
                             reverseGeocode(newPos)
                         } catch (err) {
                             console.error('Error handling marker drag:', err)
@@ -97,7 +97,7 @@ export function OSMMapSelector({
                     })
                 }
 
-                // Geocodificar dirección inicial
+                // geocodificar direccion inicial
                 if (initialAddress && !initialPosition) {
                     geocodeAddress(initialAddress, map, marker)
                 }
@@ -110,10 +110,10 @@ export function OSMMapSelector({
             }
         }
 
-        // Cargar Leaflet si no está disponible
+        // cargar leaflet si no esta disponible
         const loadLeaflet = () => {
             if (window.L) {
-                // Leaflet ya está cargado, esperar inicialización
+                // leaflet ya esta cargado, esperar inicializacion
                 setTimeout(() => {
                     if (window.L && typeof window.L.map === 'function') {
                         loadOSMMap()
@@ -125,20 +125,20 @@ export function OSMMapSelector({
                 return
             }
 
-            // Cargar estilos
+            // cargar estilos
             const link = document.createElement('link')
             link.rel = 'stylesheet'
             link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
             document.head.appendChild(link)
 
-            // Cargar script
+            // cargar script
             const script = document.createElement('script')
             script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
             script.onload = () => {
-                // Esperar inicialización completa
+                // esperar inicializacion completa
                 setTimeout(() => {
                     if (window.L && typeof window.L.map === 'function') {
-                        // Configuración necesaria para iconos de Leaflet
+                        // configuracion necesaria para iconos de leaflet
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         delete (window.L.Icon.Default.prototype as any)._getIconUrl
                         window.L.Icon.Default.mergeOptions({
@@ -162,7 +162,7 @@ export function OSMMapSelector({
 
         loadLeaflet()
 
-        // Limpiar mapa al desmontar componente
+        // limpiar mapa al desmontar componente
         return () => {
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove()
@@ -182,7 +182,7 @@ export function OSMMapSelector({
                 const { lat, lon } = data[0]
                 const newPos: [number, number] = [parseFloat(lat), parseFloat(lon)]
 
-                // Verificar que sea el mapa actual
+                // verificar que sea el mapa actual
                 if (map === mapInstanceRef.current && map && typeof map.setView === 'function') {
                     try {
                         map.setView(newPos, 15)
@@ -192,11 +192,11 @@ export function OSMMapSelector({
                         setPosition(newPos)
                     } catch (err) {
                         console.error('Error setting map position:', err)
-                        // Solo actualizar posición
+                        // solo actualizar posicion
                         setPosition(newPos)
                     }
                 } else {
-                    // Si el mapa no es el actual, solo actualizar la posición
+                    // si el mapa no es el actual, solo actualizar la posicion
                     setPosition(newPos)
                 }
             }
@@ -215,10 +215,10 @@ export function OSMMapSelector({
             const data = await response.json()
 
             if (data && data.display_name) {
-                // Extraer solo la dirección sin el país y código postal
+                // extraer solo la direccion sin el pais y codigo postal
                 const address = data.display_name
                     .split(',')
-                    .slice(0, -2) // Remover país y código postal
+                    .slice(0, -2) // remover pais y codigo postal
                     .join(',')
                     .trim()
 
@@ -255,7 +255,7 @@ export function OSMMapSelector({
         )
     }
 
-    // Manejar eventos de teclado para evitar errores
+    // manejar eventos de teclado para evitar errores
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && onCancel) {

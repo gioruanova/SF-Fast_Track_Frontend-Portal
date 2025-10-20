@@ -121,13 +121,13 @@ export function ProfesionalReclamosActivosPage() {
     setFilteredReclamos(filtered);
   }, [searchTerm, filterEstado, reclamos]);
 
-  // Calcular paginado
+  // calcular paginado
   const totalPages = Math.ceil(filteredReclamos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);

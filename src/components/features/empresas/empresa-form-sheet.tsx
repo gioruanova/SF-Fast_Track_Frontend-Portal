@@ -80,7 +80,6 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
 
   useEffect(() => {
     if (company) {
-      console.log("Empresa recibida:", company);
       const data = {
         company_nombre: company.company_nombre,
         company_phone: company.company_phone,
@@ -93,7 +92,6 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
         limite_especialidades: company.limite_especialidades,
         reminder_manual: company.reminder_manual === 1 || company.reminder_manual === true,
       };
-      console.log("FormData inicial:", data);
       setFormData(data);
       setOriginalData(data);
     } else {

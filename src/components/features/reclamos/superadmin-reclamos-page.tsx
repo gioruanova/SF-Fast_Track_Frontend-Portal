@@ -105,7 +105,7 @@ export function SuperadminReclamosPage() {
   useEffect(() => {
     let filtered = reclamos;
 
-    // Filtro de búsqueda (título, descripción, especialidad)
+    // filtro de busqueda (titulo, descripcion, especialidad)
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter((reclamo) =>
@@ -115,12 +115,12 @@ export function SuperadminReclamosPage() {
       );
     }
 
-    // Filtro por estado
+    // filtro por estado
     if (filterEstado !== "all") {
       filtered = filtered.filter((reclamo) => reclamo.reclamo_estado === filterEstado);
     }
 
-    // Filtro por empresa
+    // filtro por empresa
     if (filterCompany !== "all") {
       filtered = filtered.filter((reclamo) => reclamo.company_name === filterCompany);
     }
@@ -128,13 +128,13 @@ export function SuperadminReclamosPage() {
     setFilteredReclamos(filtered);
   }, [searchTerm, filterEstado, filterCompany, reclamos]);
 
-  // Calcular paginado
+  // calcular paginado
   const totalPages = Math.ceil(filteredReclamos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado, filterCompany]);

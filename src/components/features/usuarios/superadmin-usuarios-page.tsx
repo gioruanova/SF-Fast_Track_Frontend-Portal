@@ -70,14 +70,14 @@ export function SuperadminUsuariosPage() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterCompany, setFilterCompany] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Máximo 5 usuarios por página
+  const itemsPerPage = 5; // maximo 5 usuarios por pagina
 
-  // Estados para el sheet de cambio de contraseña
+  // estados para el sheet de cambio de contraseña
   const [isPasswordSheetOpen, setIsPasswordSheetOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [newPassword, setNewPassword] = useState("");
 
-  // Estados para crear/editar usuario
+  // estados para crear/editar usuario
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
@@ -99,7 +99,7 @@ export function SuperadminUsuariosPage() {
         apiClient.get(SUPER_API.GET_COMPANIES)
       ]);
 
-      // Filtrar superadmin y agregar nombre de empresa
+      // filtrar superadmin y agregar nombre de empresa
       const usuariosData = usuariosResponse.data
         .filter((user: UserData) => user.user_role !== "superadmin")
         .map((user: UserData) => {
@@ -123,7 +123,7 @@ export function SuperadminUsuariosPage() {
     fetchUsuarios();
   }, []);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterRole, filterStatus, filterCompany]);
@@ -252,7 +252,7 @@ export function SuperadminUsuariosPage() {
       user_dni: user.user_dni,
       user_role: user.user_role,
       company_id: user.company_id,
-      user_password: "" // No pre-llenar contraseña por seguridad
+      user_password: "" // no pre-llenar contraseña por seguridad
     });
     setIsUserSheetOpen(true);
   };
@@ -260,17 +260,17 @@ export function SuperadminUsuariosPage() {
   const handleSaveUser = async () => {
     try {
       if (isEditing && editingUser) {
-        // Editar usuario existente
+        // editar usuario existente
         const url = SUPER_API.USERS_EDIT.replace('{id}', editingUser.user_id.toString());
         const editData: Record<string, unknown> = { ...userFormData };
-        // Solo incluir contraseña si se proporcionó
+        // solo incluir contraseña si se proporciono
         if (!editData.user_password) {
           delete editData.user_password;
         }
         await apiClient.put(url, editData);
         toast.success("Usuario actualizado correctamente");
       } else {
-        // Crear nuevo usuario - validar que tenga contraseña
+        // crear nuevo usuario - validar que tenga contraseña
         if (!userFormData.user_password) {
           toast.error("La contraseña es obligatoria para crear un usuario");
           return;
@@ -281,7 +281,7 @@ export function SuperadminUsuariosPage() {
 
       setIsUserSheetOpen(false);
       setEditingUser(null);
-      fetchUsuarios(); // Recargar la lista
+      fetchUsuarios(); // recargar la lista
     } catch (error: unknown) {
       const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
         (error as { message?: string })?.message ||
@@ -296,7 +296,7 @@ export function SuperadminUsuariosPage() {
 
   const handleDniChange = (dni: string) => {
     setUserFormData(prev => ({ ...prev, user_dni: dni }));
-    // Generar contraseña sugerida si no es edición y hay DNI
+    // generar contraseña sugerida si no es edicion y hay dni
     if (!isEditing && dni.length >= 4) {
       const lastFourDigits = dni.slice(-4);
       setUserFormData(prev => ({ ...prev, user_password: `Fast${lastFourDigits}` }));

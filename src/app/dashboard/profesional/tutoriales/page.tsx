@@ -1,8 +1,26 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProfesionalTutorialesPage() {
+  const { companyConfig } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Si la empresa está inactiva, redirigir al dashboard
+    if (companyConfig?.company?.company_estado === 0) {
+      router.push("/dashboard/profesional");
+    }
+  }, [companyConfig, router]);
+
+  // Si la empresa está inactiva, no renderizar nada
+  if (companyConfig?.company?.company_estado === 0) {
+    return null;
+  }
+
   return (
     <>
       <DashboardHeader 

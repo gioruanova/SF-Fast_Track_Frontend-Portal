@@ -102,12 +102,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
         especialidad_id: parseInt(selectedEspecialidad)
       };
       
-      console.log("Enviando payload:", payload);
-      console.log("URL:", CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD);
       
       const response = await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
       
-      console.log("Respuesta del servidor:", response.data);
       
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asignada correctamente`);
       onUpdate();
@@ -150,12 +147,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       
       const url = CLIENT_API.EDITAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
       
-      console.log("Editando asignación:", payload);
-      console.log("URL:", url);
       
       const response = await apiClient.put(url, payload);
       
-      console.log("Respuesta del servidor:", response.data);
       
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} actualizada correctamente`);
       onUpdate();
@@ -189,12 +183,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       
       const url = CLIENT_API.ELIMINAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
       
-      console.log("Eliminando asignación:", idAsignacion);
-      console.log("URL:", url);
       
       const response = await apiClient.delete(url);
       
-      console.log("Respuesta del servidor:", response.data);
       
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} eliminada correctamente`);
       onUpdate();

@@ -10,7 +10,7 @@ export const CLIENT_API = {
 
 
 
-  // Gestion de usuarios
+  // gestion de usuarios
   GET_USERS: `${config.apiUrl}/${slugs.customersApi}/users`,
   USERS_CREATE: `${config.apiUrl}/${slugs.customersApi}/users`,
   USERS_EDIT: `${config.apiUrl}/${slugs.customersApi}/users/{id}`,
@@ -34,8 +34,8 @@ export const CLIENT_API = {
   ELIMINAR_ASIGNACION_ESPECIALIDAD: `${config.apiUrl}/${slugs.customersApi}/profesionalEspecialidad/{id_asignacion}`,
 
 
-  // REPORTES EXTRACCION
-  // Gestion profesionales
+  // reportes extraccion
+  // gestion profesionales
   PROFESIONAL_DESCARGA: `${config.apiUrl}/${slugs.customersApi}/vistas/profesionales`,
   RECLAMO_DESCARGA: `${config.apiUrl}/${slugs.customersApi}/vistas/reclamos/{type}`,
 
@@ -48,27 +48,27 @@ export const CLIENT_API = {
   DESACTIVAR_CLIENTE: `${config.apiUrl}/${slugs.customersApi}/clientes-recurrentes/block/{cliente_id}`,
 
 
-  // Gestion de reclamos owner/operador
+  // gestion de reclamos owner/operador
   RECLAMO_GESTION_ADMIN: `${config.apiUrl}/${slugs.customersApi}/reclamos/gestion/{id}`,
 
 
-  // PERFIL PROFESIONAL
-  // Acciones profesional
+  // perfil profesional
+  // acciones profesional
   HABILITAR_FILA: `${config.apiUrl}/${slugs.customersApi}/workload/enable`,
   DESHABILITAR_FILA: `${config.apiUrl}/${slugs.customersApi}/workload/disable`,
 
-  // Gestion de reclamos profesional
+  // gestion de reclamos profesional
   GET_RECLAMOS_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional`,
   GET_RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}//reclamos/profesional/gestion/{id}`,
   RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
 
 
-  //gestion empresa (owner)
+  // gestion empresa (owner)
   UPDATE_COMPANY: `${config.apiUrl}/${slugs.customersApi}/company`, // PUT edita informacion parcial de la empresa (solo owner)
   UPDATE_COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`, // PUT edita configuracion de la empresa
 
 
-  // General
+  // general
   FEEDBACK: `${config.apiUrl}/${slugs.customersApi}/platform/feedback`,
   COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
   ESTADO_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/workload/estado`,

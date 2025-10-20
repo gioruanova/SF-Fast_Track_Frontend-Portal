@@ -69,7 +69,7 @@ export function SuperadminEspecialidadesPage() {
         apiClient.get(SUPER_API.GET_COMPANIES),
       ]);
 
-      // Procesar especialidades con información de empresa
+      // procesar especialidades con informacion de empresa
       const especialidadesData = especialidadesRes.data.map((esp: unknown) => {
         const espData = esp as { company_id: number; [key: string]: unknown };
         const company = companiesRes.data.find((c: unknown) => (c as { company_id: number; [key: string]: unknown }).company_id === espData.company_id);
@@ -109,13 +109,13 @@ export function SuperadminEspecialidadesPage() {
     return matchesSearch && matchesCompany && matchesEstado;
   });
 
-  // Calcular paginado
+  // calcular paginado
   const totalPages = Math.ceil(filteredEspecialidades.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedEspecialidades = filteredEspecialidades.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterCompany, filterEstado]);
@@ -124,18 +124,18 @@ export function SuperadminEspecialidadesPage() {
     try {
       const newEstado = currentEstado === 1 ? 0 : 1;
       
-      // Construir URLs
+      // construir urls
       const enableUrl = SUPER_API.ENABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
       const disableUrl = SUPER_API.DISABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
       
-      // Llamada al endpoint para cambiar el estado
+      // llamada al endpoint para cambiar el estado
       if (newEstado === 1) {
         await apiClient.put(enableUrl);
       } else {
         await apiClient.put(disableUrl);
       }
       
-      // Actualizar estado local
+      // actualizar estado local
       setEspecialidades(prev => 
         prev.map(esp => 
           esp.id_especialidad === especialidadId 

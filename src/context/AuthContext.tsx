@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Configurar cliente API con autenticación
+  // configurar cliente api con autenticacion
   const apiClient = axios.create({
     baseURL: config.apiUrl,
     withCredentials: true,
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       const error = err as { response?: { status?: number } };
       
-      // Intentar renovar token si hay error de autenticación
+      // intentar renovar token si hay error de autenticacion
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         try {
           const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
@@ -91,21 +91,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Manejo centralizado de errores
+  // manejo centralizado de errores
   const getErrorMessage = (error: unknown): string => {
-    // Errores de validación del frontend (sin response)
+    // errores de validacion del frontend (sin response)
     const errorObj = error as { message?: string; response?: { data?: { code?: string }; status?: number }; code?: string };
     
     if (errorObj.message && !errorObj.response) {
       return errorObj.message;
     }
 
-    // Errores de conexión
+    // errores de conexion
     if (errorObj.message === "Network Error" || (!errorObj.response && !errorObj.message)) {
       return "No se pudo conectar con el servidor. Verifica tu conexión a internet.";
     }
 
-    // Errores seguros del backend
+    // errores seguros del backend
     const safeErrorCodes = ["MISSING_CREDENTIALS", "INVALID_EMAIL_FORMAT", "INVALID_PASSWORD_LENGTH", "VALIDATION_ERROR"];
     if (errorObj.response?.data?.code && safeErrorCodes.includes(errorObj.response.data.code)) {
       const errorMessages: Record<string, string> = {
@@ -117,17 +117,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return errorMessages[errorObj.response.data.code];
     }
 
-    // Error 400 (datos inválidos)
+    // error 400 (datos invalidos)
     if (errorObj.response?.status === 400) {
       return "Datos de entrada inválidos";
     }
 
-    // Error 401 (credenciales incorrectas)
+    // error 401 (credenciales incorrectas)
     if (errorObj.response?.status === 401) {
       return "Credenciales incorrectas";
     }
 
-    // Por seguridad, no exponer detalles de errores internos
+    // por seguridad, no exponer detalles de errores internos
     return "Ha habido un error. Póngase en contacto con su administrador";
   };
 
@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
 
-      // Validaciones básicas
+      // validaciones basicas
       if (!email.trim()) throw new Error("El email es requerido");
       if (!password.trim()) throw new Error("La contraseña es requerida");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("El formato del email no es válido");
@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
         } catch {
-          // Si falla el perfil, usar mensaje genérico
+          // si falla el perfil, usar mensaje generico
           throw new Error("Ha habido un error. Póngase en contacto con su administrador");
         }
       } else {
@@ -200,7 +200,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     refreshCompanyConfig,
     isLoading,
-    error: null, // Solo usamos toasts para errores
+    error: null, // solo usamos toasts para errores
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

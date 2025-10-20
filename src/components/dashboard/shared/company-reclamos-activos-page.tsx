@@ -127,13 +127,13 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
     setFilteredReclamos(filtered);
   }, [searchTerm, filterEstado, reclamos]);
 
-  // Calcular paginado
+  // calcular paginado
   const totalPages = Math.ceil(filteredReclamos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
@@ -165,7 +165,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
         responseType: 'blob',
       });
 
-      // Crear URL del blob y descargar
+      // crear url del blob y descargar
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
@@ -173,7 +173,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
       const link = document.createElement('a');
       link.href = url;
       
-      // Intentar obtener filename del header Content-Disposition
+      // intentar obtener filename del header content-disposition
       const contentDisposition = response.headers['content-disposition'];
       let filename;
       
@@ -184,7 +184,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
         }
       }
       
-      // Si no hay header, generar nombre descriptivo
+      // si no hay header, generar nombre descriptivo
       if (!filename) {
         const fecha = Date.now();
         const empresa = companyConfig?.company?.company_nombre || 'Empresa';
@@ -244,7 +244,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
               </Button>
               <Button
                 onClick={() => handleDownloadReport('all')}
-                disabled={downloadingType !== null}
+                disabled={downloadingType !== null || reclamos.length <= 0}
                 variant="default"
                 size="sm"
               >
@@ -260,7 +260,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
         </CardHeader>
         <CardContent>
           {/* Filtros */}
-          <div className="flex mb-6 flex-col md:flex-row gap-2 md:gap-0">
+          <div className="flex mb-6 flex-col md:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input

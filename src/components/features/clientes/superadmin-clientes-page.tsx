@@ -41,7 +41,7 @@ export function SuperadminClientesPage() {
   const [empresasStats, setEmpresasStats] = useState<EmpresaStats[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Configurar cliente API
+  // configurar cliente api
   const apiClient = axios.create({
     baseURL: config.apiUrl,
     withCredentials: true,
@@ -50,12 +50,12 @@ export function SuperadminClientesPage() {
     },
   })
 
-  // Cargar clientes recurrentes
+  // cargar clientes recurrentes
   const loadClientes = async () => {
     try {
       setIsLoading(true)
 
-      // Cargar clientes y empresas en paralelo
+      // cargar clientes y empresas en paralelo
       const [clientesResponse, empresasResponse] = await Promise.all([
         apiClient.get(SUPER_API.GET_CLIENTES),
         apiClient.get(SUPER_API.GET_COMPANIES)
@@ -64,29 +64,22 @@ export function SuperadminClientesPage() {
       const clientesData = clientesResponse.data || []
       const empresasData = empresasResponse.data || []
 
-      console.log('Datos de clientes recibidos:', clientesData)
-      console.log('Datos de empresas recibidos:', empresasData)
+
       setClientes(clientesData)
 
-      // Crear mapa de empresas por ID
+      // crear mapa de empresas por id
       const empresasMap = new Map<number, string>()
       empresasData.forEach((empresa: { company_id: number; company_nombre: string }) => {
         empresasMap.set(empresa.company_id, empresa.company_nombre)
       })
 
-      // Agrupar clientes por empresa usando company_id
+      // agrupar clientes por empresa usando company_id
       const empresaMap = new Map<number, ClienteRecurrente[]>()
 
       clientesData.forEach((cliente: ClienteRecurrente) => {
-        console.log('Procesando cliente:', {
-          id: cliente.cliente_id,
-          name: cliente.cliente_complete_name,
-          company_name: cliente.company_name,
-          company_id: cliente.company_id,
-          active: cliente.cliente_active
-        })
 
-        // Solo incluir clientes que tengan company_id
+
+        // solo incluir clientes que tengan company_id
         if (cliente.company_id) {
           if (!empresaMap.has(cliente.company_id)) {
             empresaMap.set(cliente.company_id, [])
@@ -95,7 +88,7 @@ export function SuperadminClientesPage() {
         }
       })
 
-      // Calcular estadísticas por empresa
+      // calcular estadisticas por empresa
       const statsArray: EmpresaStats[] = Array.from(empresaMap.entries()).map(([companyId, clientesEmpresa]) => {
         const activos = clientesEmpresa.filter(c => c.cliente_active).length
         const inactivos = clientesEmpresa.filter(c => !c.cliente_active).length
@@ -112,12 +105,9 @@ export function SuperadminClientesPage() {
         }
       })
 
-      // Ordenar por número de clientes (descendente)
+      // ordenar por numero de clientes (descendente)
       statsArray.sort((a, b) => b.total_clientes - a.total_clientes)
 
-      console.log('Empresas encontradas (IDs):', Array.from(empresaMap.keys()))
-      console.log('Mapa de empresas:', Array.from(empresasMap.entries()))
-      console.log('Estadísticas calculadas:', statsArray)
       setEmpresasStats(statsArray)
     } catch (error: unknown) {
       console.error("Error al cargar clientes:", error)

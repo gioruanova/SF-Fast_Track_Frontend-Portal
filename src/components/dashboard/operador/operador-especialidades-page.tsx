@@ -74,7 +74,7 @@ export function OperadorEspecialidadesPage() {
   const [filterEstado, setFilterEstado] = useState<string>("all");
   const [filterProfesionales, setFilterProfesionales] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Mostrar 6 cards por página
+  const itemsPerPage = 6; // mostrar 6 cards por pagina
 
   const fetchData = useCallback(async () => {
     try {
@@ -89,7 +89,7 @@ export function OperadorEspecialidadesPage() {
         user.user_role === "profesional"
       );
 
-      // Mapear especialidades con sus profesionales
+      // mapear especialidades con sus profesionales
       const especialidadesConProfesionales = especialidadesData.map((esp: EspecialidadData) => {
         const profesionalesDeEstaEspecialidad = profesionalesData.filter((prof: ProfesionalData) =>
           prof.especialidades && prof.especialidades.some((e) => e.id_especialidad === esp.id_especialidad)
@@ -136,13 +136,13 @@ export function OperadorEspecialidadesPage() {
     return matchesSearch && matchesEstado && matchesProfesionales;
   });
 
-  // Calcular paginado
+  // calcular paginado
   const totalPages = Math.ceil(filteredEspecialidades.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedEspecialidades = filteredEspecialidades.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
+  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado, filterProfesionales]);

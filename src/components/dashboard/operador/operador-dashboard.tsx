@@ -46,6 +46,7 @@ export function OperadorDashboard({ user }: OperadorDashboardProps) {
                 </span>
               </span>
             </CardDescription>
+            {!user.company_status ? <span className="text-sm text-red-500">Su suscripcion se encuentra cancelada. Por favor contacte al administrador de su empresa</span> : null}
           </CardHeader>
         </Card>
 
