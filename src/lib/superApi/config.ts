@@ -48,6 +48,7 @@ export const SUPER_API = {
 
   // gestion de banner
   GET_BANNERS: `${config.apiUrl}/${slugs.superApi}/banners`, // GET trae todos los banners
+  GET_ACTIVE_BANNER: `${config.apiUrl}/${slugs.superApi}/active-banner`, // GET trae el banner activo
   CREATE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners`, // POST crea un nuevo banner
   EDIT_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, // PUT edita un banner
   DELETE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, // DELETE elimina un banner

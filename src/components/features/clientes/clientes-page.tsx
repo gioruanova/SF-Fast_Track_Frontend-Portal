@@ -44,7 +44,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  // configurar cliente api
   const apiClient = axios.create({
     baseURL: config.apiUrl,
     withCredentials: true,

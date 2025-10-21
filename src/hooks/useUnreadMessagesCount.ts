@@ -7,7 +7,6 @@ import { CLIENT_API } from "@/lib/clientApi/config";
 import axios from "axios";
 import { config } from "@/lib/config";
 
-// Extender la interfaz Window para incluir refreshUnreadCount
 declare global {
   interface Window {
     refreshUnreadCount?: () => void;
@@ -33,12 +32,10 @@ export function useUnreadMessagesCount() {
       let response;
 
       if (user?.user_role === 'superadmin') {
-        // Para superadmin: contar mensajes públicos no leídos
         response = await apiClient.get(SUPER_API.GET_PUBLIC_MESSAGES);
         const unreadMessages = response.data.filter((msg: { message_read: number }) => msg.message_read === 0);
         setUnreadCount(unreadMessages.length);
       } else {
-        // Para otros roles: contar mensajes de plataforma no leídos
         response = await apiClient.get(CLIENT_API.GET_MESSAGES_PLATFORM);
         const unreadMessages = response.data.filter((msg: { is_read: number }) => msg.is_read === 0);
         setUnreadCount(unreadMessages.length);
@@ -54,14 +51,9 @@ export function useUnreadMessagesCount() {
   useEffect(() => {
     if (user) {
       fetchUnreadCount();
-      
-      // Refrescar cada 30 segundos
-      const interval = setInterval(fetchUnreadCount, 30000);
-      return () => clearInterval(interval);
     }
   }, [user, fetchUnreadCount]);
 
-  // Exponer la función para refrescar manualmente
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.refreshUnreadCount = fetchUnreadCount;
