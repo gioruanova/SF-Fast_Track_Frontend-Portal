@@ -71,6 +71,7 @@ export const CLIENT_API = {
   MARK_AS_UNREAD_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/message/unread/{specific_message_id}`, 
 
 
-
+  // gestion de banner
+  GET_BANNER_CLIENT: `${config.apiUrl}/${slugs.customersApi}/active-banner`, // GET trae el banner activo para el sitio
 
 };

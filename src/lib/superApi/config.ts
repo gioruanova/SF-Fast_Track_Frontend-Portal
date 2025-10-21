@@ -46,4 +46,11 @@ export const SUPER_API = {
   PLAT_MESSAGE_USER: `${config.apiUrl}/${slugs.superApi}/platform/messages/user/{user_id}`,
 
 
+  // gestion de banner
+  GET_BANNERS: `${config.apiUrl}/${slugs.superApi}/banners`, // GET trae todos los banners
+  CREATE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners`, // POST crea un nuevo banner
+  EDIT_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, // PUT edita un banner
+  DELETE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, // DELETE elimina un banner
+  DISABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/disable/{banner_id}`, // DISABLE deshabilita un banner
+  ENABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/enable/{banner_id}`, // ENABLE habilita un banner
 };
