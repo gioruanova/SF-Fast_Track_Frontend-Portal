@@ -89,6 +89,24 @@ export function NotificationCenter() {
       }
     };
 
+    const handleBroadcastMessage = (event: MessageEvent) => {
+      // Temporal: mostrar alerta para debug en iOS
+      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+        alert('🔔 NotificationCenter recibió mensaje via BroadcastChannel: ' + JSON.stringify(event.data));
+      }
+      
+      if (event.data?.type === 'NOTIFICATION_SHOWN') {
+        const notificationData = event.data.data;
+        
+        // Temporal: mostrar alerta para debug en iOS
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 Procesando notificación via BroadcastChannel: ' + notificationData.title);
+        }
+        
+        addNotification(notificationData.title, notificationData.body, notificationData.path);
+      }
+    };
+
     // Temporal: verificar Service Worker en iOS
     if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
       if (navigator.serviceWorker) {
@@ -99,9 +117,28 @@ export function NotificationCenter() {
     }
     
     navigator.serviceWorker?.addEventListener('message', handleMessage);
+    
+    // También escuchar BroadcastChannel para iOS
+    let broadcastChannel = null;
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        broadcastChannel = new BroadcastChannel('notification-channel');
+        broadcastChannel.addEventListener('message', handleBroadcastMessage);
+        
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 BroadcastChannel configurado para iOS');
+        }
+      } catch (error) {
+        console.log('BroadcastChannel not supported');
+      }
+    }
 
     return () => {
       navigator.serviceWorker?.removeEventListener('message', handleMessage);
+      if (broadcastChannel) {
+        broadcastChannel.removeEventListener('message', handleBroadcastMessage);
+        broadcastChannel.close();
+      }
     };
   }, []);
 
