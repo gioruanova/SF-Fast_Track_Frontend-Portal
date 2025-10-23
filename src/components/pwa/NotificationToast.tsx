@@ -34,29 +34,6 @@ export function NotificationToast() {
 
         setIsVisible(true);
 
-        // Solo reenviar mensajes en iOS para evitar duplicados en desktop
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          const forwardedMessage = {
-            type: 'NOTIFICATION_SHOWN',
-            data: notificationData,
-            source: 'NotificationToast' // Marcar que viene del Toast
-          };
-          
-          // Enviar via BroadcastChannel si está disponible
-          if (typeof BroadcastChannel !== 'undefined') {
-            try {
-              const channel = new BroadcastChannel('notification-channel');
-              channel.postMessage(forwardedMessage);
-              channel.close();
-            } catch (error) {
-              console.log('BroadcastChannel failed in NotificationToast');
-            }
-          }
-          
-          // También enviar via window.postMessage como fallback
-          window.postMessage(forwardedMessage, '*');
-        }
-
         setTimeout(() => {
           setIsAnimatingOut(true);
           setTimeout(() => {

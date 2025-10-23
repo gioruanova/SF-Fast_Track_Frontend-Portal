@@ -45,11 +45,6 @@ export function NotificationCenter() {
 
   useEffect(() => {
     loadNotifications();
-    
-    // Temporal: verificar que el componente se monta en iOS
-    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-      alert('🔔 NotificationCenter se montó correctamente');
-    }
   }, []);
 
   useEffect(() => {
@@ -72,95 +67,16 @@ export function NotificationCenter() {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Temporal: mostrar alerta para debug en iOS
-      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-        alert('🔔 NotificationCenter recibió mensaje: ' + JSON.stringify(event.data));
-      }
-      
       if (event.data?.type === 'NOTIFICATION_SHOWN' && !event.data?.source) {
         const notificationData = event.data.data;
-        
-        // Temporal: mostrar alerta para debug en iOS
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          alert('🔔 Procesando notificación: ' + notificationData.title);
-        }
-        
         addNotification(notificationData.title, notificationData.body, notificationData.path);
       }
     };
 
-    const handleBroadcastMessage = (event: MessageEvent) => {
-      // Temporal: mostrar alerta para debug en iOS
-      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-        alert('🔔 NotificationCenter recibió mensaje via BroadcastChannel: ' + JSON.stringify(event.data));
-      }
-      
-      if (event.data?.type === 'NOTIFICATION_SHOWN') {
-        const notificationData = event.data.data;
-        
-        // Temporal: mostrar alerta para debug en iOS
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          alert('🔔 Procesando notificación via BroadcastChannel: ' + notificationData.title);
-        }
-        
-        addNotification(notificationData.title, notificationData.body, notificationData.path);
-      }
-    };
-
-    const handleWindowMessage = (event: MessageEvent) => {
-      // Temporal: mostrar alerta para debug en iOS
-      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-        alert('🔔 NotificationCenter recibió mensaje via window.postMessage: ' + JSON.stringify(event.data));
-      }
-      
-      if (event.data?.type === 'NOTIFICATION_SHOWN') {
-        const notificationData = event.data.data;
-        
-        // Temporal: mostrar alerta para debug en iOS
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          alert('🔔 Procesando notificación via window.postMessage: ' + notificationData.title);
-        }
-        
-        addNotification(notificationData.title, notificationData.body, notificationData.path);
-      }
-    };
-
-    // Temporal: verificar Service Worker en iOS
-    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-      if (navigator.serviceWorker) {
-        alert('🔔 Service Worker disponible, agregando listener');
-      } else {
-        alert('🔔 ERROR: Service Worker no disponible');
-      }
-    }
-    
     navigator.serviceWorker?.addEventListener('message', handleMessage);
-    
-    // También escuchar BroadcastChannel para iOS
-    let broadcastChannel = null;
-    if (typeof BroadcastChannel !== 'undefined') {
-      try {
-        broadcastChannel = new BroadcastChannel('notification-channel');
-        broadcastChannel.addEventListener('message', handleBroadcastMessage);
-        
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          alert('🔔 BroadcastChannel configurado para iOS');
-        }
-      } catch (error) {
-        console.log('BroadcastChannel not supported');
-      }
-    }
-    
-    // También escuchar window.postMessage como fallback
-    window.addEventListener('message', handleWindowMessage);
 
     return () => {
       navigator.serviceWorker?.removeEventListener('message', handleMessage);
-      if (broadcastChannel) {
-        broadcastChannel.removeEventListener('message', handleBroadcastMessage);
-        broadcastChannel.close();
-      }
-      window.removeEventListener('message', handleWindowMessage);
     };
   }, []);
 
@@ -186,7 +102,7 @@ export function NotificationCenter() {
 
   const addNotification = (title: string, body: string, path?: string) => {
     const newNotification: Notification = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title,
       body,
       timestamp: Date.now(),
@@ -199,17 +115,6 @@ export function NotificationCenter() {
 
       try {
         localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
-        
-        // Temporal: verificar localStorage en iOS
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          alert('🔔 Guardando en localStorage: ' + updatedNotifications.length + ' notificaciones');
-          
-          // Force a small delay for iOS localStorage sync
-          setTimeout(() => {
-            localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
-            alert('🔔 localStorage actualizado: ' + updatedNotifications.length + ' notificaciones');
-          }, 100);
-        }
       } catch (error) {
         console.error('Error saving notifications:', error);
       }

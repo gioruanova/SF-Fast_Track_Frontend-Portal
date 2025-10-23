@@ -125,31 +125,16 @@ self.addEventListener('push', (event) => {
       
       const clients = await self.clients.matchAll();
       
-      const message = {
-        type: 'NOTIFICATION_SHOWN',
-        data: {
-          title: notificationData.title,
-          body: notificationData.body,
-          path: notificationData.data?.path, // path para redirigr
-          icon: notificationData.icon // icono app
-        }
-      };
-      
-      console.log('🔔 Service Worker: Sending message to client', message);
-      
-      // Intentar BroadcastChannel primero (mejor para iOS)
-      if (typeof BroadcastChannel !== 'undefined') {
-        try {
-          const channel = new BroadcastChannel('notification-channel');
-          channel.postMessage(message);
-          channel.close();
-        } catch (error) {
-          console.log('BroadcastChannel failed, falling back to postMessage');
-        }
-      }
-      
-      // Fallback a postMessage
       clients.forEach(client => {
+        const message = {
+          type: 'NOTIFICATION_SHOWN',
+          data: {
+            title: notificationData.title,
+            body: notificationData.body,
+            path: notificationData.data?.path, // path para redirigr
+            icon: notificationData.icon // icono app
+          }
+        };
         client.postMessage(message);
       });
     } catch (error) {
