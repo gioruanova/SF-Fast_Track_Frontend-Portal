@@ -34,31 +34,32 @@ export function NotificationToast() {
 
         setIsVisible(true);
 
-        // Solo en iOS: reenviar mensaje para que NotificationCenter lo reciba
-        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-          alert('🔔 NotificationToast: Reenviando mensaje para iOS');
+        // Guardar la notificación en localStorage y actualizar el contador
+        // Esto debe hacerlo el componente que muestra la notificación
+        const newNotification = {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          title: notificationData.title,
+          body: notificationData.body,
+          timestamp: Date.now(),
+          read: false,
+          path: notificationData.path,
+        };
+
+        try {
+          const stored = localStorage.getItem('fasttrack_notifications');
+          const existingNotifications = stored ? JSON.parse(stored) : [];
+          const updatedNotifications = [newNotification, ...existingNotifications].slice(0, 50);
+          localStorage.setItem('fasttrack_notifications', JSON.stringify(updatedNotifications));
           
-          const forwardedMessage = {
-            type: 'NOTIFICATION_SHOWN',
-            data: notificationData,
-            source: 'NotificationToast'
-          };
-          
-          // Usar BroadcastChannel para iOS
-          if (typeof BroadcastChannel !== 'undefined') {
-            try {
-              alert('🔔 NotificationToast: Enviando via BroadcastChannel');
-              const channel = new BroadcastChannel('notification-channel');
-              channel.postMessage(forwardedMessage);
-              channel.close();
-              alert('🔔 NotificationToast: Mensaje enviado exitosamente');
-            } catch (error) {
-              alert('🔔 NotificationToast: Error en BroadcastChannel: ' + error.message);
-            }
-          } else {
-            alert('🔔 NotificationToast: BroadcastChannel no disponible');
-          }
+          // Disparar evento para que el NotificationCenter actualice su estado
+          const updateEvent = new CustomEvent('notificationsUpdated', {
+            detail: updatedNotifications
+          });
+          window.dispatchEvent(updateEvent);
+        } catch (error) {
+          console.error('Error saving notification:', error);
         }
+
 
         setTimeout(() => {
           setIsAnimatingOut(true);

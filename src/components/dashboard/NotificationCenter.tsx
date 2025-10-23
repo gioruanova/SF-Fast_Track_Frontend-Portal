@@ -66,44 +66,16 @@ export function NotificationCenter() {
   }, [isOpen, refreshSubscriptionStatus]);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'NOTIFICATION_SHOWN' && !event.data?.source) {
-        const notificationData = event.data.data;
-        addNotification(notificationData.title, notificationData.body, notificationData.path);
-      }
+    // Escuchar cuando las notificaciones se actualizan (desde NotificationToast)
+    const handleNotificationsUpdate = (event: CustomEvent) => {
+      const updatedNotifications = event.detail;
+      setNotifications(updatedNotifications);
     };
 
-    const handleBroadcastMessage = (event: MessageEvent) => {
-      alert('🔔 NotificationCenter: Recibió mensaje via BroadcastChannel: ' + JSON.stringify(event.data));
-      
-      if (event.data?.type === 'NOTIFICATION_SHOWN' && event.data?.source === 'NotificationToast') {
-        const notificationData = event.data.data;
-        alert('🔔 NotificationCenter: Procesando notificación: ' + notificationData.title);
-        addNotification(notificationData.title, notificationData.body, notificationData.path);
-      }
-    };
-
-    navigator.serviceWorker?.addEventListener('message', handleMessage);
-
-    // Solo en iOS: escuchar BroadcastChannel
-    let broadcastChannel = null;
-    if ((navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) && typeof BroadcastChannel !== 'undefined') {
-      try {
-        alert('🔔 NotificationCenter: Configurando BroadcastChannel para iOS');
-        broadcastChannel = new BroadcastChannel('notification-channel');
-        broadcastChannel.addEventListener('message', handleBroadcastMessage);
-        alert('🔔 NotificationCenter: BroadcastChannel configurado exitosamente');
-      } catch (error) {
-        alert('🔔 NotificationCenter: Error configurando BroadcastChannel: ' + error.message);
-      }
-    }
+    window.addEventListener('notificationsUpdated', handleNotificationsUpdate as EventListener);
 
     return () => {
-      navigator.serviceWorker?.removeEventListener('message', handleMessage);
-      if (broadcastChannel) {
-        broadcastChannel.removeEventListener('message', handleBroadcastMessage);
-        broadcastChannel.close();
-      }
+      window.removeEventListener('notificationsUpdated', handleNotificationsUpdate as EventListener);
     };
   }, []);
 
