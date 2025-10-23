@@ -27,6 +27,11 @@ export function NotificationToast() {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      // Debug para iOS
+      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+        alert('🔔 NotificationToast: Recibió mensaje del Service Worker: ' + JSON.stringify(event.data));
+      }
+      
       if (event.data?.type === 'NOTIFICATION_SHOWN') {
         const notificationData = event.data.data;
 

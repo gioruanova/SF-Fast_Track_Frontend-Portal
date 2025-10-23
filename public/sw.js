@@ -135,6 +135,7 @@ self.addEventListener('push', (event) => {
             icon: notificationData.icon // icono app
           }
         };
+        console.log('🔔 Service Worker: Sending message to client:', client.url);
         client.postMessage(message);
       });
     } catch (error) {
