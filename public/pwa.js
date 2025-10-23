@@ -3,9 +3,28 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('Service Worker registrado con scope:', registration.scope);
-        
-        // Forzar actualización si hay una nueva versión
+        if (registration.active) {
+          if (registration.active.state === 'activated') {
+            if (navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage({
+                type: 'CLIENT_PING',
+                timestamp: Date.now()
+              });
+            }
+          } else {
+            registration.active.addEventListener('statechange', () => {
+              if (registration.active?.state === 'activated') {
+              }
+            });
+          }
+        }
+
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data.type === 'NAVIGATE_TO') {
+            window.location.href = event.data.url;
+          }
+        });
+
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {
@@ -18,8 +37,7 @@ if ('serviceWorker' in navigator) {
             });
           }
         });
-        
-        // Verificar actualizaciones cada 5 minutos
+
         setInterval(() => {
           registration.update();
         }, 5 * 60 * 1000);
@@ -28,8 +46,7 @@ if ('serviceWorker' in navigator) {
         console.error('Error al registrar Service Worker:', error);
       });
   });
-  
-  // Recargar cuando se active un nuevo SW
+
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     console.log('Service Worker actualizado, recargando...');
     window.location.reload();

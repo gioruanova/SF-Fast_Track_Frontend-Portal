@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { ProfessionalPlatformMessagesManagement } from "@/components/dashboard/shared/professional-platform-messages-management";
+import { isCompanyUser } from "@/types/auth";
 
 export default function ProfesionalMensajesPage() {
-  const { companyConfig } = useAuth();
+  const { companyConfig, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -15,6 +16,10 @@ export default function ProfesionalMensajesPage() {
     }
   }, [companyConfig, router]);
 
+
+  if (!user || !isCompanyUser(user) || user.user_role !== "profesional") {
+    return null;
+  }
 
   if (companyConfig?.company?.company_estado === 0) {
     return null;
@@ -26,6 +31,7 @@ export default function ProfesionalMensajesPage() {
           { label: "Dashboard", href: "/dashboard/profesional" },
           { label: "Mensajes" }
         ]}
+        userRole={user.user_role}
       />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

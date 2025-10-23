@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { useAuth } from "@/context/AuthContext";
+import { isCompanyUser } from "@/types/auth";
 
 export default function ProfesionalTutorialesPage() {
-  const { companyConfig } = useAuth();
+  const { companyConfig, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -14,6 +15,10 @@ export default function ProfesionalTutorialesPage() {
       router.push("/dashboard/profesional");
     }
   }, [companyConfig, router]);
+
+  if (!user || !isCompanyUser(user) || user.user_role !== "profesional") {
+    return null;
+  }
 
   if (companyConfig?.company?.company_estado === 0) {
     return null;
@@ -26,6 +31,7 @@ export default function ProfesionalTutorialesPage() {
           { label: "Dashboard", href: "/dashboard/profesional" },
           { label: "Tutoriales" }
         ]} 
+        userRole={user.user_role}
       />
       
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

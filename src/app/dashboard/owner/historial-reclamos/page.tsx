@@ -32,6 +32,7 @@ export default function HistorialReclamosPage() {
           { label: "Dashboard", href: "/dashboard/owner" },
           { label: `Historial ${companyConfig?.plu_heading_reclamos ?? "Reclamos"}` }
         ]}
+        userRole={user.user_role}
       />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

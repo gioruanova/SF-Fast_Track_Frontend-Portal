@@ -33,6 +33,7 @@ export default function TrabajarReclamosPage() {
           { label: "Dashboard", href: "/dashboard/operador" },
           { label: `${companyConfig?.plu_heading_reclamos || "Reclamos"} en curso` }
         ]} 
+        userRole={user.user_role}
       />
       
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

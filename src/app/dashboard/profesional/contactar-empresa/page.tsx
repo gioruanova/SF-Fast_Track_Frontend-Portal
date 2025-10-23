@@ -19,6 +19,7 @@ export default function ContactarEmpresaPage() {
           { label: "Dashboard", href: "/dashboard/profesional" },
           { label: "Contactar Empresa" }
         ]}
+        userRole={user.user_role}
       />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

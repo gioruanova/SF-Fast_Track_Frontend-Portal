@@ -298,7 +298,7 @@ export function CompanyPlatformMessagesManagement() {
                   {paginatedMessages.map((message) => (
                     <TableRow key={message.id} className={`px-2 py-1 ${message.is_read === 0 ? 'bg-primary/10' : 'bg-transparent'}`}>
                       <TableCell>{formatDate(message.created_at)}</TableCell>
-                      <TableCell className="font-medium">{message.platformMessage.platform_message_title}</TableCell>
+                      <TableCell className="font-medium">{(message.platformMessage.platform_message_title).slice(0, 20)}</TableCell>
                       <TableCell>
                         <Badge variant={message.is_read === 1 ? "default" : "secondary"}>
                           {message.is_read === 1 ? "Leído" : "No leído"}

@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/theme/theme-provider";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
+import { NotificationToast } from "@/components/pwa/NotificationToast";
+import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 
 
 const geistSans = Geist({
@@ -45,8 +47,10 @@ export default function RootLayout({
         >
           <AuthProvider>
             {children}
+            <NotificationPrompt />
           </AuthProvider>
           <Toaster />
+          <NotificationToast />
         </ThemeProvider>
       </body>
     </html>

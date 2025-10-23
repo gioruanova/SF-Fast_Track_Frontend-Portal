@@ -20,6 +20,7 @@ export default function ProfesionalDashboardPage() {
       <DashboardHeader 
         breadcrumbs={[{ label: "Dashboard" }]} 
         rightContent={isCompanyActive ? <GestionarEstadoDisponibilidad /> : undefined}
+        userRole={user.user_role}
       />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

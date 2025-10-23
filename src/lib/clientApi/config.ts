@@ -2,6 +2,14 @@ import { config, slugs } from "../config";
 
 
 export const CLIENT_API = {
+
+  // NOTIFICACIONES PUSH
+  NOTIFICATION_GET_VAPID: `${config.apiUrl}/${slugs.customersApi}/notifications/vapid-public-key`,
+  NOTIFICATION_SUBSCRIBE: `${config.apiUrl}/${slugs.customersApi}/notifications/register-token`,
+  NOTIFICATION_UNSUBSCRIBE: `${config.apiUrl}/${slugs.customersApi}/notifications/unregister-token`,
+  NOTIFICATION_UNSUBSCRIBE_SPECIFIC: `${config.apiUrl}/${slugs.customersApi}/notifications/unregister-specific-token`,
+  NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES: `${config.apiUrl}/${slugs.customersApi}/notifications/unregister-token`,
+
   GET_RECLAMOS: `${config.apiUrl}/${slugs.customersApi}/reclamos`,
   GET_LOGS: `${config.apiUrl}/${slugs.customersApi}/globalLogs`,
   LOGS_READ: `${config.apiUrl}/${slugs.customersApi}/globalLogs/read`,

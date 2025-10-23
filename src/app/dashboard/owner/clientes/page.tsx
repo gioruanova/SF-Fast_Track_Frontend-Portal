@@ -34,6 +34,7 @@ export default function OwnerClientesPage() {
           { label: "Dashboard", href: "/dashboard/owner" },
           { label: companyConfig?.plu_heading_solicitante || "Clientes" }
         ]}
+        userRole={user.user_role}
       />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

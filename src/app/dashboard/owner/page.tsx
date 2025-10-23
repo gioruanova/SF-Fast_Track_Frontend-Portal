@@ -15,7 +15,10 @@ export default function OwnerDashboardPage() {
 
   return (
     <>
-      <DashboardHeader breadcrumbs={[{ label: "Dashboard" }]} />
+      <DashboardHeader 
+        breadcrumbs={[{ label: "Dashboard" }]} 
+        userRole={user.user_role}
+      />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-2 md:pt-3">
         <QuickActionsBar userRole="owner" />
         <OwnerDashboard user={user} />
