@@ -77,7 +77,7 @@ export function NotificationToast() {
         } catch (error) {
           console.error('Error saving notification:', error);
           if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-            alert('🔔 NotificationToast: Error guardando notificación: ' + error.message);
+            alert('🔔 NotificationToast: Error guardando notificación: ' + (error instanceof Error ? error.message : String(error)));
           }
         }
 
