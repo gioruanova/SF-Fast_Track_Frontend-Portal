@@ -36,6 +36,8 @@ export function NotificationToast() {
 
         // Solo en iOS: reenviar mensaje para que NotificationCenter lo reciba
         if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 NotificationToast: Reenviando mensaje para iOS');
+          
           const forwardedMessage = {
             type: 'NOTIFICATION_SHOWN',
             data: notificationData,
@@ -45,12 +47,16 @@ export function NotificationToast() {
           // Usar BroadcastChannel para iOS
           if (typeof BroadcastChannel !== 'undefined') {
             try {
+              alert('🔔 NotificationToast: Enviando via BroadcastChannel');
               const channel = new BroadcastChannel('notification-channel');
               channel.postMessage(forwardedMessage);
               channel.close();
+              alert('🔔 NotificationToast: Mensaje enviado exitosamente');
             } catch (error) {
-              console.log('BroadcastChannel failed');
+              alert('🔔 NotificationToast: Error en BroadcastChannel: ' + error.message);
             }
+          } else {
+            alert('🔔 NotificationToast: BroadcastChannel no disponible');
           }
         }
 

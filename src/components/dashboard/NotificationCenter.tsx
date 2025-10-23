@@ -74,8 +74,11 @@ export function NotificationCenter() {
     };
 
     const handleBroadcastMessage = (event: MessageEvent) => {
+      alert('🔔 NotificationCenter: Recibió mensaje via BroadcastChannel: ' + JSON.stringify(event.data));
+      
       if (event.data?.type === 'NOTIFICATION_SHOWN' && event.data?.source === 'NotificationToast') {
         const notificationData = event.data.data;
+        alert('🔔 NotificationCenter: Procesando notificación: ' + notificationData.title);
         addNotification(notificationData.title, notificationData.body, notificationData.path);
       }
     };
@@ -86,10 +89,12 @@ export function NotificationCenter() {
     let broadcastChannel = null;
     if ((navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) && typeof BroadcastChannel !== 'undefined') {
       try {
+        alert('🔔 NotificationCenter: Configurando BroadcastChannel para iOS');
         broadcastChannel = new BroadcastChannel('notification-channel');
         broadcastChannel.addEventListener('message', handleBroadcastMessage);
+        alert('🔔 NotificationCenter: BroadcastChannel configurado exitosamente');
       } catch (error) {
-        console.log('BroadcastChannel not supported');
+        alert('🔔 NotificationCenter: Error configurando BroadcastChannel: ' + error.message);
       }
     }
 
