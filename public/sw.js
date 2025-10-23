@@ -123,7 +123,7 @@ self.addEventListener('push', (event) => {
     try {
       await self.registration.showNotification(notificationData.title, notificationData);
       
-      const clients = await self.clients.matchAll({ includeUncontrolled: true });
+      const clients = await self.clients.matchAll();
       
       clients.forEach(client => {
         const message = {
@@ -135,6 +135,7 @@ self.addEventListener('push', (event) => {
             icon: notificationData.icon // icono app
           }
         };
+        console.log('🔔 Service Worker: Sending message to client', message);
         client.postMessage(message);
       });
     } catch (error) {
@@ -170,7 +171,7 @@ self.addEventListener('notificationclick', (event) => {
       }
       
       try {
-        const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+        const clientList = await clients.matchAll({ type: 'window' });
         
         for (const client of clientList) {
           if (client.url.includes(self.location.origin)) {
@@ -192,7 +193,7 @@ self.addEventListener('notificationclick', (event) => {
   };
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (clientList) => {
+    clients.matchAll({ type: 'window' }).then(async (clientList) => {
       const targetUrl = await getTargetUrl();
       
       for (const client of clientList) {

@@ -67,8 +67,19 @@ export function NotificationCenter() {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      // Temporal: mostrar alerta para debug en iOS
+      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+        alert('🔔 NotificationCenter recibió mensaje: ' + JSON.stringify(event.data));
+      }
+      
       if (event.data?.type === 'NOTIFICATION_SHOWN' && !event.data?.source) {
         const notificationData = event.data.data;
+        
+        // Temporal: mostrar alerta para debug en iOS
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 Procesando notificación: ' + notificationData.title);
+        }
+        
         addNotification(notificationData.title, notificationData.body, notificationData.path);
       }
     };
@@ -115,6 +126,12 @@ export function NotificationCenter() {
 
       try {
         localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
+        // Force a small delay for iOS localStorage sync
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          setTimeout(() => {
+            localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
+          }, 100);
+        }
       } catch (error) {
         console.error('Error saving notifications:', error);
       }
