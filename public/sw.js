@@ -126,18 +126,21 @@ self.addEventListener('push', (event) => {
       
       const clients = await self.clients.matchAll();
       
-      clients.forEach(client => {
-        const message = {
-          type: 'NOTIFICATION_SHOWN',
-          data: {
-            title: notificationData.title,
-            body: notificationData.body,
-            path: notificationData.data?.path, // path para redirigr
-            icon: notificationData.icon // icono app
-          }
-        };
-        client.postMessage(message);
-      });
+      // Pequeño delay para asegurar que los componentes estén listos
+      setTimeout(() => {
+        clients.forEach(client => {
+          const message = {
+            type: 'NOTIFICATION_SHOWN',
+            data: {
+              title: notificationData.title,
+              body: notificationData.body,
+              path: notificationData.data?.path, // path para redirigr
+              icon: notificationData.icon // icono app
+            }
+          };
+          client.postMessage(message);
+        });
+      }, 100); // 100ms delay
     } catch (error) {
       console.error('Error showing notification:', error);
       

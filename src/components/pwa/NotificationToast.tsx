@@ -26,8 +26,10 @@ export function NotificationToast() {
   }, []);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'NOTIFICATION_SHOWN') {
+    // Pequeño delay para asegurar que el componente esté completamente montado
+    const timeoutId = setTimeout(() => {
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data?.type === 'NOTIFICATION_SHOWN') {
         const notificationData = event.data.data;
 
         setNotifications([notificationData]);
@@ -82,7 +84,8 @@ export function NotificationToast() {
     return () => {
       navigator.serviceWorker?.removeEventListener('message', handleMessage);
     };
-  }, []);
+  }, 50); // 50ms delay para montaje
+}, []);
 
   const handleNotificationClick = (notification: NotificationData) => {
     if (notification.path) {
