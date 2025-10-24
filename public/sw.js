@@ -58,7 +58,6 @@ self.addEventListener('fetch', (event) => {
 
 // PUSH NOTIFICATIONS
 self.addEventListener('push', (event) => {
-  // Notificar a los clientes que se recibió un push
   self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({

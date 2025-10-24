@@ -30,7 +30,6 @@ if ('serviceWorker' in navigator) {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('Nueva versión del SW disponible, actualizando...');
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
                 window.location.reload();
               }
@@ -48,7 +47,6 @@ if ('serviceWorker' in navigator) {
   });
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('Service Worker actualizado, recargando...');
     window.location.reload();
   });
 }

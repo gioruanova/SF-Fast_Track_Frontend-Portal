@@ -17,14 +17,12 @@ interface UseAuthWithNotificationsProps {
   setIsLoading: (loading: boolean) => void;
 }
 
-export function useAuthWithNotifications({ 
-  setUser, 
-  setCompanyConfig, 
-  setIsLoading 
+export function useAuthWithNotifications({
+  setUser,
+  setCompanyConfig,
+  setIsLoading
 }: UseAuthWithNotificationsProps) {
   const router = useRouter();
-  // Hook de notificaciones push disponible para uso futuro
-  // const { checkSupport, checkSubscription, subscribeToPush } = usePushNotifications();
 
   // Configurar cliente API con autenticación
   const apiClient = axios.create({
@@ -35,7 +33,6 @@ export function useAuthWithNotifications({
     },
   });
 
-  // Obtener configuración de empresa
   const fetchCompanyConfig = useCallback(async () => {
     try {
       const configResponse = await apiClient.get(CLIENT_API.COMPANY_CONFIG);
@@ -48,12 +45,10 @@ export function useAuthWithNotifications({
     }
   }, [apiClient, setCompanyConfig]);
 
-  // Refrescar configuración de empresa
   const refreshCompanyConfig = useCallback(async () => {
     await fetchCompanyConfig();
   }, [fetchCompanyConfig]);
 
-  // Verificar autenticación
   const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -70,16 +65,15 @@ export function useAuthWithNotifications({
       }
     } catch (err) {
       const error = err as { response?: { status?: number } };
-      
-      // Intentar renovar token si hay error de autenticación
+
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         try {
           const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
-          
+
           if (refreshResponse.data.success) {
             await new Promise(resolve => setTimeout(resolve, 200));
             const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-            
+
             if (profileResponse.data?.user_id) {
               setUser(profileResponse.data);
               if (isCompanyUser(profileResponse.data)) {
@@ -102,24 +96,21 @@ export function useAuthWithNotifications({
     }
   }, [apiClient, setUser, fetchCompanyConfig, setIsLoading]);
 
-  // Manejo centralizado de errores
   const getErrorMessage = useCallback((error: unknown): string => {
-    const errorObj = error as { 
-      message?: string; 
-      response?: { data?: { code?: string }; status?: number }; 
-      code?: string 
+    const errorObj = error as {
+      message?: string;
+      response?: { data?: { code?: string }; status?: number };
+      code?: string
     };
-    
+
     if (errorObj.message && !errorObj.response) {
       return errorObj.message;
     }
 
-    // Errores de conexión
     if (errorObj.message === "Network Error" || (!errorObj.response && !errorObj.message)) {
       return "No se pudo conectar con el servidor. Verifica tu conexión a internet.";
     }
 
-    // Errores seguros del backend
     const safeErrorCodes = ["MISSING_CREDENTIALS", "INVALID_EMAIL_FORMAT", "INVALID_PASSWORD_LENGTH", "VALIDATION_ERROR"];
     if (errorObj.response?.data?.code && safeErrorCodes.includes(errorObj.response.data.code)) {
       const errorMessages: Record<string, string> = {
@@ -131,26 +122,21 @@ export function useAuthWithNotifications({
       return errorMessages[errorObj.response.data.code];
     }
 
-    // Error 400 (datos inválidos)
     if (errorObj.response?.status === 400) {
       return "Datos de entrada inválidos";
     }
 
-    // Error 401 (credenciales incorrectas)
     if (errorObj.response?.status === 401) {
       return "Credenciales incorrectas";
     }
 
-    // Por seguridad, no exponer detalles de errores internos
     return "Ha habido un error. Póngase en contacto con su administrador";
   }, []);
 
-  // Login con manejo de notificaciones
   const login = useCallback(async (email: string, password: string) => {
     try {
       setIsLoading(true);
 
-      // Validaciones básicas
       if (!email.trim()) throw new Error("El email es requerido");
       if (!password.trim()) throw new Error("La contraseña es requerida");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("El formato del email no es válido");
@@ -161,23 +147,20 @@ export function useAuthWithNotifications({
       if (loginResponse.data.success) {
         try {
           const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-          
+
           if (profileResponse.data?.user_id) {
             setUser(profileResponse.data);
             if (isCompanyUser(profileResponse.data)) {
               await fetchCompanyConfig();
             }
             await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // NO suscribir automáticamente - dejar que el usuario decida
-            console.log('🔔 Login successful - user can manually enable notifications');
-            
+
+
             router.push("/dashboard");
           } else {
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
         } catch {
-          // Si falla el perfil, usar mensaje genérico
           throw new Error("Ha habido un error. Póngase en contacto con su administrador");
         }
       } else {
