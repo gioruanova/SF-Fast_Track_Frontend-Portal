@@ -205,7 +205,7 @@ export function OwnerLogsActivity() {
                       variant="default"
                       size="sm"
                       onClick={() => setShowDeleteDialog(true)}
-                      className="text-destructive hover:text-destructive bg-indigo-900 hover:bg-indigo-800"
+                      className="bg-red-500 hover:bg-red-900 text-foreground"
                     >
                       <Trash2 className="h-4 w-4 mr-0" />
                       Borrar todos

@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-indigo-600 text-white hover:bg-indigo-400/90",
+        default: "bg-primary text-white hover:bg-primary/80",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
@@ -47,11 +47,17 @@ function Button({
     asChild?: boolean
   }) {
   const Comp = asChild ? Slot : "button"
+  
+  // Estabilizar las clases para evitar errores de hidratación
+  const buttonClasses = React.useMemo(() => 
+    cn(buttonVariants({ variant, size, className })), 
+    [variant, size, className]
+  )
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={buttonClasses}
       {...props}
     />
   )

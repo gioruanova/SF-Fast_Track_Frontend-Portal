@@ -16,11 +16,11 @@ export default function LoginPage() {
             <LoginForm />
           </div>
         </div>
-        <div className="flex flex-col justiy-center items-center">
+        {/* <div className="flex flex-col justiy-center items-center">
           <span>owner@gmail.com</span>
           <span>operador-1@gmail.com</span>
           <span>profesional-2@gmail.com</span>
-        </div>
+        </div> */}
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image

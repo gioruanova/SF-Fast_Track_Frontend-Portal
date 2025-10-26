@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { NotificationToast } from "@/components/pwa/NotificationToast";
 import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
+import { ShowQRForMobile } from "@/components/pwa/ShowQRForMobile";
 
 
 const geistSans = Geist({
@@ -48,6 +49,7 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <NotificationPrompt />
+            <ShowQRForMobile />
           </AuthProvider>
           <Toaster />
           <NotificationToast />
