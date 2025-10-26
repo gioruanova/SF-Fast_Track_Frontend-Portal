@@ -25,7 +25,7 @@ export function NotificationPrompt() {
         }, 3000);
       }
     }
-  }, [isSupported, user?.user_id, hasNotificationDecision]);
+  }, [isSupported, user, companyConfig, hasNotificationDecision]);
 
   const handleAccept = async () => {
     // Verificar que el usuario esté completamente cargado
