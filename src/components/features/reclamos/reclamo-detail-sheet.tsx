@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench, Mail, Phone, MapIcon } from "lucide-react";
+import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench, Mail, Phone, MapIcon, Bell } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
 import axios from "axios";
@@ -87,6 +87,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
   const [notaCierre, setNotaCierre] = useState("");
   const [presupuesto, setPresupuesto] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingReminder, setIsSendingReminder] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
   const handleEstadoChange = (value: string) => {
@@ -159,6 +160,44 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSendReminder = async () => {
+    if (!reclamo) return;
+
+    try {
+      setIsSendingReminder(true);
+
+      const endpoint = CLIENT_API.ENVIAR_RECORDATORIO_RECLAMO.replace(":reclamo_id", reclamo.reclamo_id.toString());
+      console.log("Endpoint:", endpoint);
+      console.log("Reclamo ID:", reclamo.reclamo_id);
+
+      await apiClient.put(endpoint);
+
+      toast.success("Recordatorio enviado correctamente");
+      refreshDashboard();
+    } catch (error) {
+      console.error("Error enviando recordatorio:", error);
+
+      if (axios.isAxiosError(error) && error.response) {
+        const errorMessage = error.response.data?.error || error.response.data?.message;
+        const status = error.response.status;
+
+        if (status === 400) {
+          toast.error(errorMessage || "No se pudo enviar el recordatorio. Verifica los datos.");
+        } else if (status === 404) {
+          toast.error("El reclamo no fue encontrado o no tienes acceso a él.");
+        } else if (status === 500) {
+          toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
+        } else {
+          toast.error(errorMessage || "Error al enviar el recordatorio.");
+        }
+      } else {
+        toast.error("Error de conexión. Verifica tu conexión a internet.");
+      }
+    } finally {
+      setIsSendingReminder(false);
     }
   };
 
@@ -261,6 +300,18 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 </span>
               </div>
 
+              <Separator />
+              {(userRole === "owner" || userRole === "operador") && companyConfig?.company?.reminder_manual == 1 && (reclamo.reclamo_estado !== "CERRADO" && reclamo.reclamo_estado !== "CANCELADO") && (
+                <Button
+                  onClick={handleSendReminder}
+                  disabled={isSendingReminder}
+                  className=""
+                >
+                  <Bell className="w-4" />
+                  <span>{isSendingReminder ? "Enviando..." : "Enviar Recordatorio"}</span>
+                </Button>
+              )}
+              <Separator />
 
               {reclamo.cliente_email && (
                 <div className="flex items-center gap-2 text-sm">
@@ -407,6 +458,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
               {canProfesionalEdit && (
                 <>
+
                   <div>
                     <Label htmlFor="estado">Cambiar Estado</Label>
                     <Select value={selectedEstado || undefined} onValueChange={handleEstadoChange}>
@@ -476,7 +528,9 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                     </Button>
                   )}
 
+
                 </>
+
               )}
               {userRole === "profesional" && (
                 <div className="border-t pt-4 space-y-4">

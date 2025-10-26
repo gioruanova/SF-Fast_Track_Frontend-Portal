@@ -103,10 +103,10 @@ export function OwnerCompanySettingsCard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="rounded-lg border bg-muted/30 p-4">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    Límite de operadores
+                    Límite de {companyConfig?.plu_heading_operador || "operadores"}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/80 cursor-help" />
@@ -118,7 +118,7 @@ export function OwnerCompanySettingsCard() {
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-4">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    Límite de profesionales
+                    Límite de {companyConfig?.plu_heading_profesional || "profesionales"}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/80 cursor-help" />
@@ -130,7 +130,7 @@ export function OwnerCompanySettingsCard() {
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-4">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    Límite de especialidades
+                    Límite de {companyConfig?.plu_heading_especialidad || "especialidades"}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/80 cursor-help" />
@@ -140,8 +140,20 @@ export function OwnerCompanySettingsCard() {
                   </p>
                   <p className="text-base font-medium">{companyConfig?.company?.limite_especialidades ?? "-"}</p>
                 </div>
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    Servicio de recordatorios
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/80 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>Si tu plan cuenta con esta funcionalidad, vas a poder enviar recordatorios de {companyConfig?.plu_heading_reclamos || "reclamos"}</TooltipContent>
+                    </Tooltip>
+                  </p>
+                  {companyConfig?.company?.reminder_manual == 1 ? <Badge variant="secondary" className="text-xs bg-green-700">Activo</Badge> : <Badge variant="secondary" className="text-xs">Inactivo</Badge>}
+                </div>
               </div>
-              <span className="text-sm text-muted-foreground italic">Si necesita ampliar estos limites, no dude en contactar a su administrador para obtener planes adicionales y actualizaciones</span>
+              <span className="text-sm text-muted-foreground italic">Si necesitas ampliar estos limites, no dudes en contactar a tu administrador para obtener planes adicionales y actualizaciones</span>
             </div>
           </div>
 
