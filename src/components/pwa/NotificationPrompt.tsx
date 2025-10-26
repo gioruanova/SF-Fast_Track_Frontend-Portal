@@ -13,7 +13,9 @@ export function NotificationPrompt() {
   const { isSupported, subscribeToPush, hasNotificationDecision } = usePushNotifications();
   const { user } = useAuth();
 
+
   useEffect(() => {
+    // Solo ejecutar si el usuario está completamente cargado
     if (user?.user_id) {
       const userHasDecision = hasNotificationDecision(user.user_id.toString());
       
@@ -26,12 +28,18 @@ export function NotificationPrompt() {
   }, [isSupported, user?.user_id, hasNotificationDecision]);
 
   const handleAccept = async () => {
+    // Verificar que el usuario esté completamente cargado
+    if (!user || !user.user_id) {
+      console.warn('⚠️ User not fully loaded, cannot subscribe to notifications');
+      return;
+    }
+
     setIsLoading(true);
     
     try {
-      const success = await subscribeToPush();
+      const success = await subscribeToPush(true, user.user_id.toString(), user.user_role);
       
-      if (success && user?.user_id) {
+      if (success) {
         localStorage.setItem(`fasttrack_notification_decision_${user.user_id.toString()}`, 'accepted');
         setShowPrompt(false);
       }

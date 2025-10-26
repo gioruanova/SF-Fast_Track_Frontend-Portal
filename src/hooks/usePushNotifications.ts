@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { CLIENT_API } from '@/lib/clientApi/config';
 import { SUPER_API } from '@/lib/superApi/config';
 import { useAuth } from '@/context/AuthContext';
+import { User } from '@/types/auth';
 
 // Función para convertir VAPID key de base64 a Uint8Array
 function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
@@ -28,9 +29,11 @@ export function usePushNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
+
   // Determinar qué API usar basado en el rol del usuario
-  const getApiConfig = () => {
-    return user?.user_role === 'superadmin' ? SUPER_API : CLIENT_API;
+  const getApiConfig = (currentUser?: User | null) => {
+    const userRole = currentUser?.user_role || user?.user_role;
+    return userRole === 'superadmin' ? SUPER_API : CLIENT_API;
   };
 
   // Verificar si las notificaciones push están soportadas
@@ -96,9 +99,9 @@ export function usePushNotifications() {
   }, []);
 
   // Obtener clave pública VAPID
-  const getVapidPublicKey = async (): Promise<string> => {
+  const getVapidPublicKey = async (currentUser?: User | null): Promise<string> => {
     try {
-      const apiConfig = getApiConfig();
+      const apiConfig = getApiConfig(currentUser);
       const response = await fetch(apiConfig.NOTIFICATION_GET_VAPID, {
         credentials: 'include',
         headers: {
@@ -107,7 +110,9 @@ export function usePushNotifications() {
       });
 
       if (!response.ok) {
-        throw new Error('Error obteniendo clave VAPID');
+        const errorText = await response.text();
+        console.error('❌ VAPID endpoint error:', errorText);
+        throw new Error(`Error obteniendo clave VAPID: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -119,9 +124,9 @@ export function usePushNotifications() {
   };
 
   // Registrar token en el backend
-  const registerToken = async (subscription: PushSubscription): Promise<void> => {
+  const registerToken = async (subscription: PushSubscription, currentUser?: User | null): Promise<void> => {
     try {
-      const apiConfig = getApiConfig();
+      const apiConfig = getApiConfig(currentUser);
       const response = await fetch(apiConfig.NOTIFICATION_SUBSCRIBE, {
         method: 'POST',
         credentials: 'include',
@@ -143,10 +148,31 @@ export function usePushNotifications() {
   };
 
   // Suscribirse a notificaciones push
-  const subscribeToPush = useCallback(async (showToasts: boolean = true, userId?: string): Promise<boolean> => {
+  const subscribeToPush = useCallback(async (showToasts: boolean = true, _userId?: string, _userRole?: string): Promise<boolean> => {
     if (!checkSupport()) {
       if (showToasts) {
         toast.error('Las notificaciones push no están soportadas en este navegador');
+      }
+      return false;
+    }
+
+    // Usar el usuario del contexto (no crear objetos parciales)
+    const currentUser = user;
+    
+    // Verificar que el usuario esté cargado
+    if (!currentUser) {
+      console.warn('⚠️ User not loaded yet, waiting...');
+      if (showToasts) {
+        toast.error('Usuario no cargado, intente nuevamente');
+      }
+      return false;
+    }
+
+    // Verificar que el usuario tenga un rol válido
+    if (!currentUser.user_role) {
+      console.warn('⚠️ User role not available');
+      if (showToasts) {
+        toast.error('Rol de usuario no disponible');
       }
       return false;
     }
@@ -164,7 +190,7 @@ export function usePushNotifications() {
       }
 
       // Obtener clave VAPID
-      const vapidPublicKey = await getVapidPublicKey();
+      const vapidPublicKey = await getVapidPublicKey(currentUser);
       const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
       // Obtener registro del service worker y esperar a que esté activo
@@ -191,11 +217,11 @@ export function usePushNotifications() {
       });
 
       // Registrar token en el backend
-      await registerToken(subscription);
+      await registerToken(subscription, currentUser);
 
       // Actualizar localStorage - marcar como aceptado para este usuario
-      if (userId) {
-        localStorage.setItem(`fasttrack_notification_decision_${userId}`, 'accepted');
+      if (_userId) {
+        localStorage.setItem(`fasttrack_notification_decision_${_userId}`, 'accepted');
       }
 
       setIsSubscribed(true);
@@ -213,7 +239,7 @@ export function usePushNotifications() {
     } finally {
       setIsLoading(false);
     }
-  }, [checkSupport]);
+  }, [checkSupport, getVapidPublicKey, registerToken, user]);
 
   // Desuscribirse de notificaciones push (solo dispositivo actual)
   const unsubscribeFromPush = useCallback(async (userId?: string): Promise<boolean> => {
@@ -262,7 +288,7 @@ export function usePushNotifications() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [getApiConfig]);
 
   // Cancelar notificaciones en todos los dispositivos
   const unsubscribeFromAllDevices = useCallback(async (userId?: string): Promise<boolean> => {
@@ -308,7 +334,7 @@ export function usePushNotifications() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [getApiConfig]);
 
   // Limpiar suscripción local (forzar nueva suscripción)
   const clearLocalSubscription = useCallback(async (): Promise<boolean> => {

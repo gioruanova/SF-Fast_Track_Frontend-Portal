@@ -171,7 +171,7 @@ export function SuperadminReclamosPage() {
                 Visualiza y gestiona todos los reclamos del sistema
               </p>
             </div>
-            <Badge variant="secondary" className="text-lg px-4 py-2">
+            <Badge variant="secondary" className="text-lg px-4 py-1">
               {filteredReclamos.length} de {reclamos.length}
             </Badge>
           </div>

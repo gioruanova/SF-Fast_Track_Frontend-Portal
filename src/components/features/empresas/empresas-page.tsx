@@ -355,17 +355,17 @@ export function EmpresasPage() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-center">
                           <div className="flex flex-col gap-1 text-xs">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-2">
                               <span className="text-muted-foreground">Owners:</span>
-                              <span className="font-medium">{userCounts[company.company_id]?.owners || 0}</span>
+                              <span className="font-medium">{userCounts[company.company_id]?.owners || 0} / 1</span>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-2">
                               <span className="text-muted-foreground">Operadores:</span>
-                              <span className="font-medium">{userCounts[company.company_id]?.operadores || 0}</span>
+                              <span className="font-medium">{userCounts[company.company_id]?.operadores || 0} / {company.limite_operadores}</span>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-2">
                               <span className="text-muted-foreground">Profesionales:</span>
-                              <span className="font-medium">{userCounts[company.company_id]?.profesionales || 0}</span>
+                              <span className="font-medium">{userCounts[company.company_id]?.profesionales || 0} / {company.limite_profesionales}</span>
                             </div>
                           </div>
                         </TableCell>

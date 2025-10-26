@@ -1,23 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench, Mail, Phone, MapIcon } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
 import axios from "axios";
@@ -29,6 +18,7 @@ import { useAuth } from "@/context/AuthContext";
 import { ContactoRapido } from "@/components/dashboard/profesional/contacto-rapido-feature";
 import { Separator } from "@/components/ui/separator";
 import { MapViewer } from "@/components/ui/map-viewer";
+import { ContactoClienteRapido } from "@/components/dashboard/profesional/contacto-rapido-cliente-feature";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -45,7 +35,11 @@ interface ReclamoData {
   reclamo_estado: string;
   cliente_complete_name: string;
   cliente_direccion?: string;
+  cliente_lat?: number;
+  cliente_lng?: number;
   reclamo_url?: string;
+  cliente_email?: string;
+  cliente_phone?: string;
   profesional: string;
   agenda_fecha: string;
   agenda_hora_desde: string;
@@ -93,6 +87,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
   const [notaCierre, setNotaCierre] = useState("");
   const [presupuesto, setPresupuesto] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const handleEstadoChange = (value: string) => {
     setSelectedEstado(value);
@@ -225,7 +220,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             <div className="flex flex-col items-center gap-2 text-sm flex-1">
               <div className="flex items-center gap-2 text-sm">
                 <Wrench className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{companyConfig?.sing_heading_especialidad}:</span>
+                <span className="text-muted-foreground">{companyConfig?.sing_heading_especialidad || "Especialidad"}:</span>
               </div>
               <p className="font-medium">{reclamo.nombre_especialidad}</p>
             </div>
@@ -235,7 +230,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           <div className="flex items-start flex-col gap-2 text-sm">
             <div className="flex items-center gap-2 text-sm">
               <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{companyConfig?.sing_heading_profesional} responsable:</span>
+              <span className="text-muted-foreground">{companyConfig?.sing_heading_profesional || "Profesional"} responsable:</span>
             </div>
             <span className="font-medium">{reclamo.profesional}</span>
           </div>
@@ -245,7 +240,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <User className="w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{companyConfig?.sing_heading_solicitante}:</span>
+                <span className="text-muted-foreground">{companyConfig?.sing_heading_solicitante || "Solicitante"}:</span>
                 <span className="font-medium">{reclamo.cliente_complete_name}</span>
               </div>
 
@@ -267,6 +262,22 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
               </div>
 
 
+              {reclamo.cliente_email && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Email:</span>
+                  <a href={`mailto:${reclamo.cliente_email}`} className="font-medium text-primary hover:underline">{reclamo.cliente_email}</a>
+                </div>
+              )}
+
+              {reclamo.cliente_phone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Teléfono:</span>
+                  <a href={`tel:${reclamo.cliente_phone}`} className="font-medium text-primary hover:underline">{reclamo.cliente_phone}</a>
+                </div>
+              )}
+
               {reclamo.cliente_direccion && (
                 <div className="space-y-3">
                   <div className="flex items-start flex-col gap-2 text-sm">
@@ -284,6 +295,16 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                       showExpandButton={true}
                     />
                   </div>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${reclamo.cliente_lat},${reclamo.cliente_lng}`}
+                      className="w-full flex items-center justify-center gap-2"
+                      target="_blank" rel="noopener noreferrer">
+                      <MapIcon className="w-4 h-4" />
+                      Ver en Google Maps
+                    </a>
+                  </Button>
+                  <span className="text-xs text-muted-foreground flex text-center italic">(Su dispositivo requiere acceso a su ubicacion actual para poder ver la direccion en Google Maps)</span>
                 </div>
               )}
 
@@ -307,12 +328,33 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           </div>
           <Separator />
 
-
-
           <div>
             <Label className="text-muted-foreground">Descripción:</Label>
-            <p className="mt-1 text-sm">{reclamo.reclamo_detalle}</p>
+
+
+            {showMore && (
+              <p className="mt-1 text-sm text-justify">{reclamo.reclamo_detalle}</p>
+            )}
+            {!showMore && (
+              <p className="mt-1 text-sm text-justify">{reclamo.reclamo_detalle.length > 400 ? reclamo.reclamo_detalle.substring(0, 400) + "..." : reclamo.reclamo_detalle}</p>
+            )}
+
+            {reclamo.reclamo_detalle.length > 400 && (
+              <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => setShowMore(!showMore)}>{showMore ? "Ver menos" : "Ver mas"}</Button>
+            )}
+
           </div>
+
+
+          {userRole === "profesional" && (
+            <div className="border-t pt-4 space-y-4">
+              <div className="flex flex-col items-start gap-0">
+                <span>No dudes en contactar al {companyConfig?.sing_heading_solicitante} para evacuar cualquier duda que tengas</span>
+              </div>
+              <ContactoClienteRapido cliente_phone={reclamo.cliente_phone} cliente_email={reclamo.cliente_email} reclamo_nro={reclamo.reclamo_id.toString()} reclamo_detalle={reclamo.reclamo_titulo} />
+            </div>
+          )}
+
           <Separator />
 
           {/* Mostrar nota de cierre y presupuesto si el reclamo está cerrado/cancelado */}

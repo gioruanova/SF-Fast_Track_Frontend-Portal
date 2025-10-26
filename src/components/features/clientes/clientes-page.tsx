@@ -35,7 +35,7 @@ interface ClientesPageProps {
   userRole: "owner" | "operador"
 }
 
-export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
+export function ClientesPage({ userRole }: ClientesPageProps) {
   // userrole se usa para validacion de tipos, la logica de permisos se maneja en el layout
   const { companyConfig } = useAuth()
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -311,7 +311,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-lg px-4 py-2">
+              <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredClientes.length} de {clientes.length}
               </Badge>
               <Button onClick={handleCreateCliente}>

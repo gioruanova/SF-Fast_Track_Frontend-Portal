@@ -201,7 +201,7 @@ export function ProfesionalReclamosActivos() {
                             </span>
                           </div>
                           
-                          <p className="text-sm text-muted-foreground line-clamp-2">
+                          <p className="text-sm text-muted-foreground line-clamp-1">
                             {reclamo.reclamo_detalle}
                           </p>
 

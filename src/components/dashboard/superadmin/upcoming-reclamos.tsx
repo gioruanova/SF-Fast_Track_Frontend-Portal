@@ -212,7 +212,7 @@ export function SuperadminUpcomingReclamos() {
                             <span className="text-xs bg-muted px-2 py-1 rounded">#{reclamo.reclamo_id}</span>
                           </div>
 
-                          <p className="text-sm text-muted-foreground line-clamp-2">
+                          <p className="text-sm text-muted-foreground line-clamp-1">
                             {reclamo.reclamo_detalle}
                           </p>
 

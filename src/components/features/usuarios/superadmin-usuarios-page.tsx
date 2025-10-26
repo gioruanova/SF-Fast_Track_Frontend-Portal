@@ -317,7 +317,7 @@ export function SuperadminUsuariosPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-lg px-4 py-2">
+              <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredUsuarios.length} de {usuarios.length}
               </Badge>
               <Button onClick={handleCreateUser}>

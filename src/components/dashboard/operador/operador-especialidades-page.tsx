@@ -194,7 +194,7 @@ export function OperadorEspecialidadesPage() {
             </p>
           </div>
           <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-            <Badge variant="secondary" className="text-lg px-4 py-2">
+            <Badge variant="secondary" className="text-lg px-4 py-1">
               {filteredEspecialidades.length} de {especialidades.length}
             </Badge>
             <Badge variant="outline" className="text-lg px-4 py-2">

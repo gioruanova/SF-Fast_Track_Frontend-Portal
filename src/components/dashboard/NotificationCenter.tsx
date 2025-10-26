@@ -100,28 +100,28 @@ export function NotificationCenter() {
     }
   };
 
-  const addNotification = (title: string, body: string, path?: string) => {
-    const newNotification: Notification = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title,
-      body,
-      timestamp: Date.now(),
-      read: false,
-      path, // va el path solo si existee
-    };
+  // const addNotification = (title: string, body: string, path?: string) => {
+  //   const newNotification: Notification = {
+  //     id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  //     title,
+  //     body,
+  //     timestamp: Date.now(),
+  //     read: false,
+  //     path, // va el path solo si existee
+  //   };
 
-    setNotifications(prev => {
-      const updatedNotifications = [newNotification, ...prev].slice(0, 50); // Máximo 50
+  //   setNotifications(prev => {
+  //     const updatedNotifications = [newNotification, ...prev].slice(0, 50); // Máximo 50
 
-      try {
-        localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
-      } catch (error) {
-        console.error('Error saving notifications:', error);
-      }
+  //     try {
+  //       localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
+  //     } catch (error) {
+  //       console.error('Error saving notifications:', error);
+  //     }
 
-      return updatedNotifications;
-    });
-  };
+  //     return updatedNotifications;
+  //   });
+  // };
 
   const markAsRead = (id: string) => {
     const updatedNotifications = notifications.map(notification =>

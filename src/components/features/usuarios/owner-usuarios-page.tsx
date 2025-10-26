@@ -273,7 +273,7 @@ export function OwnerUsuariosPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-lg px-4 py-2">
+              <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredUsers.length} de {users.length}
               </Badge>
               <Button onClick={handleCreateUser}>
@@ -349,7 +349,7 @@ export function OwnerUsuariosPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>DNI</TableHead>
                     <TableHead>Teléfono</TableHead>
-                    <TableHead>Rol</TableHead>
+                    <TableHead className="text-center">Rol</TableHead>
                     <TableHead className="text-center">Estado</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
@@ -363,7 +363,7 @@ export function OwnerUsuariosPage() {
                       <TableCell>{user.user_email}</TableCell>
                       <TableCell>{user.user_dni}</TableCell>
                       <TableCell>{user.user_phone}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         {getRoleBadge(user.user_role)}
                       </TableCell>
                       <TableCell className="text-center">

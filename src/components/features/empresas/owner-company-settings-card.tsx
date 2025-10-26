@@ -360,12 +360,14 @@ export function OwnerCompanySettingsCard() {
                 <CardDescription className="pt-4">Notificaciones personalizadas</CardDescription>
                 <div className="grid grid-cols-1 gap-4 mt-4">
                   {([
-                    { key: "string_inicio_reclamo_solicitante", label: "Mensaje inicio: Solicitante", desc: "Mensaje enviado al solicitante al iniciar la gestión." },
-                    { key: "string_recordatorio_reclamo_solicitante", label: "Mensaje recordatorio: Solicitante", desc: "Mensaje de recordatorio para el solicitante." },
-                    { key: "string_cierre_reclamo_solicitante", label: "Mensaje cierre: Solicitante", desc: "Mensaje al solicitante cuando finaliza la gestión." },
+                    // { key: "string_inicio_reclamo_solicitante", label: "Mensaje inicio: Solicitante", desc: "Mensaje enviado al solicitante al iniciar la gestión." },
+                    // { key: "string_actualizacion_reclamo_solicitante", label: "Mensaje actualización: Solicitante", desc: "Mensaje de actualización para el solicitante." },
+                    // { key: "string_recordatorio_reclamo_solicitante", label: "Mensaje recordatorio: Solicitante", desc: "Mensaje de recordatorio para el solicitante." },
+                    // { key: "string_cierre_reclamo_solicitante", label: "Mensaje cierre: Solicitante", desc: "Mensaje al solicitante cuando finaliza la gestión." },
                     { key: "string_inicio_reclamo_profesional", label: "Mensaje inicio: Profesional", desc: "Mensaje enviado al profesional al asignar una actividad." },
+                    { key: "string_actualizacion_reclamo_profesional", label: "Mensaje actualización: Profesional", desc: "Mensaje de actualización para el profesional." },
                     { key: "string_recordatorio_reclamo_profesional", label: "Mensaje recordatorio: Profesional", desc: "Mensaje de recordatorio para el profesional." },
-                    { key: "string_cierre_reclamo_profesional", label: "Mensaje cierre: Profesional", desc: "Mensaje al profesional cuando se cierra la actividad." },
+                    // { key: "string_cierre_reclamo_profesional", label: "Mensaje cierre: Profesional", desc: "Mensaje al profesional cuando se cierra la actividad." },
                   ] as Array<{ key: string; label: string; desc: string }>).map((item) => {
                     const value = companyConfig?.[item.key as keyof typeof companyConfig] ?? "";
                     return (

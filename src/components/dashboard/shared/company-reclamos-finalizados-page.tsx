@@ -4,22 +4,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Eye, Search, X, Calendar, User, Download, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Eye, Search, X, Calendar, User, Download, Loader2, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detail-sheet";
 import { toast } from "sonner";
 import axios from "axios";
@@ -155,7 +142,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
   const handleDownloadReport = async (type: 'inactive' | 'all') => {
     try {
       setDownloadingType(type);
-      
+
       const endpoint = CLIENT_API.RECLAMO_DESCARGA.replace('{type}', type);
       const response = await apiClient.get(endpoint, {
         responseType: 'blob',
@@ -168,18 +155,18 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      
+
       // intentar obtener filename del header content-disposition
       const contentDisposition = response.headers['content-disposition'];
       let filename;
-      
+
       if (contentDisposition) {
         const matches = /filename[^;=\n]*=\s*([^;\n]*)/.exec(contentDisposition);
         if (matches && matches[1]) {
           filename = matches[1].replace(/['"]/g, '').trim();
         }
       }
-      
+
       // si no hay header, generar nombre descriptivo
       if (!filename) {
         const fecha = Date.now();
@@ -188,7 +175,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
         const heading = companyConfig?.plu_heading_reclamos || 'Reclamos';
         filename = `${empresa} - Reporte ${heading} - [${tipoReporte}]_${fecha}.xlsx`;
       }
-      
+
       link.download = filename;
 
       document.body.appendChild(link);
@@ -252,6 +239,9 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                   <Download className="h-4 w-4 mr-0" />
                 )}
                 Todos
+              </Button>
+              <Button onClick={fetchReclamos} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -379,7 +369,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} ya finalizados/as
             </div>
-            
+
             {totalPages > 1 && (
               <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
                 <Button
@@ -392,7 +382,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                   <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="hidden sm:inline ml-1">Anterior</span>
                 </Button>
-                
+
                 <div className="flex flex-wrap items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <Button
@@ -406,7 +396,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                     </Button>
                   ))}
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"

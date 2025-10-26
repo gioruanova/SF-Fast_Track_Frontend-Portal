@@ -4,22 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Eye, Search, X, Calendar, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { Eye, Search, X, Calendar, User, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detail-sheet";
 import { toast } from "sonner";
 import axios from "axios";
@@ -78,13 +65,13 @@ export function ProfesionalReclamosFinalizadosPage() {
     try {
       setIsLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_RECLAMOS_PROFESIONAL);
-      
+
       const finishedReclamos = response.data
         .filter((r: ReclamoData) => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO")
         .sort((a: ReclamoData, b: ReclamoData) => {
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
-      
+
       setReclamos(finishedReclamos);
       setFilteredReclamos(finishedReclamos);
     } catch (error) {
@@ -161,9 +148,14 @@ export function ProfesionalReclamosFinalizadosPage() {
                 Todos tus {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} finalizados
               </p>
             </div>
-            <Badge variant="secondary" className="px-4 py-1.5 text-sm">
-              {filteredReclamos.length} de {reclamos.length}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="px-4 py-1.5 text-sm">
+                {filteredReclamos.length} de {reclamos.length}
+              </Badge>
+              <Button onClick={fetchReclamos} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -287,45 +279,45 @@ export function ProfesionalReclamosFinalizadosPage() {
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} sin actividades pendientes
             </div>
-            
+
             {totalPages > 1 && (
-            <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="text-xs md:text-sm px-2 md:px-3"
-              >
-                <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
-                <span className="hidden sm:inline ml-1">Anterior</span>
-              </Button>
-              
-              <div className="flex flex-wrap items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
-                  >
-                    {page}
-                  </Button>
-                ))}
+              <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="text-xs md:text-sm px-2 md:px-3"
+                >
+                  <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline ml-1">Anterior</span>
+                </Button>
+
+                <div className="flex flex-wrap items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="text-xs md:text-sm px-2 md:px-3"
+                >
+                  <span className="hidden sm:inline mr-1">Siguiente</span>
+                  <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+                </Button>
               </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="text-xs md:text-sm px-2 md:px-3"
-              >
-                <span className="hidden sm:inline mr-1">Siguiente</span>
-                <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
-              </Button>
-            </div>
             )}
           </div>
         </CardContent>

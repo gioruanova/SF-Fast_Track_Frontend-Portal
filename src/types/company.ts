@@ -17,9 +17,11 @@ export interface CompanyConfigData {
   sing_heading_especialidad: string;
   plu_heading_especialidad: string;
   string_inicio_reclamo_solicitante: string;
+  string_actualizacion_reclamo_solicitante: string;
   string_recordatorio_reclamo_solicitante: string;
   string_cierre_reclamo_solicitante: string;
   string_inicio_reclamo_profesional: string;
+  string_actualizacion_reclamo_profesional: string;
   string_recordatorio_reclamo_profesional: string;
   string_cierre_reclamo_profesional: string;
   created_at: string;

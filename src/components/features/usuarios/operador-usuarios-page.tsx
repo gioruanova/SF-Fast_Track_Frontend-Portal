@@ -277,7 +277,7 @@ export function OperadorUsuariosPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-lg px-4 py-2">
+              <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredUsers.length} de {users.length}
               </Badge>
               <Button onClick={handleCreateUser}>

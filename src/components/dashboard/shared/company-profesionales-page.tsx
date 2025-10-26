@@ -134,7 +134,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
               Administra los {companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"} de tu empresa
             </p>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2">
+          <Badge variant="secondary" className="text-lg px-4 py-1">
             {filteredProfesionales.length} de {profesionales.length}
           </Badge>
         </div>

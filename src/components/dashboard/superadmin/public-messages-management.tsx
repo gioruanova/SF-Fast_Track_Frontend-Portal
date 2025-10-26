@@ -361,17 +361,18 @@ export function PublicMessagesManagement() {
                               <SheetHeader>
                                 <SheetTitle>Mensaje Completo</SheetTitle>
                                 <SheetDescription>
-                                  De: {message.message_email} | {message.message_source}
+                                  De: {message.category_original} - {message.message_source} | {message.message_email}
                                 </SheetDescription>
                               </SheetHeader>
                               <div className="mt-4 space-y-4">
                                 <div>
                                   <h4 className="font-medium mb-2">Información del contacto:</h4>
                                   <p className="text-sm text-muted-foreground">
-                                    Email: {message.message_email}
+                                    <span>Email: </span> <a className="text-primary hover:text-blue-700" href={`mailto:${message.message_email}`}>{message.message_email}</a>
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    Teléfono: {message.message_phone}
+                                    <span>Telefono: </span>
+                                    {message.message_phone !== "N/A" ? <a className="text-primary hover:text-blue-700" href={`tel:${message.message_phone}`}>{message.message_phone}</a> : <span className="text-muted-foreground">N/A</span>}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     Fuente: {message.message_source}
@@ -385,7 +386,7 @@ export function PublicMessagesManagement() {
                                 </div>
                                 <div>
                                   <h4 className="font-medium mb-2">Mensaje:</h4>
-                                  <p className="whitespace-pre-wrap">{message.message_content}</p>
+                                  <p className="whitespace-pre-wrap max-h-[300px] overflow-y-auto">{message.message_content}</p>
                                 </div>
                               </div>
                             </SheetContent>

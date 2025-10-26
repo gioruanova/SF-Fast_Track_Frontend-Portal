@@ -47,6 +47,9 @@ export function ProfessionalPlatformMessagesManagement() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [openDialogId, setOpenDialogId] = useState<number | null>(null);
+
+
 
   // Funciones para listado de mensajes
   const fetchMessages = async () => {
@@ -216,7 +219,7 @@ export function ProfessionalPlatformMessagesManagement() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Dialog>
+                        <Dialog open={openDialogId === message.id} onOpenChange={(open) => setOpenDialogId(open ? message.id : null)}>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
                               <ExternalLink className="h-4 w-4" />
@@ -233,18 +236,17 @@ export function ProfessionalPlatformMessagesManagement() {
                               <div>
                                 <h4 className="font-medium mb-2">Contenido del mensaje:</h4>
                                 <div className="bg-muted p-4 rounded-lg">
-                                  <p className="whitespace-pre-wrap">{message.platformMessage.platform_message_content}</p>
+                                  <div
+                                    className="whitespace-pre-wrap max-h-[300px] overflow-y-auto prose prose-sm max-w-none"
+                                    dangerouslySetInnerHTML={{
+                                      __html: message.platformMessage.platform_message_content
+                                    }}
+                                  />
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">Estado:</span>
-                                <Badge variant={message.is_read === 1 ? "default" : "secondary"}>
-                                  {message.is_read === 1 ? "Leído" : "No leído"}
-                                </Badge>
                               </div>
                             </div>
                             <DialogFooter>
-                              <Button variant="outline" onClick={() => { }}>
+                              <Button variant="outline" onClick={() => { setOpenDialogId(null) }}>
                                 Cerrar
                               </Button>
                             </DialogFooter>
