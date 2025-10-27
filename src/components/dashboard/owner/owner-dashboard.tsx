@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DashboardProvider } from "@/context/DashboardContext";
 import { CompanyStatsOverview } from "../shared/company-stats-overview";
 import { OwnerLogsActivity } from "./logs-activity";
 import { CompanyUpcomingReclamos } from "../shared/company-upcoming-reclamos";
@@ -25,8 +24,7 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
   const isCompanyActive = user.company_status === 1;
 
   return (
-    <DashboardProvider>
-      <div className="space-y-4">
+    <div className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">
@@ -72,7 +70,6 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
           </Card>
         )}
       </div>
-    </DashboardProvider>
   );
 }
 

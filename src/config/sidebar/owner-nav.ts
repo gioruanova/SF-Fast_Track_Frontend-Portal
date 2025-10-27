@@ -12,66 +12,80 @@ import {
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
 
-export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] => [
-  {
-    title: "Inicio",
-    url: "/dashboard/owner",
-    icon: House,
+export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] => {
+  const isCompanyActive = config?.company?.company_estado === 1;
 
-  },
-  {
-    title: "Mi Organizacion",
-    url: "/dashboard/owner/mi-empresa",
-    icon: Landmark,
+  return [
+    {
+      title: "Inicio",
+      url: "/dashboard/owner",
+      icon: House,
 
-  },
-  {
-    title: `${config?.plu_heading_reclamos}`,
-    url: "#",
-    icon: SquareCheck,
-    isActive: true,
-    items: [
-      {
-        title: `Generar ${config?.sing_heading_reclamos}`,
-        url: "#",
-      },
-      {
-        title: `${config?.plu_heading_reclamos} en curso`,
-        url: "/dashboard/owner/trabajar-reclamos",
-      },
-      {
-        title: `Historial de ${config?.plu_heading_reclamos?.toLowerCase()}`,
-        url: "/dashboard/owner/historial-reclamos",
-      },
-    ],
+    },
+    {
+      title: "Mi Organizacion",
+      url: "/dashboard/owner/mi-empresa",
+      icon: Landmark,
+      disabled: !isCompanyActive,
 
-  },
-  {
-    title: `${config?.plu_heading_especialidad}`,
-    url: "/dashboard/owner/especialidades",
-    icon: Wrench,
+    },
+    {
+      title: `${config?.plu_heading_reclamos}`,
+      url: "#",
+      icon: SquareCheck,
+      isActive: !isCompanyActive ? false : true,
+      disabled: !isCompanyActive,
+      items: [
+        {
+          title: `Generar ${config?.sing_heading_reclamos}`,
+          url: "#",
+          isCreateAction: true,
+          disabled: !isCompanyActive,
+        },
+        {
+          title: `${config?.plu_heading_reclamos} en curso`,
+          url: "/dashboard/owner/trabajar-reclamos",
+          disabled: !isCompanyActive,
+        },
+        {
+          title: `Historial de ${config?.plu_heading_reclamos?.toLowerCase()}`,
+          url: "/dashboard/owner/historial-reclamos",
+          disabled: !isCompanyActive,
+        },
+      ],
 
-  },
-  {
-    title: `${config?.plu_heading_profesional}`,
-    url: "/dashboard/owner/profesionales",
-    icon: ShieldUser,
+    },
+    {
+      title: `${config?.plu_heading_especialidad}`,
+      url: "/dashboard/owner/especialidades",
+      icon: Wrench,
+      disabled: !isCompanyActive,
 
-  },
-  {
-    title: "Usuarios",
-    url: "/dashboard/owner/users",
-    icon: Users,
+    },
+    {
+      title: `${config?.plu_heading_profesional}`,
+      url: "/dashboard/owner/profesionales",
+      icon: ShieldUser,
+      disabled: !isCompanyActive,
 
-  },
+    },
+    {
+      title: "Usuarios",
+      url: "/dashboard/owner/users",
+      icon: Users,
+      disabled: !isCompanyActive,
 
-  {
-    title: `${config?.plu_heading_solicitante}`,
-    url: "/dashboard/owner/clientes",
-    icon: Briefcase,
-  },
+    },
 
-];
+    {
+      title: `${config?.plu_heading_solicitante}`,
+      url: "/dashboard/owner/clientes",
+      icon: Briefcase,
+      disabled: !isCompanyActive,
+    },
+
+  ];
+};
 
 export const ownerTeamData = (companyName: string): TeamData[] => [
   {

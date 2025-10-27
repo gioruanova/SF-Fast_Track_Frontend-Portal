@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useUnreadMessagesCount } from "@/hooks/useUnreadMessagesCount"
 import { NotificationBadge } from "@/components/ui/notification-badge"
+import { useDashboard } from "@/context/DashboardContext"
 
 export function NavMain({
   items,
@@ -31,9 +32,12 @@ export function NavMain({
     url: string
     icon?: LucideIcon
     isActive?: boolean
+    disabled?: boolean
     items?: {
       title: string
       url: string
+      isCreateAction?: boolean
+      disabled?: boolean
     }[]
   }[]
   label?: string
@@ -41,8 +45,20 @@ export function NavMain({
   const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
   const { unreadCount } = useUnreadMessagesCount();
+  const { setShouldOpenCreateReclamo } = useDashboard();
 
-  const handleNavigation = (url: string) => {
+  const handleNavigation = (url: string, isCreateAction?: boolean, disabled?: boolean) => {
+    if (disabled) {
+      return; // No hacer nada si está desactivado
+    }
+    
+    if (isCreateAction) {
+      setShouldOpenCreateReclamo(true);
+      if (isMobile) {
+        setOpenMobile(false);
+      }
+      return;
+    }
     router.push(url);
     if (isMobile) {
       setOpenMobile(false);
@@ -67,8 +83,9 @@ export function NavMain({
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton 
                   tooltip={item.title}
-                  onClick={() => handleNavigation(item.url)}
-                  className="cursor-pointer"
+                  onClick={() => handleNavigation(item.url, false, item.disabled)}
+                  className={`cursor-pointer ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={item.disabled}
                 >
                   {item.icon && <item.icon />}
                   <span className="flex-1">{item.title}</span>
@@ -87,7 +104,11 @@ export function NavMain({
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title} className="cursor-pointer">
+                  <SidebarMenuButton 
+                    tooltip={item.title} 
+                    className={`cursor-pointer ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={item.disabled}
+                  >
                     {item.icon && <item.icon />}
                     <span className="flex-1">{item.title}</span>
                     {shouldShowBadge && <NotificationBadge count={unreadCount} />}
@@ -99,8 +120,8 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton 
-                          onClick={() => handleNavigation(subItem.url)}
-                          className="cursor-pointer"
+                          onClick={() => handleNavigation(subItem.url, subItem.isCreateAction, subItem.disabled)}
+                          className={`cursor-pointer ${subItem.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <span>{subItem.title}</span>
                         </SidebarMenuSubButton>

@@ -31,9 +31,12 @@ import { isSuperAdmin, isCompanyUser } from "@/types/auth"
 import { UserProfileSheet } from "@/components/features/profile/user-profile-sheet"
 
 export function NavUser() {
-  const { user, logout } = useAuth()
+  const { user, logout, companyConfig } = useAuth()
   const { isMobile } = useSidebar()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  
+  // Verificar si la empresa está activa
+  const isCompanyActive = companyConfig?.company?.company_estado === 1;
 
   if (!user) return null
 
@@ -122,7 +125,11 @@ export function NavUser() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
+                <DropdownMenuItem 
+                  onClick={() => setIsProfileOpen(true)}
+                  disabled={!isCompanyActive}
+                  className={!isCompanyActive ? 'opacity-50 cursor-not-allowed' : ''}
+                >
                   <BadgeCheck />
                   Mi Perfil
                 </DropdownMenuItem>

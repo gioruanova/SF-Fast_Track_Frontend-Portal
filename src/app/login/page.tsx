@@ -29,6 +29,7 @@ export default function LoginPage() {
           className="absolute inset-0 h-full w-full object-cover"
           width={1920}
           height={1080}
+          priority={true}
         />
 
         {/* TODO: Quitar esto para produccion */}

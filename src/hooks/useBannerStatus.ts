@@ -45,11 +45,16 @@ export function useBannerStatus() {
   const { user, companyConfig } = useAuth();
 
   const fetchBannerStatus = useCallback(async () => {
+    // Verificar si la empresa está activa antes de hacer la llamada
+    if (companyConfig?.company?.company_estado !== 1) {
+      setBanner(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       let response;
-
-
 
       if (isSuperAdmin(user)) {
         response = await apiClient.get(SUPER_API.GET_BANNERS);
@@ -69,21 +74,14 @@ export function useBannerStatus() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, companyConfig?.company?.company_estado]);
 
   useEffect(() => {
-    // Si la compañía está inactiva, no mostrar banner
-    if (companyConfig?.company?.company_estado === 0) {
-      setBanner(null);
-      setLoading(false);
-      return;
-    }
-    
-    // Si hay usuario y la compañía está activa, cargar banner
-    if (user && companyConfig?.company?.company_estado === 1) {
+    // Solo cargar banner si hay usuario
+    if (user) {
       fetchBannerStatus();
     }
-  }, [companyConfig?.company?.company_estado, user, fetchBannerStatus]);
+  }, [user, fetchBannerStatus]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

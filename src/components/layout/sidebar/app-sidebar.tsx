@@ -23,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const navItems = getNavItems(user, companyConfig);
   const teams = getTeamData(user);
-  const projects = getProjects(user);
+  const projects = getProjects(user, companyConfig);
 
   return (
     <Sidebar collapsible="icon" {...props}>

@@ -298,7 +298,6 @@ export function OperadorEspecialidadesPage() {
                             {especialidad.profesionales.map((prof) => (
                               <div key={prof.user_id} className="text-xs bg-muted/50 rounded px-2 py-1">
                                 <div className="font-medium">{prof.user_complete_name}</div>
-                                <div className="text-muted-foreground">{prof.user_email}</div>
                               </div>
                             ))}
                           </div>

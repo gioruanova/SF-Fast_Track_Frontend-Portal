@@ -3,6 +3,8 @@ import { LucideIcon } from "lucide-react";
 export interface NavSubItem {
   title: string;
   url: string;
+  isCreateAction?: boolean;
+  disabled?: boolean;
 }
 
 export interface NavItem {
@@ -11,6 +13,7 @@ export interface NavItem {
   icon?: LucideIcon;
   isActive?: boolean;
   items?: NavSubItem[];
+  disabled?: boolean;
 }
 
 export interface TeamData {
@@ -26,5 +29,6 @@ export interface ProjectData {
   icon?: LucideIcon;
   isActive?: boolean;
   items?: NavSubItem[];
+  disabled?: boolean;
 }
 

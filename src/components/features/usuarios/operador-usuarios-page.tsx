@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { Search, Plus, Edit, UserCheck, UserX, Key, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Plus, UserCheck, UserX, Key, X, ChevronLeft, ChevronRight } from "lucide-react"
 import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
@@ -27,6 +27,7 @@ interface User {
   user_status: number
   created_at: string
   updated_at: string
+  apto_recibir?: boolean | number
 }
 
 
@@ -71,7 +72,7 @@ export function OperadorUsuariosPage() {
       setIsLoading(true)
       const response = await apiClient.get(CLIENT_API.GET_USERS)
       // filtrar operadores y profesionales (no owners)
-      const usuariosPermitidos = (response.data || []).filter((user: User) => 
+      const usuariosPermitidos = (response.data || []).filter((user: User) =>
         user.user_role === "profesional" || user.user_role === "operador"
       )
       setUsers(usuariosPermitidos)
@@ -89,10 +90,10 @@ export function OperadorUsuariosPage() {
 
   const handleToggleUserStatus = async (user: User) => {
     try {
-      const endpoint = user.user_status === 1 
+      const endpoint = user.user_status === 1
         ? CLIENT_API.USER_BLOCK.replace("{id}", user.user_id.toString())
         : CLIENT_API.USER_UNBLOCK.replace("{id}", user.user_id.toString())
-      
+
       await apiClient.post(endpoint)
       toast.success(`Usuario ${user.user_status === 1 ? 'bloqueado' : 'desbloqueado'} exitosamente`)
       fetchUsers()
@@ -140,25 +141,12 @@ export function OperadorUsuariosPage() {
     setIsUserSheetOpen(true)
   }
 
-  const handleEditUser = (user: User) => {
-    setIsEditing(true)
-    setEditingUser(user)
-    setUserFormData({
-      user_complete_name: user.user_complete_name,
-      user_dni: user.user_dni,
-      user_phone: user.user_phone,
-      user_email: user.user_email,
-      user_role: "profesional", // siempre profesional al editar (no se puede cambiar)
-      user_password: ""
-    })
-    setIsUserSheetOpen(true)
-  }
 
   const handleSaveUser = async () => {
     try {
       if (isEditing && editingUser) {
         const url = CLIENT_API.USERS_EDIT.replace('{id}', editingUser.user_id.toString())
-        const editData: Record<string, unknown> = { 
+        const editData: Record<string, unknown> = {
           user_complete_name: userFormData.user_complete_name,
           user_dni: userFormData.user_dni,
           user_phone: userFormData.user_phone,
@@ -178,14 +166,14 @@ export function OperadorUsuariosPage() {
         await apiClient.post(CLIENT_API.USERS_CREATE, userFormData)
         toast.success("Usuario creado correctamente")
       }
-      
+
       setIsUserSheetOpen(false)
       setEditingUser(null)
       fetchUsers()
     } catch (error: unknown) {
-      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error || 
-                          (error as { message?: string })?.message || 
-                          "Error al guardar el usuario"
+      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
+        (error as { message?: string })?.message ||
+        "Error al guardar el usuario"
       toast.error(errorMessage)
     }
   }
@@ -207,16 +195,16 @@ export function OperadorUsuariosPage() {
     if (user && userItem.user_id === user.user_id) {
       return false
     }
-    
+
     const matchesSearch = userItem.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         userItem.user_dni.includes(searchTerm)
-    
+      userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      userItem.user_dni.includes(searchTerm)
+
     const matchesRole = filterRole === "all" || userItem.user_role === filterRole
-    const matchesStatus = filterStatus === "all" || 
-                         (filterStatus === "active" && userItem.user_status === 1) ||
-                         (filterStatus === "blocked" && userItem.user_status === 0)
-    
+    const matchesStatus = filterStatus === "all" ||
+      (filterStatus === "active" && userItem.user_status === 1) ||
+      (filterStatus === "blocked" && userItem.user_status === 0)
+
     return matchesSearch && matchesRole && matchesStatus
   })
 
@@ -242,9 +230,8 @@ export function OperadorUsuariosPage() {
 
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
-          roleColors[role] || "bg-gray-100 text-gray-800"
-        }`}
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${roleColors[role] || "bg-gray-100 text-gray-800"
+          }`}
       >
         {getRoleDisplayName(role)}
       </span>
@@ -254,11 +241,10 @@ export function OperadorUsuariosPage() {
   const getStatusBadge = (status: number) => {
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
-          status === 1
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${status === 1
             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-        }`}
+          }`}
       >
         {status === 1 ? 'Activo' : 'Inactivo'}
       </span>
@@ -355,6 +341,7 @@ export function OperadorUsuariosPage() {
                     <TableHead>Teléfono</TableHead>
                     <TableHead className="text-center">Rol</TableHead>
                     <TableHead className="text-center">Estado</TableHead>
+                    <TableHead className="text-center">Recibiendo?</TableHead>
                     <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -374,14 +361,10 @@ export function OperadorUsuariosPage() {
                         {getStatusBadge(user.user_status)}
                       </TableCell>
                       <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditUser(user)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                        {user.apto_recibir === 1 ? <Badge variant="default" className="bg-green-500 text-white px-2 py-1 rounded-md">Si</Badge> : <Badge variant="default" className="bg-red-500 text-white px-2 py-1 rounded-md">No</Badge>}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-end gap-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -470,7 +453,7 @@ export function OperadorUsuariosPage() {
               {isEditing ? "Modifica la información del usuario" : `Completa la información para crear un nuevo usuario (rol ${companyConfig?.sing_heading_profesional} por defecto)`}
             </SheetDescription>
           </SheetHeader>
-          
+
           <Separator />
           <div className="mt-0 space-y-4">
             <div className="space-y-2">

@@ -1,7 +1,7 @@
 import { User } from "@/types/auth";
 import { isSuperAdmin, isCompanyUser } from "@/types/auth";
 import { CompanyConfigData } from "@/types/company";
-import { NavItem, TeamData, ProjectData } from "./types";
+import { NavItem, TeamData } from "./types";
 import { superAdminNavItems, superAdminTeamData, superAdminProjects } from "./superadmin-nav";
 import {  ownerTeamData, ownerProjects, getOwnerNavItems } from "./owner-nav";
 import { getOperadorNavItems, operadorTeamData, operadorProjects } from "./operador-nav";
@@ -54,7 +54,7 @@ export function getTeamData(user: User | null): TeamData[] {
   return [];
 }
 
-export function getProjects(user: User | null): ProjectData[] {
+export function getProjects(user: User | null, config: CompanyConfigData | null = null): NavItem[] {
   if (!user) return [];
 
   if (isSuperAdmin(user)) {
@@ -62,13 +62,24 @@ export function getProjects(user: User | null): ProjectData[] {
   }
 
   if (isCompanyUser(user)) {
+    const isCompanyActive = config?.company?.company_estado === 1;
+    
     switch (user.user_role) {
       case "owner":
-        return ownerProjects;
+        return ownerProjects.map(project => ({
+          ...project,
+          disabled: !isCompanyActive
+        }));
       case "profesional":
-        return profesionalProjects;
+        return profesionalProjects.map(project => ({
+          ...project,
+          disabled: !isCompanyActive
+        }));
       case "operador":
-        return operadorProjects;
+        return operadorProjects.map(project => ({
+          ...project,
+          disabled: !isCompanyActive
+        }));
       default:
         return [];
     }

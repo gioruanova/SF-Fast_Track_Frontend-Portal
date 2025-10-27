@@ -3,7 +3,6 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { OperadorDashboard } from "@/components/dashboard/operador/operador-dashboard";
 import { QuickActionsBar } from "@/components/features/shared/quick-actions-bar";
-
 import { useAuth } from "@/context/AuthContext";
 import { isCompanyUser } from "@/types/auth";
 

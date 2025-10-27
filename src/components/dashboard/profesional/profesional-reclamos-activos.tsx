@@ -63,13 +63,13 @@ export function ProfesionalReclamosActivos() {
     try {
       setIsLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_RECLAMOS_PROFESIONAL);
-      
+
       const activeReclamos = response.data
         .filter((r: ReclamoData) => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO")
         .sort((a: ReclamoData, b: ReclamoData) => {
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
-      
+
       setReclamos(activeReclamos);
     } catch (error) {
       console.error("Error obteniendo reclamos:", error);
@@ -149,9 +149,9 @@ export function ProfesionalReclamosActivos() {
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => {
                 const total = reclamos.length || 1;
                 const percentage = (count / total) * 100;
-                
+
                 if (count === 0) return null;
-                
+
                 return (
                   <div
                     key={estado}
@@ -162,7 +162,7 @@ export function ProfesionalReclamosActivos() {
                 );
               })}
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 justify-center">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => (
                 <div key={estado} className="flex items-center gap-2 text-xs justify-center">
@@ -186,9 +186,8 @@ export function ProfesionalReclamosActivos() {
                   {displayedReclamos.map((reclamo, index) => (
                     <div
                       key={reclamo.reclamo_id}
-                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${
-                        index !== displayedReclamos.length - 1 ? 'mb-3' : ''
-                      }`}
+                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${index !== displayedReclamos.length - 1 ? 'mb-3' : ''
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-4 md:flex-row flex-col">
                         <div className="flex-1 space-y-2">
@@ -200,7 +199,7 @@ export function ProfesionalReclamosActivos() {
                               {reclamo.reclamo_estado}
                             </span>
                           </div>
-                          
+
                           <p className="text-sm text-muted-foreground line-clamp-1">
                             {reclamo.reclamo_detalle}
                           </p>
@@ -226,7 +225,7 @@ export function ProfesionalReclamosActivos() {
                             </span>
                           </div>
                         </div>
-                        
+
                         <Button
                           size="sm"
                           variant="default"
@@ -241,18 +240,17 @@ export function ProfesionalReclamosActivos() {
                 </div>
               )}
             </CardContent>
-            
+
             {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 flex justify-center mt-5">
                 <Button
                   variant="default"
-                  className="w-full"
                   asChild
                 >
                   <Link href="/dashboard/profesional/trabajar-reclamos">
-                    Ver todos los {reclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    Ver la totalidad de {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </CardContent>

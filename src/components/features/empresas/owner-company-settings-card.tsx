@@ -31,7 +31,7 @@ export function OwnerCompanySettingsCard() {
   const [editingValue, setEditingValue] = useState<string>("");
   const [isSavingField, setIsSavingField] = useState(false);
 
-  
+
   const values = useMemo(() => ({
     company_phone: companyConfig?.company?.company_phone || "",
     company_email: companyConfig?.company?.company_email || "",
@@ -232,7 +232,8 @@ export function OwnerCompanySettingsCard() {
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
                     <div>
                       <p className="text-sm font-medium">Requiere domicilio</p>
-                      <p className="text-xs text-muted-foreground">Solicitar dirección al crear actividades/reclamos.</p>
+                      <p className="text-xs text-muted-foreground">En caso de estar encendido, para crear cada {companyConfig?.sing_heading_solicitante?.toLowerCase() || "cliente"}
+                        se exigira un domicilio y sera compartido con tus {companyConfig?.plu_heading_profesional || "profesionales"} al momento de generar una actividad.</p>
                     </div>
                     <Switch
                       checked={togglesState.requiere_domicilio}
@@ -244,7 +245,7 @@ export function OwnerCompanySettingsCard() {
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
                     <div>
                       <p className="text-sm font-medium">Requiere URL</p>
-                      <p className="text-xs text-muted-foreground">Solicitar un enlace asociado a la actividad.</p>
+                      <p className="text-xs text-muted-foreground">En cada {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} En caso de estar encendido, se podra agregar un enlace asociado a cada {companyConfig?.sing_heading_reclamos || "reclamo"} que inicies.</p>
                     </div>
                     <Switch
                       checked={togglesState.requiere_url}
@@ -256,7 +257,8 @@ export function OwnerCompanySettingsCard() {
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
                     <div>
                       <p className="text-sm font-medium">Requiere fecha de finalización</p>
-                      <p className="text-xs text-muted-foreground">Obligar a definir una fecha de cierre.</p>
+                      <p className="text-xs text-muted-foreground">En caso de <u><strong>NO</strong></u> estar seleccionado, cada {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} se agendara (en horario) durante todo el dia seleccionado.</p>
+                      <p className="text-xs text-muted-foreground">Caso contrario, vas a poder elegir el horario de finalizacion de tu actividad.</p>
                     </div>
                     <Switch
                       checked={togglesState.requiere_fecha_final}
@@ -354,8 +356,8 @@ export function OwnerCompanySettingsCard() {
                             <div className="text-sm flex flex-col">
                               <div className="flex gap-2 flex-col items-start">
                                 <span>Ejemplo:</span>
-                                 <span>&quot;Ejemplo de <span className="font-medium underline text-primary">{String(singValue) || "-"}</span> a visualizar&quot;</span>
-                                 <span>&quot;En esta seccion podes ver el listado de tus <span className="font-medium underline text-primary">{String(pluValue) || "-"}</span>&quot;</span>
+                                <span>&quot;Ejemplo de <span className="font-medium underline text-primary">{String(singValue) || "-"}</span> a visualizar&quot;</span>
+                                <span>&quot;En esta seccion podes ver el listado de tus <span className="font-medium underline text-primary">{String(pluValue) || "-"}</span>&quot;</span>
 
                               </div>
 

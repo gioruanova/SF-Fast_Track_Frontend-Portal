@@ -254,14 +254,13 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
 
             {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 flex justify-center mt-5">
                 <Button
                   variant="default"
-                  className="w-full"
                   asChild
                 >
                   <Link href={`/dashboard/${userRole}/trabajar-reclamos`}>
-                    Ver todos los {reclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}
+                    Ver la totalidad de {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>

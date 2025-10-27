@@ -252,15 +252,14 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
 
             {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 flex justify-center mt-5">
                 <Button
                   variant="default"
-                  className="w-full"
                   asChild
                 >
                   <Link href={`/dashboard/${userRole}/historial-reclamos`}>
-                    Ver todos los {reclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} finalizados
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    Ver el reporte historico de {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </CardContent>

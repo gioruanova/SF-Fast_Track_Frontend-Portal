@@ -29,6 +29,7 @@ interface User {
   user_status: number
   created_at: string
   updated_at: string
+  apto_recibir?: boolean | number
 }
 
 
@@ -56,7 +57,7 @@ export function OwnerUsuariosPage() {
     user_phone: "",
     user_email: "",
     user_role: "operador",
-    user_password: ""
+    user_password: "",
   })
 
   const [newPassword, setNewPassword] = useState("")
@@ -88,10 +89,10 @@ export function OwnerUsuariosPage() {
 
   const handleToggleUserStatus = async (user: User) => {
     try {
-      const endpoint = user.user_status === 1 
+      const endpoint = user.user_status === 1
         ? CLIENT_API.USER_BLOCK.replace("{id}", user.user_id.toString())
         : CLIENT_API.USER_UNBLOCK.replace("{id}", user.user_id.toString())
-      
+
       await apiClient.post(endpoint)
       toast.success(`Usuario ${user.user_status === 1 ? 'bloqueado' : 'desbloqueado'} exitosamente`)
       fetchUsers()
@@ -171,14 +172,14 @@ export function OwnerUsuariosPage() {
         await apiClient.post(CLIENT_API.USERS_CREATE, userFormData)
         toast.success("Usuario creado correctamente")
       }
-      
+
       setIsUserSheetOpen(false)
       setEditingUser(null)
       fetchUsers()
     } catch (error: unknown) {
-      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error || 
-                          (error as { message?: string })?.message || 
-                          "Error al guardar el usuario"
+      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
+        (error as { message?: string })?.message ||
+        "Error al guardar el usuario"
       toast.error(errorMessage)
     }
   }
@@ -200,16 +201,16 @@ export function OwnerUsuariosPage() {
     if (user && userItem.user_id === user.user_id) {
       return false
     }
-    
+
     const matchesSearch = userItem.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         userItem.user_dni.includes(searchTerm)
-    
+      userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      userItem.user_dni.includes(searchTerm)
+
     const matchesRole = filterRole === "all" || userItem.user_role === filterRole
-    const matchesStatus = filterStatus === "all" || 
-                         (filterStatus === "active" && userItem.user_status === 1) ||
-                         (filterStatus === "blocked" && userItem.user_status === 0)
-    
+    const matchesStatus = filterStatus === "all" ||
+      (filterStatus === "active" && userItem.user_status === 1) ||
+      (filterStatus === "blocked" && userItem.user_status === 0)
+
     return matchesSearch && matchesRole && matchesStatus
   })
 
@@ -221,11 +222,10 @@ export function OwnerUsuariosPage() {
   const getStatusBadge = (status: number) => {
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
-          status === 1
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${status === 1
             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-        }`}
+          }`}
       >
         {status === 1 ? 'Activo' : 'Inactivo'}
       </span>
@@ -252,9 +252,8 @@ export function OwnerUsuariosPage() {
 
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
-          roleColors[role] || "bg-gray-100 text-gray-800"
-        }`}
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${roleColors[role] || "bg-gray-100 text-gray-800"
+          }`}
       >
         {getRoleDisplayName(role)}
       </span>
@@ -265,7 +264,7 @@ export function OwnerUsuariosPage() {
     <>
       <Card>
         <CardHeader>
-        <div className="flex items-start md:items-center justify-between flex-col md:flex-row gap-2 md:gap-0">
+          <div className="flex items-start md:items-center justify-between flex-col md:flex-row gap-2 md:gap-0">
             <div>
               <CardTitle className="text-2xl">Gestión de Usuarios</CardTitle>
               <p className="text-sm text-muted-foreground mt-1 text-balance">
@@ -351,6 +350,7 @@ export function OwnerUsuariosPage() {
                     <TableHead>Teléfono</TableHead>
                     <TableHead className="text-center">Rol</TableHead>
                     <TableHead className="text-center">Estado</TableHead>
+                    <TableHead className="text-center">Recibiendo?</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -368,6 +368,9 @@ export function OwnerUsuariosPage() {
                       </TableCell>
                       <TableCell className="text-center">
                         {getStatusBadge(user.user_status)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user.apto_recibir === 1 ? <Badge variant="default" className="bg-green-700 text-white px-2 py-1 rounded-md uppercase">Si</Badge> : <Badge variant="default" className="bg-red-800 text-white px-2 py-1 rounded-md uppercase">No</Badge>}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -509,7 +512,7 @@ export function OwnerUsuariosPage() {
               <Label htmlFor="role">Rol</Label>
               <Select
                 value={userFormData.user_role}
-                onValueChange={(value: "operador" | "profesional") => 
+                onValueChange={(value: "operador" | "profesional") =>
                   setUserFormData(prev => ({ ...prev, user_role: value }))
                 }
               >

@@ -50,11 +50,16 @@ export const CLIENT_API = {
   DESACTIVAR_CLIENTE: `${config.apiUrl}/${slugs.customersApi}/clientes-recurrentes/block/{cliente_id}`,
 
 
+  GET_AGENDA_BLOQUEADA: `${config.apiUrl}/${slugs.customersApi}/reclamos/agendaReclamo`, // GET
+  CREAR_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamo`, // POST
   RECLAMO_GESTION_ADMIN: `${config.apiUrl}/${slugs.customersApi}/reclamos/gestion/{id}`,
 
 
   HABILITAR_FILA: `${config.apiUrl}/${slugs.customersApi}/workload/enable`,
   DESHABILITAR_FILA: `${config.apiUrl}/${slugs.customersApi}/workload/disable`,
+
+
+  
 
   GET_RECLAMOS_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional`,
   GET_RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,

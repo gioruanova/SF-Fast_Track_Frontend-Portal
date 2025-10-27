@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Plus, ListTodo, History, ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useDashboard } from "@/context/DashboardContext";
 
 interface QuickActionsBarProps {
   userRole: "owner" | "operador";
@@ -15,17 +16,32 @@ interface QuickActionsBarProps {
 export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
   const router = useRouter();
   const { companyConfig } = useAuth();
+  const { setShouldOpenCreateReclamo } = useDashboard();
   const [isCollapsed, setIsCollapsed] = useState(globalThis.innerWidth < 1024 ? true : false);
+  
+  const isCompanyActive = companyConfig?.company?.company_estado === 1;
 
   const handleGenerarIncidencia = () => {
-    toast.info("Generando incidencia...");
+    if (!isCompanyActive) {
+      toast.error("La empresa está inactiva. No se pueden crear reclamos.");
+      return;
+    }
+    setShouldOpenCreateReclamo(true);
   };
 
   const handleEnCurso = () => {
+    if (!isCompanyActive) {
+      toast.error("La empresa está inactiva. No se puede acceder a esta funcionalidad.");
+      return;
+    }
     router.push(`/dashboard/${userRole}/trabajar-reclamos`);
   };
 
   const handleHistorico = () => {
+    if (!isCompanyActive) {
+      toast.error("La empresa está inactiva. No se puede acceder a esta funcionalidad.");
+      return;
+    }
     router.push(`/dashboard/${userRole}/historial-reclamos`);
   };
 
@@ -62,6 +78,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
               variant="default"
               className="w-full gap-0.5 lg:gap-1"
               onClick={handleGenerarIncidencia}
+              disabled={!isCompanyActive}
             >
               <Plus className="h-4 w-4 mr-0" />
               Crear {companyConfig?.sing_heading_reclamos}
@@ -71,6 +88,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
               variant="outline"
               className="w-full gap-0.5 lg:gap-1"
               onClick={handleEnCurso}
+              disabled={!isCompanyActive}
             >
               <ListTodo className="h-4 w-4 mr-0" />
               En Curso
@@ -80,6 +98,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
               variant="outline"
               className="w-full gap-0.5 lg:gap-1"
               onClick={handleHistorico}
+              disabled={!isCompanyActive}
             >
               <History className="h-4 w-4 mr-0" />
               Histórico
