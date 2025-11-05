@@ -303,7 +303,7 @@ export function PublicMessagesManagement() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start md:items-center justify-start  md:justify-between  flex-col md:flex-row gap-2 ">
             <div>
               <CardTitle className="text-lg font-bold">Mensajes Públicos</CardTitle>
               <CardDescription>
@@ -510,7 +510,7 @@ export function PublicMessagesManagement() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start md:items-center justify-start  md:justify-between  flex-col md:flex-row gap-2">
             <div>
               <CardTitle className="text-lg font-bold">Categorías de Mensajes Públicos</CardTitle>
               <CardDescription>

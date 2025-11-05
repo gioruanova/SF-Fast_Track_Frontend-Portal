@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Plus,
   Edit,
@@ -81,6 +82,7 @@ export function SuperadminBannerPage() {
     banner_limit: "",
     banner_active: 0
   });
+  const [dateInputValue, setDateInputValue] = useState("");
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showToggleDialog, setShowToggleDialog] = useState(false);
@@ -142,6 +144,7 @@ export function SuperadminBannerPage() {
       banner_limit: "",
       banner_active: 0
     });
+    setDateInputValue("");
     setIsSheetOpen(true);
   };
 
@@ -153,19 +156,57 @@ export function SuperadminBannerPage() {
       banner_limit: banner.banner_limit,
       banner_active: banner.banner_active
     });
+    // Convertir la fecha del backend a formato YYYY-MM-DD para el input de fecha
+    if (banner.banner_limit) {
+      const date = new Date(banner.banner_limit);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      setDateInputValue(`${year}-${month}-${day}`);
+    } else {
+      setDateInputValue("");
+    }
     setIsSheetOpen(true);
   };
 
   const handleSaveBanner = async () => {
     try {
-      if (bannerFormData.banner_limit) {
-        const limitDate = new Date(bannerFormData.banner_limit);
-        const now = new Date();
+      // Validar que si se envía un campo, no esté vacío
+      const textToSend = bannerFormData.banner_text.trim();
+      const dateToSend = dateInputValue.trim();
 
-        if (limitDate < now) {
+      // Validar que si hay texto escrito, no esté vacío después de trim
+      if (bannerFormData.banner_text && textToSend === "") {
+        toast.error("El texto del banner no puede estar vacío");
+        return;
+      }
+
+      // Preparar los datos a enviar
+      const dataToSend: { banner_text?: string; banner_limit?: string; banner_active: number } = {
+        banner_active: bannerFormData.banner_active
+      };
+
+      // Solo incluir campos que tienen valor
+      if (textToSend) {
+        dataToSend.banner_text = textToSend;
+      }
+
+      // Validar y convertir fecha si se envía
+      if (dateToSend) {
+        // Convertir fecha a datetime con medianoche (00:00:00)
+        const date = new Date(dateToSend);
+        date.setHours(0, 0, 0, 0);
+        
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        if (date < now) {
           toast.error("La fecha límite no puede ser en el pasado");
           return;
         }
+
+        // Formatear como ISO string para el backend
+        dataToSend.banner_limit = date.toISOString();
       }
 
       const apiClient = axios.create({
@@ -178,15 +219,16 @@ export function SuperadminBannerPage() {
 
       if (isEditing && editingBanner) {
         const url = SUPER_API.EDIT_BANNER.replace("{banner_id}", editingBanner.baner_id.toString());
-        await apiClient.put(url, bannerFormData);
+        await apiClient.put(url, dataToSend);
         toast.success("Banner actualizado correctamente");
       } else {
-        await apiClient.post(SUPER_API.CREATE_BANNER, bannerFormData);
+        await apiClient.post(SUPER_API.CREATE_BANNER, dataToSend);
         toast.success("Banner creado correctamente");
       }
 
       setIsSheetOpen(false);
       setEditingBanner(null);
+      setDateInputValue("");
       fetchBanners();
 
       if (typeof window !== 'undefined' && window.refreshBannerStatus) {
@@ -531,13 +573,21 @@ export function SuperadminBannerPage() {
 
             <div>
               <Label htmlFor="banner_limit" className="cursor-pointer">Fecha Límite</Label>
-              <Input
-                id="banner_limit"
-                type="datetime-local"
-                value={bannerFormData.banner_limit}
-                onChange={(e) => setBannerFormData(prev => ({ ...prev, banner_limit: e.target.value }))}
-                className="mt-1 cursor-pointer"
-              />
+              <div className="mt-1">
+                <DatePicker
+                  value={dateInputValue || undefined}
+                  onChange={(date) => setDateInputValue(date)}
+                  placeholder="Seleccionar fecha"
+                  minDate={new Date()}
+                  disabledDays={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const compareDate = new Date(date);
+                    compareDate.setHours(0, 0, 0, 0);
+                    return compareDate < today;
+                  }}
+                />
+              </div>
             </div>
 
 

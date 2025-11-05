@@ -160,7 +160,7 @@ export function SuperadminReclamosPage() {
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start md:items-center justify-start  md:justify-between flex-col md:flex-row gap-2 ">
             <div>
               <CardTitle className="text-2xl">Gestión de Reclamos</CardTitle>
               <p className="text-sm text-muted-foreground mt-1 text-balance">

@@ -178,40 +178,40 @@ export function CompanyStatsOverview() {
       {!isCollapsed && (
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="md:flex gap-1 flex-row md:flex-col justify-between md:justify-start">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 md:pb-2 md:items-start w-[100%] md:w-auto">
                 <CardTitle className="text-sm font-medium">{companyConfig?.plu_heading_operador} totales</CardTitle>
-                <BriefcaseBusiness className="h-4 w-4 text-muted-foreground" />
+                <BriefcaseBusiness className="h-4 w-4 text-muted-foreground md:flex hidden" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{totalClientes}</div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="md:flex gap-1 flex-row md:flex-col justify-between md:justify-start">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 md:pb-2  md:items-start w-[100%] md:w-auto">
                 <CardTitle className="text-sm font-medium">Total {companyConfig?.plu_heading_reclamos}</CardTitle>
-                <SquareCheck className="h-4 w-4 text-muted-foreground" />
+                <SquareCheck className="h-4 w-4 text-muted-foreground md:flex hidden" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{totalReclamos}</div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="md:flex gap-1 flex-row md:flex-col justify-between md:justify-start">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 md:pb-2  md:items-start w-[100%] md:w-auto">
                 <CardTitle className="text-sm font-medium">{companyConfig?.plu_heading_reclamos} en curso</CardTitle>
-                <SquareCheck className="h-4 w-4 text-muted-foreground" />
+                <SquareCheck className="h-4 w-4 text-muted-foreground md:flex hidden" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-500">{reclamosEnActividad}</div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="md:flex gap-1 flex-row md:flex-col justify-between md:justify-start">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 md:pb-2  md:items-start w-[100%] md:w-auto">
                 <CardTitle className="text-sm font-medium">Historial de {companyConfig?.plu_heading_reclamos}</CardTitle>
-                <SquareCheck className="h-4 w-4 text-muted-foreground" />
+                <SquareCheck className="h-4 w-4 text-muted-foreground md:flex hidden" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-500">{reclamosFinalizados}</div>

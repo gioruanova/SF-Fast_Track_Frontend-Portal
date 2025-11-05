@@ -308,7 +308,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
                   <SelectTrigger className="w-full cursor-pointer">
                     <SelectValue placeholder={`Selecciona una ${companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}`} />
                   </SelectTrigger>
+
                   <SelectContent>
+                    <span>asas</span>
                     {isLoading ? (
                       <SelectItem value="loading" disabled>Cargando...</SelectItem>
                     ) : especialidades.length > 0 ? (
@@ -316,14 +318,21 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
                         <SelectItem key={esp.id_especialidad} value={esp.id_especialidad.toString()} className="cursor-pointer">
                           {esp.nombre_especialidad}
                         </SelectItem>
+
                       ))
+
                     ) : (
                       <SelectItem value="no-available" disabled>No hay {companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"} disponibles</SelectItem>
                     )}
+
                   </SelectContent>
                 </Select>
-
+                <ul>
+                  <li className="text-xs text-red-400 list-disc ml-4 mb-2">Tenga en cuenta que al hacer el actualizacion, cualquier {companyConfig?.sing_heading_reclamos.toLowerCase()} con el nombre actual, no se vera afectado</li>
+                  <li className="text-xs text-red-400 list-disc ml-4">Cualquier {companyConfig?.sing_heading_profesional.toLowerCase()} que actualmente tenga {companyConfig?.plu_heading_reclamos.toLowerCase()} con este nombre, tampoco veran el cambio</li>
+                </ul>
                 <div className="flex gap-2">
+
                   <Button
                     onClick={() => handleEditarAsignacion(editingAsignacion)}
                     disabled={isSubmitting}
@@ -344,6 +353,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
                     Cancelar
                   </Button>
                 </div>
+
               </div>
             </div>
           )}
@@ -355,7 +365,12 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
                 <p className="text-sm text-muted-foreground">
                   ¿Estás seguro de que quieres eliminar esta asignación? Esta acción no se puede deshacer.
                 </p>
+                <ul>
+                  <li className="text-xs text-red-400 list-disc ml-4 mb-2">Tenga en cuenta que al hacer el actualizacion, cualquier {companyConfig?.sing_heading_reclamos.toLowerCase()} con el nombre actual, no se vera afectado</li>
+                  <li className="text-xs text-red-400 list-disc ml-4">Cualquier {companyConfig?.sing_heading_profesional.toLowerCase()} que actualmente tenga {companyConfig?.plu_heading_reclamos.toLowerCase()} con este nombre, tampoco veran el cambio</li>
+                </ul>
                 <div className="flex gap-2">
+
                   <Button
                     onClick={() => handleEliminarAsignacion(deletingAsignacion)}
                     disabled={isSubmitting}
@@ -373,6 +388,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
                   >
                     Cancelar
                   </Button>
+
                 </div>
               </div>
             </div>
