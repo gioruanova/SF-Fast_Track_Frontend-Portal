@@ -17,13 +17,16 @@ import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
 
+
+type UserRole = "operador" | "profesional";
+
 interface User {
   user_id: number
   user_complete_name: string
   user_dni: string
   user_phone: string
   user_email: string
-  user_role: "operador" | "profesional"
+  user_role: UserRole
   user_status: number
   created_at: string
   updated_at: string
@@ -53,7 +56,7 @@ export function OperadorUsuariosPage() {
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
 
-  const [selectedRole, setSelectedRole] = useState<"operador" | "profesional">("profesional")
+  const [selectedRole, setSelectedRole] = useState<UserRole>("profesional")
 
   const [newPassword, setNewPassword] = useState("")
 
@@ -93,7 +96,7 @@ export function OperadorUsuariosPage() {
         if (phoneRef.current) phoneRef.current.value = editingUser.user_phone
         if (emailRef.current) emailRef.current.value = editingUser.user_email
         if (passwordRef.current) passwordRef.current.value = ""
-        setSelectedRole(editingUser.user_role as "profesional")
+        setSelectedRole(editingUser.user_role)
       }, 0)
     } else if (isUserSheetOpen && !isEditing) {
       setTimeout(() => {
@@ -261,16 +264,16 @@ export function OperadorUsuariosPage() {
     return { totalPages: total, startIndex: start, endIndex: end, paginatedUsers: paginated }
   }, [filteredUsers, currentPage, itemsPerPage])
 
-  const getRoleDisplayName = (role: string) => {
-    const roleMapping: Record<string, string> = {
+  const getRoleDisplayName = (role: UserRole) => {
+    const roleMapping: Record<UserRole, string> = {
       operador: companyConfig?.sing_heading_operador || "Operador",
       profesional: companyConfig?.sing_heading_profesional || "Profesional"
     }
     return roleMapping[role] || role
   }
 
-  const getRoleBadge = (role: string) => {
-    const roleColors: Record<string, string> = {
+  const getRoleBadge = (role: UserRole) => {
+    const roleColors: Record<UserRole, string> = {
       operador: "bg-purple-100 text-purple-800",
       profesional: "bg-orange-100 text-orange-800"
     }
@@ -420,7 +423,7 @@ export function OperadorUsuariosPage() {
                         <div className="flex items-center justify-center gap-2">
 
                           {
-                            user.user_role === "operador" && user.user_role === "operador" ? (
+                            user.user_role === "operador" ? (
                               <span>-</span>
                             ) : (
 
@@ -529,10 +532,10 @@ export function OperadorUsuariosPage() {
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>
-              {isEditing ? "Editar Usuario" : "Crear Nuevo Usuario"}
+              {isEditing ? `Editar ${companyConfig?.sing_heading_profesional}` :  `Crear  ${companyConfig?.sing_heading_profesional}`}
             </SheetTitle>
             <SheetDescription>
-              {isEditing ? "Modifica la información del usuario" : `Completa la información para crear un nuevo usuario (rol ${companyConfig?.sing_heading_profesional} por defecto)`}
+              {isEditing ? `Modifica la información del usuario` : `Completa la información para crear un nuevo usuario (rol ${companyConfig?.sing_heading_profesional} por defecto)`}
             </SheetDescription>
           </SheetHeader>
 

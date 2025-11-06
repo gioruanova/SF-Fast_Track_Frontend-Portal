@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
+import { useAuth } from "@/context/AuthContext";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -42,15 +43,17 @@ const apiClient = axios.create({
   },
 });
 
+type UserRole = "superadmin" | "owner" | "operador" | "profesional";
+
 interface UserData {
   user_id: number;
   user_complete_name: string;
   user_email: string;
   user_phone: string;
   user_dni: string;
-  user_role: string;
+  user_role: UserRole;
   user_status: number;
-  company_id: number;
+  company_id: number | null;
   company_nombre?: string;
   created_at: string;
   last_login?: string;
@@ -62,6 +65,7 @@ interface CompanyData {
 }
 
 export function SuperadminUsuariosPage() {
+  const { user: currentUser } = useAuth();
   const [usuarios, setUsuarios] = useState<UserData[]>([]);
   const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,8 +102,14 @@ export function SuperadminUsuariosPage() {
       ]);
 
       const usuariosData = usuariosResponse.data
-        .filter((user: UserData) => user.user_role !== "superadmin")
+        .filter((user: UserData) => user.user_id !== currentUser?.user_id)
         .map((user: UserData) => {
+          if (user.user_role === "superadmin") {
+            return {
+              ...user,
+              company_nombre: "N/A"
+            };
+          }
           const company = companiesResponse.data.find((c: CompanyData) => c.company_id === user.company_id);
           return {
             ...user,
@@ -117,8 +127,10 @@ export function SuperadminUsuariosPage() {
   };
 
   useEffect(() => {
-    fetchUsuarios();
-  }, []);
+    if (currentUser) {
+      fetchUsuarios();
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -133,7 +145,7 @@ export function SuperadminUsuariosPage() {
         if (dniRef.current) dniRef.current.value = editingUser.user_dni;
         if (passwordRef.current) passwordRef.current.value = "";
         setSelectedRole(editingUser.user_role);
-        setSelectedCompany(editingUser.company_id.toString());
+        setSelectedCompany(editingUser.user_role === "superadmin" ? "0" : (editingUser.company_id?.toString() || "0"));
       }, 0);
     } else if (isUserSheetOpen && !isEditing) {
       setTimeout(() => {
@@ -189,12 +201,14 @@ export function SuperadminUsuariosPage() {
 
   const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {
+      superadmin: "bg-red-100 text-red-800",
       owner: "bg-blue-100 text-blue-800",
       operador: "bg-purple-100 text-purple-800",
       profesional: "bg-orange-100 text-orange-800"
     };
 
     const roleNames: Record<string, string> = {
+      superadmin: "Superadmin",
       owner: "Owner",
       operador: "Operador",
       profesional: "Profesional"
@@ -277,19 +291,20 @@ export function SuperadminUsuariosPage() {
     if (dniRef.current) dniRef.current.value = user.user_dni;
     if (passwordRef.current) passwordRef.current.value = "";
     setSelectedRole(user.user_role);
-    setSelectedCompany(user.company_id.toString());
+    setSelectedCompany(user.user_role === "superadmin" ? "0" : (user.company_id?.toString() || "0"));
     setIsUserSheetOpen(true);
   };
 
   const handleSaveUser = async () => {
     try {
+      const isSuperAdmin = selectedRole === "superadmin";
       const formData = {
         user_complete_name: nameRef.current?.value.trim() || "",
         user_email: emailRef.current?.value.trim() || "",
         user_phone: phoneRef.current?.value.trim() || "",
         user_dni: dniRef.current?.value.trim() || "",
         user_role: selectedRole || "",
-        company_id: parseInt(selectedCompany) || 0,
+        company_id: isSuperAdmin ? null : (parseInt(selectedCompany) || 0),
         user_password: passwordRef.current?.value.trim() || ""
       };
 
@@ -310,7 +325,7 @@ export function SuperadminUsuariosPage() {
       if (!formData.user_role) {
         camposFaltantes.push("Rol");
       }
-      if (!formData.company_id || formData.company_id === 0) {
+      if (!isSuperAdmin && (!formData.company_id || formData.company_id === 0)) {
         camposFaltantes.push("Empresa");
       }
 
@@ -426,6 +441,7 @@ export function SuperadminUsuariosPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all" className="cursor-pointer">Todos los roles</SelectItem>
+                <SelectItem value="superadmin" className="cursor-pointer">Superadmin</SelectItem>
                 <SelectItem value="owner" className="cursor-pointer">Owner</SelectItem>
                 <SelectItem value="operador" className="cursor-pointer">Operadores</SelectItem>
                 <SelectItem value="profesional" className="cursor-pointer">Profesionales</SelectItem>
@@ -659,30 +675,33 @@ export function SuperadminUsuariosPage() {
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="superadmin" className="cursor-pointer">Superadmin</SelectItem>
                   <SelectItem value="owner" className="cursor-pointer">Owner</SelectItem>
                   <SelectItem value="operador" className="cursor-pointer">Operador</SelectItem>
                   <SelectItem value="profesional" className="cursor-pointer">Profesional</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="text-sm font-medium">Empresa <span className="text-red-500">*</span></label>
-              <Select value={selectedCompany} onValueChange={handleCompanyChange}>
-                <SelectTrigger className="min-w-full cursor-pointer">
-                  <SelectValue placeholder="Selecciona una empresa" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((company) => (
-                    <SelectItem key={company.company_id} value={company.company_id.toString()} className="cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-3 w-3" />
-                        {company.company_nombre}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {selectedRole !== "superadmin" && (
+              <div>
+                <label className="text-sm font-medium">Empresa <span className="text-red-500">*</span></label>
+                <Select value={selectedCompany} onValueChange={handleCompanyChange}>
+                  <SelectTrigger className="min-w-full cursor-pointer">
+                    <SelectValue placeholder="Selecciona una empresa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companies.map((company) => (
+                      <SelectItem key={company.company_id} value={company.company_id.toString()} className="cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-3 w-3" />
+                          {company.company_nombre}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium">
                 Contraseña {isEditing ? "(opcional)" : ""}

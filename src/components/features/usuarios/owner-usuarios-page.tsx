@@ -18,6 +18,7 @@ import { CLIENT_API } from "@/lib/clientApi/config"
 import { Eye, EyeOff, UserX, UserCheck, RefreshCw } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
+type UserRole = "operador" | "profesional";
 
 interface User {
   user_id: number
@@ -25,7 +26,7 @@ interface User {
   user_dni: string
   user_phone: string
   user_email: string
-  user_role: "operador" | "profesional"
+  user_role: UserRole
   user_status: number
   created_at: string
   updated_at: string
@@ -56,7 +57,7 @@ export function OwnerUsuariosPage() {
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
 
-  const [selectedRole, setSelectedRole] = useState<"operador" | "profesional">("operador")
+  const [selectedRole, setSelectedRole] = useState<UserRole>("operador")
 
   const [newPassword, setNewPassword] = useState("")
 
@@ -230,7 +231,7 @@ export function OwnerUsuariosPage() {
     }
   }, [isEditing])
 
-  const handleRoleChange = useCallback((value: "operador" | "profesional") => {
+  const handleRoleChange = useCallback((value: UserRole) => {
     setSelectedRole(value)
   }, [])
 
@@ -274,21 +275,18 @@ export function OwnerUsuariosPage() {
     )
   }
 
-  const getRoleDisplayName = (role: string) => {
-    const roleMapping: Record<string, string> = {
+  const getRoleDisplayName = (role: UserRole) => {
+    const roleMapping: Record<UserRole, string> = {
       operador: companyConfig?.sing_heading_operador || "Operador",
-      profesional: companyConfig?.sing_heading_profesional || "Profesional",
-      owner: companyConfig?.sing_heading_owner || "Owner"
+      profesional: companyConfig?.sing_heading_profesional || "Profesional"
     }
     return roleMapping[role] || role
   }
 
-
-  const getRoleBadge = (role: string) => {
-    const roleColors: Record<string, string> = {
+  const getRoleBadge = (role: UserRole) => {
+    const roleColors: Record<UserRole, string> = {
       operador: "bg-purple-100 text-purple-800",
-      profesional: "bg-orange-100 text-orange-800",
-      owner: "bg-blue-100 text-blue-800"
+      profesional: "bg-orange-100 text-orange-800"
     }
 
     return (
