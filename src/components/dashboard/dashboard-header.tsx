@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { NotificationCenter } from "./NotificationCenter";
 
 interface BreadcrumbItem {
   label: string;
@@ -24,9 +23,7 @@ interface DashboardHeaderProps {
   userRole?: string;
 }
 
-export function DashboardHeader({ breadcrumbs, rightContent, userRole }: DashboardHeaderProps) {
-  
-  const canSeeNotifications = userRole && ['owner', 'operador', 'profesional', 'superadmin'].includes(userRole);
+export function DashboardHeader({ breadcrumbs, rightContent }: DashboardHeaderProps) {
   return (
     <header className="flex z-1 h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 bg-sidebar md:bg-card border-b border-border">
       <div className="flex items-center gap-2 px-4 flex-1 min-w-0">
@@ -57,7 +54,6 @@ export function DashboardHeader({ breadcrumbs, rightContent, userRole }: Dashboa
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {rightContent}
-          {canSeeNotifications && <NotificationCenter />}
         </div>
       </div>
     </header>

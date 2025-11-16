@@ -4,9 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/theme/theme-provider";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
-import { NotificationToast } from "@/components/pwa/NotificationToast";
-import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
-import { ShowQRForMobile } from "@/components/pwa/ShowQRForMobile";
 
 
 const geistSans = Geist({
@@ -32,10 +29,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#6366f1" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        <script src="/pwa.js" defer></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -47,11 +40,8 @@ export default function RootLayout({
           disableTransitionOnChange>
           <AuthProvider>
             {children}
-            <NotificationPrompt />
-            <ShowQRForMobile />
           </AuthProvider>
           <Toaster />
-          <NotificationToast />
         </ThemeProvider>
       </body>
     </html>

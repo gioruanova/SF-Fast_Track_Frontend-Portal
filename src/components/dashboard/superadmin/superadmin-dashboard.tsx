@@ -3,7 +3,6 @@
 import { DashboardProvider } from "@/context/DashboardContext";
 import { StatsOverview } from "./stats-overview";
 import { ReclamosChart } from "./reclamos-chart";
-import { LogsActivity } from "./logs-activity";
 import { SuperadminUpcomingReclamos } from "./upcoming-reclamos";
 
 export function SuperadminDashboard() {
@@ -13,7 +12,6 @@ export function SuperadminDashboard() {
         <StatsOverview />
         <SuperadminUpcomingReclamos />
         <ReclamosChart />
-        <LogsActivity />
       </div>
     </DashboardProvider>
   );

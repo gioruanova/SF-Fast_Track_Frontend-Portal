@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { SUPER_API } from "@/lib/superApi/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
@@ -30,20 +30,27 @@ interface BannerData {
   banner_active: number;
 }
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 export function useBannerStatus() {
   const [banner, setBanner] = useState<BannerData | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, companyConfig } = useAuth();
 
+  const apiClient = useMemo(() => axios.create({
+    baseURL: config.apiUrl,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }), []);
+
   const fetchBannerStatus = useCallback(async () => {
+    // No hacer fetch para profesionales
+    if (user?.user_role === 'profesional') {
+      setBanner(null);
+      setLoading(false);
+      return;
+    }
+
     if (companyConfig?.company?.company_estado !== 1) {
       setBanner(null);
       setLoading(false);
@@ -58,10 +65,12 @@ export function useBannerStatus() {
         response = await apiClient.get(SUPER_API.GET_BANNERS);
         const activeBanner = response.data.find((banner: BannerData) => banner.banner_active === 1);
         setBanner(activeBanner || null);
-      } else {
+      } else if (user?.user_role === 'owner' || user?.user_role === 'operador') {
         response = await apiClient.get(CLIENT_API.GET_BANNER_CLIENT);
         const bannerData = Array.isArray(response.data) ? response.data[0] : response.data;
         setBanner(bannerData);
+      } else {
+        setBanner(null);
       }
     } catch (error: unknown) {
       const axiosError = error as AxiosError;
@@ -72,7 +81,7 @@ export function useBannerStatus() {
     } finally {
       setLoading(false);
     }
-  }, [user, companyConfig?.company?.company_estado]);
+  }, [user, companyConfig?.company?.company_estado, apiClient]);
 
   useEffect(() => {
     if (user) {

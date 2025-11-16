@@ -2,16 +2,8 @@ import { config, slugs } from "../config";
 
 export const SUPER_API = {
 
-  // NOTIFICACIONES PUSH - Superadmin
-  NOTIFICATION_GET_VAPID: `${config.apiUrl}/${slugs.superApi}/notifications/vapid-public-key`,
-  NOTIFICATION_SUBSCRIBE: `${config.apiUrl}/${slugs.superApi}/notifications/register-token`,
-  NOTIFICATION_UNSUBSCRIBE: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-token`,
-  NOTIFICATION_UNSUBSCRIBE_SPECIFIC: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-specific-token`,
-  NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-token`,
-
   GET_COMPANIES: `${config.apiUrl}/${slugs.superApi}/companies`,
   GET_RECLAMOS: `${config.apiUrl}/${slugs.superApi}/reclamos`,
-  GET_LOGS: `${config.apiUrl}/${slugs.superApi}/globalLogs`,
 
   COMPANY_CREATE: `${config.apiUrl}/${slugs.superApi}/companies`,
   COMPANY_EDIT: `${config.apiUrl}/${slugs.superApi}/companies/{id}`,
@@ -54,7 +46,6 @@ export const SUPER_API = {
 
   // gestion de banner
   GET_BANNERS: `${config.apiUrl}/${slugs.superApi}/banners`, 
-  GET_ACTIVE_BANNER: `${config.apiUrl}/${slugs.superApi}/active-banner`, 
   CREATE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners`, 
   EDIT_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, 
   DELETE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`,

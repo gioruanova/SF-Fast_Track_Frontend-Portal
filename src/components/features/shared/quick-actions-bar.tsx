@@ -7,7 +7,6 @@ import { useAuth } from "@/context/AuthContext";
 import { Plus, ListTodo, History, ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useDashboard } from "@/context/DashboardContext";
 
 interface QuickActionsBarProps {
   userRole: "owner" | "operador";
@@ -16,7 +15,6 @@ interface QuickActionsBarProps {
 export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
   const router = useRouter();
   const { companyConfig } = useAuth();
-  const { setShouldOpenCreateReclamo } = useDashboard();
   const [isCollapsed, setIsCollapsed] = useState(globalThis.innerWidth < 1024 ? true : false);
   
   const isCompanyActive = companyConfig?.company?.company_estado === 1;
@@ -26,7 +24,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
       toast.error("La empresa está inactiva. No se pueden crear reclamos.");
       return;
     }
-    setShouldOpenCreateReclamo(true);
+    router.push("/dashboard/reclamos/crear");
   };
 
   const handleEnCurso = () => {

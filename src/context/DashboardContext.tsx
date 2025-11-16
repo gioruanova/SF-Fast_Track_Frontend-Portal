@@ -5,15 +5,12 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 interface DashboardContextType {
   refreshTrigger: number;
   refreshDashboard: () => void;
-  shouldOpenCreateReclamo: boolean;
-  setShouldOpenCreateReclamo: (open: boolean) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [shouldOpenCreateReclamo, setShouldOpenCreateReclamo] = useState(false);
 
   const refreshDashboard = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -22,9 +19,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   return (
     <DashboardContext.Provider value={{ 
       refreshTrigger, 
-      refreshDashboard,
-      shouldOpenCreateReclamo,
-      setShouldOpenCreateReclamo
+      refreshDashboard
     }}>
       {children}
     </DashboardContext.Provider>

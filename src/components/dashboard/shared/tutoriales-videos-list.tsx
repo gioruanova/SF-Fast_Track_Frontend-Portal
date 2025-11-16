@@ -60,9 +60,9 @@ export function TutorialesVideosList({ role }: TutorialesVideosListProps) {
         </div>
       </CardHeader>
       <div className="flex flex-wrap gap-6 p-6">
-        {videos.map((video) => (
+        {videos.map((video, index) => (
           <Card
-            key={video.file_id}
+            key={`${video.file_id}-${index}`}
             className="overflow-hidden hover:shadow-lg transition-all duration-200 w-full sm:min-w-[280px] sm:flex-1 md:max-w-full lg:max-w-[320px] cursor-pointer py-0"
           >
             <CardContent className="p-0">

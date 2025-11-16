@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -10,45 +10,49 @@ import { CLIENT_API } from '@/lib/clientApi/config';
 import { User, isCompanyUser } from '@/types/auth';
 import { CompanyConfigData } from '@/types/company';
 
-interface UseAuthWithNotificationsProps {
+interface UseAuthProps {
   setUser: (user: User | null) => void;
   setCompanyConfig: (config: CompanyConfigData | null) => void;
   setIsLoading: (loading: boolean) => void;
 }
 
-export function useAuthWithNotifications({
+export function useAuth({
   setUser,
   setCompanyConfig,
   setIsLoading
-}: UseAuthWithNotificationsProps) {
+}: UseAuthProps) {
   const router = useRouter();
 
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    timeout: 10000, 
-  });
+  const apiClient = useMemo(() => {
+    const client = axios.create({
+      baseURL: config.apiUrl,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000, 
+    });
 
-  apiClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (!error.response) {
-        if (error.code === 'ECONNREFUSED') {
-          error.message = 'ERR_CONNECTION_REFUSED';
-        } else if (error.code === 'ETIMEDOUT') {
-          error.message = 'ERR_CONNECTION_TIMED_OUT';
-        } else if (error.code === 'ENOTFOUND') {
-          error.message = 'ERR_NETWORK';
-        } else if (!error.message) {
-          error.message = 'Network Error';
+    client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (!error.response) {
+          if (error.code === 'ECONNREFUSED') {
+            error.message = 'ERR_CONNECTION_REFUSED';
+          } else if (error.code === 'ETIMEDOUT') {
+            error.message = 'ERR_CONNECTION_TIMED_OUT';
+          } else if (error.code === 'ENOTFOUND') {
+            error.message = 'ERR_NETWORK';
+          } else if (!error.message) {
+            error.message = 'Network Error';
+          }
         }
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
-    }
-  );
+    );
+
+    return client;
+  }, []);
 
   const fetchCompanyConfig = useCallback(async () => {
     try {
@@ -88,7 +92,6 @@ export function useAuthWithNotifications({
           const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
 
           if (refreshResponse.data.success) {
-            await new Promise(resolve => setTimeout(resolve, 200));
             const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
 
             if (profileResponse.data?.user_id) {
@@ -200,20 +203,15 @@ export function useAuthWithNotifications({
             if (isCompanyUser(profileResponse.data)) {
               await fetchCompanyConfig();
             }
-            await new Promise(resolve => setTimeout(resolve, 100));
-
 
             router.push("/dashboard");
           } else {
-
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
         } catch {
-
           throw new Error("Ha habido un error. Póngase en contacto con su administrador");
         }
       } else {
-
         throw new Error("Ha habido un error. Póngase en contacto con su administrador");
       }
     } catch (err) {
@@ -227,7 +225,6 @@ export function useAuthWithNotifications({
     }
   }, [apiClient, setUser, fetchCompanyConfig, setIsLoading, getErrorMessage, router]);
 
-  // Logout
   const logout = useCallback(async () => {
     try {
       await apiClient.get(PUBLIC_API.LOGOUT);
@@ -251,3 +248,4 @@ export function useAuthWithNotifications({
     logout,
   };
 }
+

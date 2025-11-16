@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { getNavItems, getTeamData, getProjects } from "@/config/sidebar";
-import { GestionarEstadoSheet } from "@/components/features/profesional/gestionar-estado-sheet";
 import { FeedbackSheet } from "@/components/features/feedback/feedback-sheet";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -37,13 +36,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={projects} label="Otras acciones" />
         )}
 
-        {user.user_role === "profesional" && companyConfig?.company?.company_estado === 1 && (
-          <GestionarEstadoSheet />
-        )}
-
-
       </SidebarContent>
-      {((user.user_role === "owner" || user.user_role === "profesional" || user.user_role === "operador") && companyConfig?.company?.company_estado === 1) && (
+      {((user.user_role === "owner" || user.user_role === "operador") && companyConfig?.company?.company_estado === 1) && (
         <FeedbackSheet />
       )}
 

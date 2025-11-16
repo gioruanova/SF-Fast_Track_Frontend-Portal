@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench, Mail, Phone, MapIcon, Bell } from "lucide-react";
+import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench, Mail, Phone, Bell } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
 import axios from "axios";
@@ -15,10 +15,7 @@ import { CLIENT_API } from "@/lib/clientApi/config";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
-import { ContactoRapido } from "@/components/dashboard/profesional/contacto-rapido-feature";
 import { Separator } from "@/components/ui/separator";
-import { MapViewer } from "@/components/ui/map-viewer";
-import { ContactoClienteRapido } from "@/components/dashboard/profesional/contacto-rapido-cliente-feature";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -338,24 +335,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                       </div>
                       <span className="font-medium">{reclamo.cliente_direccion}</span>
                     </div>
-
-                    <div className="mt-3">
-                      <MapViewer
-                        address={reclamo.cliente_direccion}
-                        height="200px"
-                        showExpandButton={true}
-                      />
-                    </div>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <a
-                        href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${reclamo.cliente_lat},${reclamo.cliente_lng}`}
-                        className="w-full flex items-center justify-center gap-2"
-                        target="_blank" rel="noopener noreferrer">
-                        <MapIcon className="w-4 h-4" />
-                        Ver en Google Maps
-                      </a>
-                    </Button>
-                    <span className="text-xs text-muted-foreground flex text-center italic">(Su dispositivo requiere acceso a su ubicacion actual para poder ver la direccion en Google Maps)</span>
                   </div>
                 </>
               ) : (
@@ -400,14 +379,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           </div>
 
 
-          {userRole === "profesional" && reclamo.reclamo_estado !== "CERRADO" && reclamo.reclamo_estado !== "CANCELADO" && (
-            <div className="border-t pt-4 space-y-4">
-              <div className="flex flex-col items-start gap-0">
-                <span>No dudes en contactar al {companyConfig?.sing_heading_solicitante} para evacuar cualquier duda que tengas</span>
-              </div>
-              <ContactoClienteRapido cliente_phone={reclamo.cliente_phone} cliente_email={reclamo.cliente_email} reclamo_nro={reclamo.reclamo_id.toString()} reclamo_detalle={reclamo.reclamo_titulo} />
-            </div>
-          )}
 
           <Separator />
 
@@ -532,15 +503,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
                 </>
 
-              )}
-              {userRole === "profesional" && (
-                <div className="border-t pt-4 space-y-4">
-                  <div className="flex flex-col items-start gap-0">
-                    <span>Tenes alguna duda sobre este {companyConfig?.sing_heading_reclamos}?</span>
-                    <span>Contactanos a {companyConfig?.company?.company_nombre} para que podamos ayudarte.</span>
-                  </div>
-                  <ContactoRapido variant="compact" showHeader={false} />
-                </div>
               )}
             </div>
           )}

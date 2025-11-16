@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 
-interface NotificationBadgeProps {
+interface UnreadBadgeProps {
   count: number;
   className?: string;
 }
 
-export function NotificationBadge({ count, className }: NotificationBadgeProps) {
+export function UnreadBadge({ count, className }: UnreadBadgeProps) {
   if (count === 0) return null;
 
   return (
@@ -19,3 +19,4 @@ export function NotificationBadge({ count, className }: NotificationBadgeProps) 
     </span>
   );
 }
+

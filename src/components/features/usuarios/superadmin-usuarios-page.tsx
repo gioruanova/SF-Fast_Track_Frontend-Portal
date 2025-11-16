@@ -130,6 +130,7 @@ export function SuperadminUsuariosPage() {
     if (currentUser) {
       fetchUsuarios();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   useEffect(() => {

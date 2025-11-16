@@ -3,19 +3,7 @@ import { config, slugs } from "../config";
 
 export const CLIENT_API = {
 
-  // NOTIFICACIONES PUSH
-  NOTIFICATION_GET_VAPID: `${config.apiUrl}/${slugs.customersApi}/notifications/vapid-public-key`,
-  NOTIFICATION_SUBSCRIBE: `${config.apiUrl}/${slugs.customersApi}/notifications/register-token`,
-  NOTIFICATION_UNSUBSCRIBE: `${config.apiUrl}/${slugs.customersApi}/notifications/unregister-token`,
-  NOTIFICATION_UNSUBSCRIBE_SPECIFIC: `${config.apiUrl}/${slugs.customersApi}/notifications/unregister-specific-token`,
-  NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES: `${config.apiUrl}/${slugs.customersApi}/notifications/unregister-token`,
-
   GET_RECLAMOS: `${config.apiUrl}/${slugs.customersApi}/reclamos`,
-  GET_LOGS: `${config.apiUrl}/${slugs.customersApi}/globalLogs`,
-  LOGS_READ: `${config.apiUrl}/${slugs.customersApi}/globalLogs/read`,
-  LOGS_NOT_READ: `${config.apiUrl}/${slugs.customersApi}/globalLogs/unread`,
-  LOG_DELETE: `${config.apiUrl}/${slugs.customersApi}/globalLogs`,
-
 
 
   GET_USERS: `${config.apiUrl}/${slugs.customersApi}/users`,
@@ -39,7 +27,6 @@ export const CLIENT_API = {
   ELIMINAR_ASIGNACION_ESPECIALIDAD: `${config.apiUrl}/${slugs.customersApi}/profesionalEspecialidad/{id_asignacion}`,
 
 
-  PROFESIONAL_DESCARGA: `${config.apiUrl}/${slugs.customersApi}/vistas/profesionales`,
   RECLAMO_DESCARGA: `${config.apiUrl}/${slugs.customersApi}/vistas/reclamos/{type}`,
 
 
@@ -55,14 +42,6 @@ export const CLIENT_API = {
   RECLAMO_GESTION_ADMIN: `${config.apiUrl}/${slugs.customersApi}/reclamos/gestion/{id}`,
 
 
-  HABILITAR_FILA: `${config.apiUrl}/${slugs.customersApi}/workload/enable`,
-  DESHABILITAR_FILA: `${config.apiUrl}/${slugs.customersApi}/workload/disable`,
-
-
-  
-
-  GET_RECLAMOS_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional`,
-  GET_RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
   RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
   ENVIAR_RECORDATORIO_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamos/reminder/:reclamo_id`, 
 
@@ -71,11 +50,8 @@ export const CLIENT_API = {
   UPDATE_COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
   FEEDBACK: `${config.apiUrl}/${slugs.customersApi}/platform/feedback`,
   COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
-  ESTADO_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/workload/estado`,
 
 
-  DELETE_MENSAJE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/messages/{platform_message_id}`,
-  
   CREATE_MENSAJE_PLATFORM_FOR_COMPANY: `${config.apiUrl}/${slugs.customersApi}/platform/messages`, 
   CREATE_MENSAJE_PLATFORM_FOR_USER: `${config.apiUrl}/${slugs.customersApi}/platform/messages/user/{user_id}`, 
   
@@ -87,5 +63,8 @@ export const CLIENT_API = {
 
   // gestion de banner
   GET_BANNER_CLIENT: `${config.apiUrl}/${slugs.customersApi}/active-banner`, 
+
+  // gestion de perfil
+  PROFILE_MANAGE: `${config.apiUrl}/${slugs.customersApi}/profile/manage`,
 
 };

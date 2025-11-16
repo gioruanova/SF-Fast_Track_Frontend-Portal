@@ -5,7 +5,6 @@ import { NavItem, TeamData } from "./types";
 import { superAdminNavItems, superAdminTeamData, superAdminProjects } from "./superadmin-nav";
 import {  ownerTeamData, ownerProjects, getOwnerNavItems } from "./owner-nav";
 import { getOperadorNavItems, operadorTeamData, operadorProjects } from "./operador-nav";
-import {  profesionalTeamData, profesionalProjects, getProfesionalNavItems } from "./profesional-nav";
 
 
 export function getNavItems(user: User | null, config: CompanyConfigData | null = null): NavItem[] {
@@ -19,8 +18,6 @@ export function getNavItems(user: User | null, config: CompanyConfigData | null 
     switch (user.user_role) {
       case "owner":
         return getOwnerNavItems(config);
-      case "profesional":
-        return getProfesionalNavItems(config);
       case "operador":
         return getOperadorNavItems(config);
       default:
@@ -42,8 +39,6 @@ export function getTeamData(user: User | null): TeamData[] {
     switch (user.user_role) {
       case "owner":
         return ownerTeamData(user.company_name);
-      case "profesional":
-        return profesionalTeamData(user.company_name);
       case "operador":
         return operadorTeamData(user.company_name);
       default:
@@ -67,11 +62,6 @@ export function getProjects(user: User | null, config: CompanyConfigData | null 
     switch (user.user_role) {
       case "owner":
         return ownerProjects.map(project => ({
-          ...project,
-          disabled: !isCompanyActive
-        }));
-      case "profesional":
-        return profesionalProjects.map(project => ({
           ...project,
           disabled: !isCompanyActive
         }));

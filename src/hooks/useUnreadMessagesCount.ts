@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { SUPER_API } from "@/lib/superApi/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
@@ -13,20 +13,27 @@ declare global {
   }
 }
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 export function useUnreadMessagesCount() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { user, companyConfig } = useAuth();
 
+  const apiClient = useMemo(() => axios.create({
+    baseURL: config.apiUrl,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }), []);
+
   const fetchUnreadCount = useCallback(async () => {
+    // No hacer fetch para profesionales
+    if (user?.user_role === 'profesional') {
+      setUnreadCount(0);
+      setLoading(false);
+      return;
+    }
+
     if (companyConfig?.company?.company_estado === 0) {
       setUnreadCount(0);
       setLoading(false);
@@ -41,10 +48,12 @@ export function useUnreadMessagesCount() {
         response = await apiClient.get(SUPER_API.GET_PUBLIC_MESSAGES);
         const unreadMessages = response.data.filter((msg: { message_read: number }) => msg.message_read === 0);
         setUnreadCount(unreadMessages.length);
-      } else {
+      } else if (user?.user_role === 'owner' || user?.user_role === 'operador') {
         response = await apiClient.get(CLIENT_API.GET_MESSAGES_PLATFORM);
         const unreadMessages = response.data.filter((msg: { is_read: number }) => msg.is_read === 0);
         setUnreadCount(unreadMessages.length);
+      } else {
+        setUnreadCount(0);
       }
     } catch (error) {
       console.error('Error fetching unread messages count:', error);
@@ -52,13 +61,9 @@ export function useUnreadMessagesCount() {
     } finally {
       setLoading(false);
     }
-  }, [user, companyConfig]);
+  }, [user, companyConfig, apiClient]);
 
-  useEffect(() => {
-    if (user) {
-      fetchUnreadCount();
-    }
-  }, [user, fetchUnreadCount]);
+  // NO hacer fetch automático - solo cuando se llame explícitamente
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

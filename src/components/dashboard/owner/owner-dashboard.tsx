@@ -2,7 +2,6 @@
 
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CompanyStatsOverview } from "../shared/company-stats-overview";
-import { OwnerLogsActivity } from "./logs-activity";
 import { CompanyUpcomingReclamos } from "../shared/company-upcoming-reclamos";
 import { CompanyFinalizedReclamos } from "../shared/company-finalized-reclamos";
 import { CompanyUser } from "@/types/auth";
@@ -55,7 +54,6 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
             <CompanyStatsOverview />
             <CompanyUpcomingReclamos userRole="owner" />
             <CompanyFinalizedReclamos userRole="owner" />
-            <OwnerLogsActivity />
           </>
         ) : (
           <Card>

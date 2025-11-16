@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType } from "@/types/auth";
 import { CompanyConfigData } from "@/types/company";
-import { useAuthWithNotifications } from "@/hooks/useAuthWithNotifications";
+import { useAuth as useAuthHook } from "@/hooks/useAuth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -17,7 +17,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth,
     login,
     logout,
-  } = useAuthWithNotifications({
+  } = useAuthHook({
     setUser,
     setCompanyConfig,
     setIsLoading,

@@ -14,6 +14,12 @@ export interface CompanyUser extends BaseUser {
   company_id: number;
   company_name: string;
   company_status: number;
+  user_phone?: string;
+  company_phone?: string;
+  company_email?: string;
+  company_whatsapp?: string;
+  company_telegram?: string;
+  user_dni?: string;
 }
 
 export type User = SuperAdminUser | CompanyUser;

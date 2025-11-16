@@ -382,7 +382,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
     }
 
     return errors;
-  }, [companyConfig]);
+  }, [companyConfig, formData]);
 
   const submitReclamo = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
     const errors = validateForm();
