@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { useAuth } from "@/context/AuthContext"
@@ -17,7 +17,6 @@ import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
 
-
 type UserRole = "operador" | "profesional";
 
 interface User {
@@ -32,7 +31,6 @@ interface User {
   updated_at: string
   apto_recibir?: boolean | number
 }
-
 
 export function OperadorUsuariosPage() {
   const { companyConfig, user } = useAuth()
@@ -86,7 +84,7 @@ export function OperadorUsuariosPage() {
 
   useEffect(() => {
     fetchUsers()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) 
 
   useEffect(() => {
     if (isUserSheetOpen && editingUser && isEditing) {
@@ -437,8 +435,7 @@ export function OperadorUsuariosPage() {
                                   <Edit className="h-4 w-4" />
                                 </Button>
 
-
-                                {
+{
                                   user.user_status === 0 ? (
                                     <Button
                                       variant="outline"
@@ -453,8 +450,7 @@ export function OperadorUsuariosPage() {
                                   )
                                 }
 
-
-                                <Button
+<Button
                                   variant="outline"
                                   size="sm"
                                   title={user.user_status === 1 ? "Bloquear usuario" : "Desbloquear usuario"}

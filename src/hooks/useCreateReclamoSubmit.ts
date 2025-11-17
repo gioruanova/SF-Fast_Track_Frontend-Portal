@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { CLIENT_API } from "@/lib/clientApi/config";
-import { config } from "@/lib/config";
-import axios from "axios";
+import { apiClient } from "@/lib/apiClient";
 
 interface CreateReclamoData {
   reclamo_titulo: string;
@@ -28,12 +27,6 @@ export function useCreateReclamoSubmit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { companyConfig } = useAuth();
-
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: { 'Content-Type': 'application/json' },
-  });
 
   const createReclamo = async (data: CreateReclamoData): Promise<CreateReclamoResponse> => {
     setIsSubmitting(true);

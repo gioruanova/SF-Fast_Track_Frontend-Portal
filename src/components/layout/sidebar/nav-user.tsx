@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo, useCallback } from "react"
 import {
   BadgeCheck,
   ChevronsUpDown,
@@ -35,19 +35,22 @@ export function NavUser() {
   const { isMobile } = useSidebar()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
-  const isCompanyActive = companyConfig?.company?.company_estado === 1;
+  const isCompanyActive = useMemo(() => 
+    companyConfig?.company?.company_estado === 1,
+    [companyConfig?.company?.company_estado]
+  );
 
   if (!user) return null
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await logout()
     } catch (error) {
       console.error("Error al cerrar sesión:", error)
     }
-  }
+  }, [logout])
 
-  const getInitials = (name?: string) => {
+  const getInitials = useCallback((name?: string) => {
     if (!name) return "U"
     return name
       .split(" ")
@@ -55,18 +58,18 @@ export function NavUser() {
       .join("")
       .toUpperCase()
       .slice(0, 2)
-  }
+  }, [])
 
-  const getDisplayName = () => {
+  const displayName = useMemo(() => {
     if (!user) return "Usuario"
     const userName = 'user_name' in user ? user.user_name : undefined
     if (userName) {
       return userName
     }
     return user.user_email?.split('@')[0] || "Usuario"
-  }
+  }, [user])
 
-  const getRoleInfo = () => {
+  const roleInfo = useMemo(() => {
     if (!user) return "Usuario"
     if (isSuperAdmin(user)) {
       return "Super Administrador"
@@ -75,7 +78,7 @@ export function NavUser() {
       return `${user.company_name} - ${user.user_role}`
     }
     return "Usuario"
-  }
+  }, [user])
 
   return (
     <>
@@ -89,11 +92,11 @@ export function NavUser() {
               >
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarFallback className="rounded-lg">
-                    {getInitials(getDisplayName())}
+                    {getInitials(displayName)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{getDisplayName()}</span>
+                  <span className="truncate font-medium">{displayName}</span>
                   <span className="truncate text-xs">{user.user_email}</span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
@@ -110,14 +113,14 @@ export function NavUser() {
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarFallback className="rounded-lg">
-                      {getInitials(getDisplayName())}
+                      {getInitials(displayName)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{getDisplayName()}</span>
+                    <span className="truncate font-medium">{displayName}</span>
                     <span className="truncate text-xs">{user.user_email}</span>
                     <span className="truncate text-xs text-muted-foreground">
-                      {getRoleInfo()}
+                      {roleInfo}
                     </span>
                   </div>
                 </div>

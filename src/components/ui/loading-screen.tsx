@@ -1,5 +1,6 @@
-"use client";
+﻿"use client";
 
+import { memo } from "react";
 import { LoadingSpinner } from "./loading-spinner";
 import { cn } from "@/lib/utils";
 
@@ -8,10 +9,10 @@ interface LoadingScreenProps {
   className?: string;
 }
 
-export function LoadingScreen({ 
+const LoadingScreenComponent = ({ 
   message = "Cargando...", 
   className 
-}: LoadingScreenProps) {
+}: LoadingScreenProps) => {
   return (
     <div 
       className={cn(
@@ -25,5 +26,7 @@ export function LoadingScreen({
       </div>
     </div>
   );
-}
+};
+
+export const LoadingScreen = memo(LoadingScreenComponent);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ProtectedPage } from "@/components/auth/protected-page";
+import { RouteGuard } from "@/components/auth/route-guard";
 
 export default function ProfesionalLayout({
   children,
@@ -8,9 +8,9 @@ export default function ProfesionalLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedPage>
+    <RouteGuard allowedRoles={["profesional"]}>
       {children}
-    </ProtectedPage>
+    </RouteGuard>
   );
 }
 

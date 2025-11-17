@@ -1,5 +1,6 @@
 "use client"
 
+import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronRight, type LucideIcon } from "lucide-react"
 
@@ -42,7 +43,7 @@ export function NavMain({
   const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
 
-  const handleNavigation = (url: string, disabled?: boolean) => {
+  const handleNavigation = useCallback((url: string, disabled?: boolean) => {
     if (disabled) {
       return;
     }
@@ -51,7 +52,7 @@ export function NavMain({
     if (isMobile) {
       setOpenMobile(false);
     }
-  };
+  }, [router, isMobile, setOpenMobile]);
 
   return (
     <SidebarGroup>

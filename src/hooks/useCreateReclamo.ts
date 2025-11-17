@@ -1,10 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { CLIENT_API } from "@/lib/clientApi/config";
-import { config } from "@/lib/config";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import { apiClient } from "@/lib/apiClient";
 
 interface ClienteRecurrente {
   cliente_id: number;
@@ -59,7 +58,6 @@ interface FechaBloqueada {
   profesional_id: number;
 }
 
-
 export interface ReclamoFormData {
   cliente_id: number | null;
   especialidad_id: number | null;
@@ -76,11 +74,6 @@ export interface ReclamoFormData {
   cliente_phone?: string;
 }
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
-});
 
 export function useCreateReclamo(isOpen: boolean = false) {
   const { companyConfig } = useAuth();
@@ -135,13 +128,10 @@ export function useCreateReclamo(isOpen: boolean = false) {
     fechasBloqueadas: fechasBloqueadas,
   };
 
-
-
-
-
-  const loadAgendaBloqueada = useCallback(async (profesionalId: number) => {
+  const loadAgendaData = useCallback(async (profesionalId: number) => {
     if (!profesionalId) {
       setAgendaBloqueada([]);
+      setFechasBloqueadas([]);
       return;
     }
 
@@ -155,28 +145,8 @@ export function useCreateReclamo(isOpen: boolean = false) {
       );
 
       setAgendaBloqueada(agendaFiltrada);
-    } catch (error) {
-      console.error("Error loading agenda bloqueada:", error);
-      setAgendaBloqueada([]);
-    } finally {
-      setLoadingFechas(false);
-    }
-  }, []);
 
-  const loadFechasBloqueadas = useCallback(async (profesionalId: number) => {
-    if (!profesionalId) {
-      setFechasBloqueadas([]);
-      return;
-    }
-
-    try {
-      setLoadingFechas(true);
-      const response = await apiClient.get(CLIENT_API.GET_AGENDA_BLOQUEADA);
-      const agenda = response.data || [];
-
-      const fechasDelProfesional = agenda.filter(
-        (item: AgendaBloqueada) => item.profesional_id === profesionalId
-      ).map((item: AgendaBloqueada) => ({
+      const fechasDelProfesional = agendaFiltrada.map((item: AgendaBloqueada) => ({
         fecha: item.agenda_fecha.split('T')[0],
         hora_desde: item.agenda_hora_desde,
         hora_hasta: item.agenda_hora_hasta,
@@ -185,7 +155,8 @@ export function useCreateReclamo(isOpen: boolean = false) {
 
       setFechasBloqueadas(fechasDelProfesional);
     } catch (error) {
-      console.error("Error loading fechas bloqueadas:", error);
+      console.error("Error loading agenda bloqueada:", error);
+      setAgendaBloqueada([]);
       setFechasBloqueadas([]);
     } finally {
       setLoadingFechas(false);
@@ -196,11 +167,10 @@ export function useCreateReclamo(isOpen: boolean = false) {
     try {
       setLoading(true);
 
-      const [clientesRes, usersRes, asignacionesRes, agendaRes, especialidadesRes] = await Promise.all([
+      const [clientesRes, usersRes, asignacionesRes, especialidadesRes] = await Promise.all([
         apiClient.get(CLIENT_API.GET_CLIENTES),
         apiClient.get(CLIENT_API.GET_USERS),
         apiClient.get(CLIENT_API.GET_ASIGNACIONES),
-        apiClient.get(CLIENT_API.GET_AGENDA_BLOQUEADA),
         apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
       ]);
 
@@ -232,8 +202,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
       setEspecialidadesOptions(especialidadesUnicas);
       setUsers(usersRes.data || []);
       setAsignacionesOptions(asignaciones);
-      setAsignacionesOriginales(asignaciones);  
-      setAgendaBloqueada(agendaRes.data || []);
+      setAsignacionesOriginales(asignaciones);
 
     } catch (error) {
       console.error("Error loading initial data:", error);
@@ -288,13 +257,12 @@ export function useCreateReclamo(isOpen: boolean = false) {
 
   useEffect(() => {
     if (formData.profesional_id) {
-      loadFechasBloqueadas(formData.profesional_id);
-      loadAgendaBloqueada(formData.profesional_id);
+      loadAgendaData(formData.profesional_id);
     } else {
       setFechasBloqueadas([]);
       setAgendaBloqueada([]);
     }
-  }, [formData.profesional_id, loadFechasBloqueadas, loadAgendaBloqueada]);
+  }, [formData.profesional_id, loadAgendaData]);
 
   const updateField = useCallback((field: keyof ReclamoFormData, value: string | number | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -393,8 +361,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
     try {
       setLoading(true);
 
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise(resolve => setTimeout(resolve, 1000));
 
       return { success: true };
     } catch (error) {

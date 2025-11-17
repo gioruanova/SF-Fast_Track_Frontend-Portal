@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, } from "@/components/ui/sheet";
@@ -277,8 +277,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 <span className="font-medium">{reclamo.cliente_complete_name}</span>
               </div>
 
-
-              <div className="flex items-center gap-2 text-sm">
+<div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Fecha agendada:</span>
                 <span className="font-medium">
@@ -306,8 +305,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 </Button>
               )}
 
-
-              {reclamo.cliente_email && (
+{reclamo.cliente_email && (
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Email:</span>
@@ -323,8 +321,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 </div>
               )}
 
-
-              {reclamo.cliente_direccion && companyConfig?.requiere_domicilio === 1 ? (
+{reclamo.cliente_direccion && companyConfig?.requiere_domicilio === 1 ? (
                 <>
                   <Separator />
                   <div className="space-y-3">
@@ -364,8 +361,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           <div>
             <Label className="text-muted-foreground">Descripción:</Label>
 
-
-            {showMore && (
+{showMore && (
               <p className="mt-1 text-sm text-justify">{reclamo.reclamo_detalle}</p>
             )}
             {!showMore && (
@@ -378,9 +374,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
           </div>
 
-
-
-          <Separator />
+<Separator />
 
           {reclamo.reclamo_nota_cierre && (reclamo.reclamo_nota_cierre || reclamo.reclamo_presupuesto) && (
             <>
@@ -426,9 +420,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 </div>
               )}
 
-
-
-              {canProfesionalEdit && (
+{canProfesionalEdit && (
                 <>
 
                   <div>
@@ -500,8 +492,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                     </Button>
                   )}
 
-
-                </>
+</>
 
               )}
             </div>

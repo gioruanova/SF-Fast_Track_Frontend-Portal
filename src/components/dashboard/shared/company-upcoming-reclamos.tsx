@@ -1,26 +1,15 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Calendar, User, Eye, ArrowRight } from "lucide-react";
 import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detail-sheet";
-import { useDashboard } from "@/context/DashboardContext";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
+import { useReclamos } from "@/hooks/useReclamos";
 import Link from "next/link";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 interface ReclamoData {
   reclamo_id: number;
@@ -55,37 +44,17 @@ interface CompanyUpcomingReclamosProps {
 }
 
 export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingReclamosProps = {}) {
-  const { refreshTrigger } = useDashboard();
   const { companyConfig } = useAuth();
-  const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
-  const [allReclamos, setAllReclamos] = useState<ReclamoData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { activeReclamos: allActiveReclamos, reclamos: allReclamos, isLoading, refresh } = useReclamos();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const fetchReclamos = async () => {
-    try {
-      setIsLoading(true);
-      const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
-      setAllReclamos(response.data);
-
-      const activeReclamos = response.data
-        .filter((r: ReclamoData) => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO")
-        .sort((a: ReclamoData, b: ReclamoData) => {
-          return new Date(a.agenda_fecha).getTime() - new Date(b.agenda_fecha).getTime();
-        });
-      setReclamos(activeReclamos);
-    } catch (error) {
-      console.error("Error obteniendo reclamos:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchReclamos();
-  }, [refreshTrigger]);
+  const reclamos = useMemo(() => {
+    return [...allActiveReclamos].sort((a, b) => {
+      return new Date(a.agenda_fecha).getTime() - new Date(b.agenda_fecha).getTime();
+    });
+  }, [allActiveReclamos]);
 
   const handleOpenSheet = (reclamo: ReclamoData) => {
     setSelectedReclamo(reclamo);
@@ -98,7 +67,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
   };
 
   const handleUpdate = () => {
-    fetchReclamos();
+    refresh();
   };
 
   const estadisticasPorEstado = {
@@ -222,10 +191,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                             <span>{reclamo.cliente_complete_name}</span>
                           </div>
 
-
-
-
-                          <div className="flex flex-wrap gap-2">
+<div className="flex flex-wrap gap-2">
                             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                               {reclamo.nombre_especialidad}
                             </span>

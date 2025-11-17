@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo, useState } from "react";
 import axios from "axios";
@@ -31,8 +31,7 @@ export function OwnerCompanySettingsCard() {
   const [editingValue, setEditingValue] = useState<string>("");
   const [isSavingField, setIsSavingField] = useState(false);
 
-
-  const values = useMemo(() => ({
+const values = useMemo(() => ({
     company_phone: companyConfig?.company?.company_phone || "",
     company_email: companyConfig?.company?.company_email || "",
     company_whatsapp: companyConfig?.company?.company_whatsapp || "",
@@ -58,8 +57,7 @@ export function OwnerCompanySettingsCard() {
     const current = togglesState[key];
     if (current === next) return;
 
-
-    try {
+try {
       setIsUpdatingToggle(key);
       const payload: Record<string, boolean> = { [key]: next };
       await apiClient.put(CLIENT_API.UPDATE_COMPANY_CONFIG, payload);
@@ -73,9 +71,7 @@ export function OwnerCompanySettingsCard() {
     }
   };
 
-
-
-  return (
+return (
     <React.Fragment>
       <Card>
         <CardHeader className="border-b border-border pb-4">
@@ -261,9 +257,8 @@ export function OwnerCompanySettingsCard() {
                       <p className="text-xs text-muted-foreground">
                       <strong>Importante: </strong>de no estar encendida esta opcion, el sistema bloqueara la agenda para todo ese dia del {companyConfig?.sing_heading_profesional?.toLowerCase() || "reclamo"} que se selecciono.
                       </p>
-                      
-                      
-                    </div>
+
+</div>
                     <Switch
                       checked={togglesState.requiere_fecha_final}
                       onCheckedChange={(checked) => handleToggle('requiere_fecha_final', checked)}
@@ -481,5 +476,4 @@ export function OwnerCompanySettingsCard() {
     </React.Fragment>
   );
 }
-
 

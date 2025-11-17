@@ -1,11 +1,10 @@
-import { User } from "@/types/auth";
+﻿import { User } from "@/types/auth";
 import { isSuperAdmin, isCompanyUser } from "@/types/auth";
 import { CompanyConfigData } from "@/types/company";
 import { NavItem, TeamData } from "./types";
 import { superAdminNavItems, superAdminTeamData, superAdminProjects } from "./superadmin-nav";
 import {  ownerTeamData, ownerProjects, getOwnerNavItems } from "./owner-nav";
 import { getOperadorNavItems, operadorTeamData, operadorProjects } from "./operador-nav";
-
 
 export function getNavItems(user: User | null, config: CompanyConfigData | null = null): NavItem[] {
   if (!user) return [];

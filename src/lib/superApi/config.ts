@@ -1,4 +1,4 @@
-import { config, slugs } from "../config";
+﻿import { config, slugs } from "../config";
 
 export const SUPER_API = {
 
@@ -24,13 +24,11 @@ export const SUPER_API = {
   ENABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/unblock/{especialidadId}`,
   DISABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/block/{especialidadId}`,
 
-  // gestion de mensajes
   GET_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages`,
   READ_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages/read/{message_id}`,
   UNREAD_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages/unread/{message_id}`,
   DELETE_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages/{message_id}`,
 
-  // mensajes publicos categorias
   GET_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories`,
   CREATE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories`,
   EDIT_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/{category_id}`,
@@ -38,17 +36,7 @@ export const SUPER_API = {
   ENABLE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/enable/{category_id}`,
   DELETE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/{category_id}`,
 
-  // gestion de mensajes plataform
   PLAT_MESSAGE_ALL: `${config.apiUrl}/${slugs.superApi}/platform/messages`,
   PLAT_MESSAGE_COMPANY: `${config.apiUrl}/${slugs.superApi}/platform/messages/company/{company_id}`,
   PLAT_MESSAGE_USER: `${config.apiUrl}/${slugs.superApi}/platform/messages/user/{user_id}`,
-
-
-  // gestion de banner
-  GET_BANNERS: `${config.apiUrl}/${slugs.superApi}/banners`, 
-  CREATE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners`, 
-  EDIT_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, 
-  DELETE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`,
-  DISABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/disable/{banner_id}`, 
-  ENABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/enable/{banner_id}`, 
 };

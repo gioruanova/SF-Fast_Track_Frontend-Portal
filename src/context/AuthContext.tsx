@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { User, AuthContextType } from "@/types/auth";
 import { CompanyConfigData } from "@/types/company";
 import { useAuth as useAuthHook } from "@/hooks/useAuth";
@@ -25,10 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
-  const value: AuthContextType = {
+const value: AuthContextType = useMemo(() => ({
     user,
     companyConfig,
     login,
@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshCompanyConfig,
     isLoading,
     error: null,
-  };
+  }), [user, companyConfig, login, logout, refreshCompanyConfig, isLoading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

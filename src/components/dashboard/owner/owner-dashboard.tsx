@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CompanyStatsOverview } from "../shared/company-stats-overview";
@@ -19,8 +19,7 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
     return user.user_email?.split('@')[0] || "Usuario";
   };
 
-  
-  const isCompanyActive = user.company_status === 1;
+const isCompanyActive = user.company_status === 1;
 
   return (
     <div className="space-y-4">
@@ -48,8 +47,7 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
           </CardHeader>
         </Card>
 
-
-        {isCompanyActive ? (
+{isCompanyActive ? (
           <>
             <CompanyStatsOverview />
             <CompanyUpcomingReclamos userRole="owner" />

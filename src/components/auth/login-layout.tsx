@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -8,10 +8,6 @@ interface LoginLayoutProps {
   children: ReactNode;
 }
 
-/**
- * Layout para la página de login
- * Proporciona la estructura visual del login (formulario + imagen de fondo)
- */
 export function LoginLayout({ children }: LoginLayoutProps) {
   return (
     <div className="grid min-h-svh lg:grid-cols-2 relative">

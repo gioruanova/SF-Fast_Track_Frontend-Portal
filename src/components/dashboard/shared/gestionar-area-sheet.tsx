@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -89,11 +89,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
         especialidad_id: parseInt(selectedEspecialidad)
       };
 
+await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
 
-      await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
-
-
-      toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asignada correctamente`);
+toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asignada correctamente`);
       onUpdate();
       setIsOpen(false);
       setSelectedEspecialidad("");
@@ -134,11 +132,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
 
       const url = CLIENT_API.EDITAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
 
+await apiClient.put(url, payload);
 
-      await apiClient.put(url, payload);
-
-
-      toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} actualizada correctamente`);
+toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} actualizada correctamente`);
       onUpdate();
       setEditingAsignacion(null);
       setSelectedEditEspecialidad("");
@@ -170,11 +166,9 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
 
       const url = CLIENT_API.ELIMINAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
 
+await apiClient.delete(url);
 
-      await apiClient.delete(url);
-
-
-      toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} eliminada correctamente`);
+toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} eliminada correctamente`);
       onUpdate();
       setDeletingAsignacion(null);
     } catch (error: unknown) {
@@ -194,8 +188,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
     }
   };
 
-
-  const especialidadesDisponibles = especialidades.filter(esp =>
+const especialidadesDisponibles = especialidades.filter(esp =>
     esp.estado_especialidad === 1 &&
     !profesional.especialidades?.some(profEsp => profEsp.id_especialidad === esp.id_especialidad)
   );

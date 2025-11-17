@@ -1,17 +1,14 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Calendar, User, Eye, ArrowRight } from "lucide-react";
 import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detail-sheet";
-import { useDashboard } from "@/context/DashboardContext";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
+import { useReclamos } from "@/hooks/useReclamos";
 import Link from "next/link";
 
 interface ReclamoData {
@@ -43,46 +40,17 @@ interface CompanyFinalizedReclamosProps {
 }
 
 export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalizedReclamosProps = {}) {
-  const { refreshTrigger } = useDashboard();
   const { companyConfig } = useAuth();
-  const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
-  const [allReclamos, setAllReclamos] = useState<ReclamoData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { finalizedReclamos: allFinalizedReclamos, reclamos: allReclamos, isLoading, refresh } = useReclamos();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const fetchReclamos = useCallback(async () => {
-    try {
-      setIsLoading(true);
-
-      const apiClient = axios.create({
-        baseURL: config.apiUrl,
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
-      setAllReclamos(response.data);
-
-      const finishedReclamos = response.data
-        .filter((r: ReclamoData) => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO")
-        .sort((a: ReclamoData, b: ReclamoData) => {
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
-      setReclamos(finishedReclamos);
-    } catch (error) {
-      console.error("Error obteniendo reclamos:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchReclamos();
-  }, [refreshTrigger, fetchReclamos]);
+  const reclamos = useMemo(() => {
+    return [...allFinalizedReclamos].sort((a, b) => {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [allFinalizedReclamos]);
 
   const handleOpenSheet = (reclamo: ReclamoData) => {
     setSelectedReclamo(reclamo);
@@ -95,7 +63,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
   };
 
   const handleUpdate = () => {
-    fetchReclamos();
+    refresh();
   };
 
   const estadisticasPorEstado = {
@@ -202,10 +170,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                             </span>
                           </div>
 
-
-
-
-                          <div className="flex items-center gap-1">
+<div className="flex items-center gap-1">
                             <User className="h-3 w-3" />
                             <span>{reclamo.cliente_complete_name}</span>
                           </div>
@@ -231,8 +196,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                             </div>
                           </div>
 
-
-                        </div>
+</div>
 
                         <Button
                           size="sm"

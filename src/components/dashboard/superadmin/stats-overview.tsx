@@ -7,17 +7,8 @@ import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/context/DashboardContext";
-import axios from "axios";
-import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { apiClient } from "@/lib/apiClient";
 
 interface UserData {
   user_id: number;

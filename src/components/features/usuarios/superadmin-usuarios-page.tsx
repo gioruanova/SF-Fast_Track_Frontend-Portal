@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -130,7 +130,7 @@ export function SuperadminUsuariosPage() {
     if (currentUser) {
       fetchUsuarios();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [currentUser]);
 
   useEffect(() => {
@@ -269,8 +269,7 @@ export function SuperadminUsuariosPage() {
     fetchUsuarios();
   };
 
-
-  const handleCreateUser = () => {
+const handleCreateUser = () => {
     setIsEditing(false);
     setEditingUser(null);
     if (nameRef.current) nameRef.current.value = "";

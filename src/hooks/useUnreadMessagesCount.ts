@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -27,7 +27,7 @@ export function useUnreadMessagesCount() {
   }), []);
 
   const fetchUnreadCount = useCallback(async () => {
-    // No hacer fetch para profesionales
+    
     if (user?.user_role === 'profesional') {
       setUnreadCount(0);
       setLoading(false);
@@ -63,9 +63,7 @@ export function useUnreadMessagesCount() {
     }
   }, [user, companyConfig, apiClient]);
 
-  // NO hacer fetch automático - solo cuando se llame explícitamente
-
-  useEffect(() => {
+useEffect(() => {
     if (typeof window !== 'undefined') {
       window.refreshUnreadCount = fetchUnreadCount;
     }

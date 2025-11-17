@@ -1,4 +1,6 @@
-export const ShapeLeft = () => {
+﻿import { memo } from "react";
+
+const ShapeLeftComponent = () => {
   return (
     <div
       aria-hidden="true"
@@ -15,7 +17,7 @@ export const ShapeLeft = () => {
   );
 };
 
-export const ShapeRight = () => {
+const ShapeRightComponent = () => {
   return (
     <div
       aria-hidden="true"
@@ -31,3 +33,6 @@ export const ShapeRight = () => {
     </div>
   );
 };
+
+export const ShapeLeft = memo(ShapeLeftComponent);
+export const ShapeRight = memo(ShapeRightComponent);

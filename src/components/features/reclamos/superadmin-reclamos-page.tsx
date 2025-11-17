@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -277,8 +277,7 @@ export function SuperadminReclamosPage() {
                         </div>
                       </TableCell>
 
-
-                      <TableCell>
+<TableCell>
                         <Badge variant="outline" className="text-xs">
                           {reclamo.nombre_especialidad}
                         </Badge>

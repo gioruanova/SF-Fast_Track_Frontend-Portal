@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -61,8 +61,7 @@ export function ClientesPage({}: ClientesPageProps) {
     cliente_direccion: ""
   })
 
-
-  const fetchClientes = async () => {
+const fetchClientes = async () => {
     try {
       setIsLoading(true)
       const response = await apiClient.get(CLIENT_API.GET_CLIENTES)
@@ -77,7 +76,7 @@ export function ClientesPage({}: ClientesPageProps) {
 
   useEffect(() => {
     fetchClientes()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) 
 
   const handleCreateCliente = () => {
     setIsEditing(false)

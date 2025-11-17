@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,10 +8,6 @@ import { LoginLayout } from "@/components/auth/login-layout";
 import { LoadingScreen } from "@/components/ui/loading-screen";
 import { getDashboardRoute } from "@/hooks/useRoleRouting";
 
-/**
- * Página de login
- * Si el usuario ya está autenticado, redirige al dashboard según su rol
- */
 export default function LoginPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
@@ -28,7 +24,7 @@ export default function LoginPage() {
   }
 
   if (user) {
-    return null; // Redirección en proceso
+    return null; 
   }
 
   return (

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -32,7 +32,6 @@ interface User {
   updated_at: string
   apto_recibir?: boolean | number
 }
-
 
 export function OwnerUsuariosPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -84,7 +83,7 @@ export function OwnerUsuariosPage() {
 
   useEffect(() => {
     fetchUsers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [])
 
   useEffect(() => {

@@ -7,18 +7,10 @@ import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp, BriefcaseBusiness, SquareCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/context/DashboardContext";
-import axios from "axios";
-import { config } from "@/lib/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
 import { useAuth } from "@/context/AuthContext";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { useReclamos } from "@/hooks/useReclamos";
+import { apiClient } from "@/lib/apiClient";
 
 interface UserData {
   user_id: number;
@@ -55,27 +47,25 @@ const CHART_COLORS = [
 export function CompanyStatsOverview() {
   const { refreshTrigger } = useDashboard();
   const { companyConfig } = useAuth();
+  const { reclamos: reclamosData } = useReclamos();
   const [users, setUsers] = useState<UserData[]>([]);
   const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
   const [clientes, setClientes] = useState<ClienteData[]>([]);
-  const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [usersRes, especialidadesRes, clientesRes, reclamosRes] = await Promise.all([
+        const [usersRes, especialidadesRes, clientesRes] = await Promise.all([
           apiClient.get(CLIENT_API.GET_USERS),
           apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
           apiClient.get(CLIENT_API.GET_CLIENTES),
-          apiClient.get(CLIENT_API.GET_RECLAMOS),
         ]);
 
         setUsers(usersRes.data);
         setEspecialidades(especialidadesRes.data);
         setClientes(clientesRes.data);
-        setReclamos(reclamosRes.data);
       } catch (error) {
         console.error("Error obteniendo datos:", error);
       } finally {
@@ -122,9 +112,9 @@ export function CompanyStatsOverview() {
   const especialidadesData = especialidadesGrouped;
 
   const totalClientes = clientes.length;
-  const totalReclamos = reclamos.length;
-  const reclamosEnActividad = reclamos.filter(r => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO").length;
-  const reclamosFinalizados = reclamos.filter(r => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO").length;
+  const totalReclamos = reclamosData.length;
+  const reclamosEnActividad = reclamosData.filter(r => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO").length;
+  const reclamosFinalizados = reclamosData.filter(r => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO").length;
 
   if (isLoading) {
     return (

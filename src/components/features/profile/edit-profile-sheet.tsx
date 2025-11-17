@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useAuth } from "@/context/AuthContext"
@@ -100,8 +100,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
   const fetchUserData = async () => {
     if (!user) return
 
-    // Para owner y operador, usar datos del contexto
-    if (isCompanyUser(user) && (user.user_role === "owner" || user.user_role === "operador")) {
+if (isCompanyUser(user) && (user.user_role === "owner" || user.user_role === "operador")) {
       const profileInfo: ProfileData = {
         user_id: user.user_id,
         user_complete_name: user.user_name || "",
@@ -117,8 +116,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
       return
     }
 
-    // Para superadmin, hacer fetch al endpoint
-    try {
+try {
       const endpoint = SUPER_API.GET_USERS
       const response = await apiClient.get(endpoint)
       const users: UserData[] = response.data
@@ -233,11 +231,10 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         return
       }
 
-      // Para owner y operador, usar el nuevo endpoint de perfil
-      if (isCompanyUser(user) && (user.user_role === "owner" || user.user_role === "operador")) {
+if (isCompanyUser(user) && (user.user_role === "owner" || user.user_role === "operador")) {
         await apiClient.put(CLIENT_API.PROFILE_MANAGE, updateData)
       } else {
-        // Para superadmin, usar el endpoint anterior
+        
         const endpoint = SUPER_API.USERS_EDIT
         const url = endpoint.replace("{id}", user.user_id.toString())
         await apiClient.put(url, updateData)

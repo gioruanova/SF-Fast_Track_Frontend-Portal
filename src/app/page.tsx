@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -6,12 +6,6 @@ import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/ui/loading-screen";
 import { getDashboardRoute } from "@/hooks/useRoleRouting";
 
-/**
- * Página raíz de la aplicación
- * Redirige según el estado de autenticación:
- * - Si está autenticado → Dashboard según rol
- * - Si no está autenticado → Login
- */
 export default function Home() {
   const { user, isLoading } = useAuth();
   const router = useRouter();

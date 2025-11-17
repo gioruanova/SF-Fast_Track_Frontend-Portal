@@ -1,10 +1,9 @@
-import {
+﻿import {
     Users,
     Mail,
     Shield,
     SquareCheck,
     Wrench,
-    Megaphone,
     House,
     Briefcase,
     Landmark,
@@ -44,8 +43,6 @@ export const superAdminNavItems: NavItem[] = [
         icon: Briefcase,
     },
 
-
-
 ];
 
 export const superAdminTeamData: TeamData[] = [
@@ -58,7 +55,6 @@ export const superAdminTeamData: TeamData[] = [
 ];
 
 export const superAdminProjects: ProjectData[] = [
-
     {
         title: "Mensajes publicos",
         url: "/dashboard/superadmin/mensajes",
@@ -68,12 +64,6 @@ export const superAdminProjects: ProjectData[] = [
         title: "Mensajes Plataforma",
         url: "/dashboard/superadmin/mensajes-plataforma",
         icon: Radio,
-    },
-
-    {
-        title: "Banner general",
-        url: "/dashboard/superadmin/banner",
-        icon: Megaphone,
     },
 ];
 

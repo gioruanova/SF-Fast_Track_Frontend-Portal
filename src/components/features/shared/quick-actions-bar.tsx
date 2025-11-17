@@ -24,7 +24,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
       toast.error("La empresa está inactiva. No se pueden crear reclamos.");
       return;
     }
-    router.push("/dashboard/reclamos/crear");
+    router.push(`/dashboard/${userRole}/crear-reclamo`);
   };
 
   const handleEnCurso = () => {

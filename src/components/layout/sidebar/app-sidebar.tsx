@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
+import { useMemo } from "react";
 import { NavMain } from "@/components/layout/sidebar/nav-main";
 import { NavUser } from "@/components/layout/sidebar/nav-user";
 import { TeamSwitcher } from "@/components/layout/sidebar/team-switcher";
@@ -18,11 +19,16 @@ import { FeedbackSheet } from "@/components/features/feedback/feedback-sheet";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, companyConfig } = useAuth();
 
-  if (!user) return null;
+  const navItems = useMemo(() => getNavItems(user, companyConfig), [user, companyConfig]);
+  const teams = useMemo(() => getTeamData(user), [user]);
+  const projects = useMemo(() => getProjects(user, companyConfig), [user, companyConfig]);
+  const showFeedback = useMemo(() => 
+    (user?.user_role === "owner" || user?.user_role === "operador") && 
+    companyConfig?.company?.company_estado === 1,
+    [user?.user_role, companyConfig?.company?.company_estado]
+  );
 
-  const navItems = getNavItems(user, companyConfig);
-  const teams = getTeamData(user);
-  const projects = getProjects(user, companyConfig);
+  if (!user) return null;
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -37,9 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
 
       </SidebarContent>
-      {((user.user_role === "owner" || user.user_role === "operador") && companyConfig?.company?.company_estado === 1) && (
-        <FeedbackSheet />
-      )}
+      {showFeedback && <FeedbackSheet />}
 
       <SidebarFooter>
 

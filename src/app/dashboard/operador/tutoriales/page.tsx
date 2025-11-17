@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -17,8 +17,7 @@ export default function OperadorTutorialesPage() {
     }
   }, [companyConfig, router]);
 
-
-  if (!user || !isCompanyUser(user) || user.user_role !== "operador") {
+if (!user || !isCompanyUser(user) || user.user_role !== "operador") {
     return null;
   }
 

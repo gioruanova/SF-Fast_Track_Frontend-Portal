@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { CreateReclamoForm } from "@/components/features/reclamos/create-reclamo-form";
@@ -8,41 +8,28 @@ import { isCompanyUser } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-/**
- * Página para crear reclamos
- * Ruta compartida por owner y operador
- * Protegida por RouteGuard (solo owner y operador)
- */
-export default function CrearReclamoPage() {
+export default function CrearReclamoOperadorPage() {
   const { user, companyConfig } = useAuth();
   const router = useRouter();
 
-  // Si la empresa está inactiva, redirigir al dashboard
-  useEffect(() => {
+useEffect(() => {
     if (user && isCompanyUser(user) && companyConfig?.company?.company_estado === 0) {
-      const dashboardRoute = user.user_role === "owner" ? "/dashboard/owner" : "/dashboard/operador";
-      router.replace(dashboardRoute);
+      router.replace("/dashboard/operador");
     }
   }, [user, companyConfig, router]);
 
-  // Si la empresa está inactiva, no renderizar nada
-  if (companyConfig?.company?.company_estado === 0) {
+if (companyConfig?.company?.company_estado === 0) {
     return null;
   }
 
-  const getDashboardRoute = () => {
-    if (!user || !isCompanyUser(user)) return "/dashboard";
-    return user.user_role === "owner" ? "/dashboard/owner" : "/dashboard/operador";
-  };
-
   return (
-    <RouteGuard allowedRoles={["owner", "operador"]}>
+    <RouteGuard allowedRoles={["operador"]}>
       <DashboardHeader
         breadcrumbs={[
-          { label: "Dashboard", href: getDashboardRoute() },
+          { label: "Dashboard", href: "/dashboard/operador" },
           { label: `Crear ${companyConfig?.sing_heading_reclamos || "Reclamo"}` }
         ]}
-        userRole={user?.user_role || "owner"}
+        userRole={user?.user_role || "operador"}
       />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5 w-full">
         <CreateReclamoForm />

@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/ui/loading-screen";
@@ -12,12 +12,6 @@ interface RouteGuardProps {
   redirectTo?: string;
 }
 
-/**
- * Componente que protege rutas basándose en autenticación y roles
- * - Verifica si el usuario está autenticado
- * - Verifica si el usuario tiene el rol permitido
- * - Redirige según corresponda
- */
 export function RouteGuard({ 
   children, 
   allowedRoles,
@@ -26,39 +20,31 @@ export function RouteGuard({
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
+  const hasAccess = useMemo(() => {
+    if (isLoading) return null;
+    if (!user) return false;
+    if (allowedRoles && allowedRoles.length > 0) {
+      return allowedRoles.includes(user.user_role);
+    }
+    return true;
+  }, [user, isLoading, allowedRoles]);
+
   useEffect(() => {
-    if (!isLoading) {
-      // Si no hay usuario, redirigir a login
+    if (hasAccess === false) {
       if (!user) {
         router.replace(redirectTo || "/login");
-        return;
-      }
-
-      // Si hay roles permitidos y el usuario no tiene uno de esos roles
-      if (allowedRoles && allowedRoles.length > 0) {
-        if (!allowedRoles.includes(user.user_role)) {
-          router.replace("/unauthorized");
-          return;
-        }
+      } else {
+        router.replace("/");
       }
     }
-  }, [user, isLoading, allowedRoles, router, redirectTo]);
+  }, [hasAccess, user, router, redirectTo]);
 
-  // Mostrar loading mientras se verifica
-  if (isLoading) {
+  if (isLoading || hasAccess === null) {
     return <LoadingScreen message="Verificando permisos..." />;
   }
 
-  // Si no hay usuario, no renderizar nada (la redirección está en proceso)
-  if (!user) {
+  if (!hasAccess) {
     return null;
-  }
-
-  // Si hay roles permitidos y el usuario no tiene acceso
-  if (allowedRoles && allowedRoles.length > 0) {
-    if (!allowedRoles.includes(user.user_role)) {
-      return null;
-    }
   }
 
   return <>{children}</>;

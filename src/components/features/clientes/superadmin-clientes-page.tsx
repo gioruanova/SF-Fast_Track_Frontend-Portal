@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,7 +8,6 @@ import { Building, Users, UserCheck, UserX, TrendingUp, TrendingDown } from "luc
 import axios from "axios"
 import { config } from "@/lib/config"
 import { SUPER_API } from "@/lib/superApi/config"
-
 
 interface ClienteRecurrente {
   cliente_id: number
@@ -142,7 +141,7 @@ export function SuperadminClientesPage() {
   useEffect(() => {
     loadClientes()
     
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) 
 
   if (isLoading) {
     return (

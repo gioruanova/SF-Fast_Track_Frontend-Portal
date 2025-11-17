@@ -9,6 +9,7 @@ import { PUBLIC_API } from '@/lib/publicApi/config';
 import { CLIENT_API } from '@/lib/clientApi/config';
 import { User, isCompanyUser } from '@/types/auth';
 import { CompanyConfigData } from '@/types/company';
+import { getDashboardRoute } from '@/hooks/useRoleRouting';
 
 interface UseAuthProps {
   setUser: (user: User | null) => void;
@@ -70,6 +71,13 @@ export function useAuth({
     await fetchCompanyConfig();
   }, [fetchCompanyConfig]);
 
+  const handleProfileResponse = useCallback(async (userData: User) => {
+    setUser(userData);
+    if (isCompanyUser(userData)) {
+      await fetchCompanyConfig();
+    }
+  }, [setUser, fetchCompanyConfig]);
+
   const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -77,10 +85,7 @@ export function useAuth({
       const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
 
       if (profileResponse.data?.user_id) {
-        setUser(profileResponse.data);
-        if (isCompanyUser(profileResponse.data)) {
-          await fetchCompanyConfig();
-        }
+        await handleProfileResponse(profileResponse.data);
       } else {
         setUser(null);
       }
@@ -95,10 +100,7 @@ export function useAuth({
             const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
 
             if (profileResponse.data?.user_id) {
-              setUser(profileResponse.data);
-              if (isCompanyUser(profileResponse.data)) {
-                await fetchCompanyConfig();
-              }
+              await handleProfileResponse(profileResponse.data);
             } else {
               setUser(null);
             }
@@ -114,7 +116,7 @@ export function useAuth({
     } finally {
       setIsLoading(false);
     }
-  }, [apiClient, setUser, fetchCompanyConfig, setIsLoading]);
+  }, [apiClient, setUser, handleProfileResponse, setIsLoading]);
 
   const getErrorMessage = useCallback((error: unknown): string => {
     const errorObj = error as {
@@ -199,12 +201,8 @@ export function useAuth({
           const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
 
           if (profileResponse.data?.user_id) {
-            setUser(profileResponse.data);
-            if (isCompanyUser(profileResponse.data)) {
-              await fetchCompanyConfig();
-            }
-
-            router.push("/dashboard");
+            await handleProfileResponse(profileResponse.data);
+            router.push(getDashboardRoute(profileResponse.data.user_role));
           } else {
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
@@ -223,7 +221,7 @@ export function useAuth({
     } finally {
       setIsLoading(false);
     }
-  }, [apiClient, setUser, fetchCompanyConfig, setIsLoading, getErrorMessage, router]);
+  }, [apiClient, handleProfileResponse, setIsLoading, getErrorMessage, router]);
 
   const logout = useCallback(async () => {
     try {

@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
 
 interface DashboardContextType {
   refreshTrigger: number;
@@ -12,15 +12,17 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export function DashboardProvider({ children }: { children: ReactNode }) {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const refreshDashboard = () => {
+  const refreshDashboard = useCallback(() => {
     setRefreshTrigger(prev => prev + 1);
-  };
+  }, []);
+
+const value = useMemo(() => ({
+    refreshTrigger,
+    refreshDashboard
+  }), [refreshTrigger, refreshDashboard]);
 
   return (
-    <DashboardContext.Provider value={{ 
-      refreshTrigger, 
-      refreshDashboard
-    }}>
+    <DashboardContext.Provider value={value}>
       {children}
     </DashboardContext.Provider>
   );

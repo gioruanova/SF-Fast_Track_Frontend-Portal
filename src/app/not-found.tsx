@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 
 export default function NotFound() {
   const router = useRouter();
@@ -11,12 +11,5 @@ export default function NotFound() {
     router.replace("/");
   }, [router]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center space-y-4">
-        <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <p className="text-muted-foreground">Redirigiendo...</p>
-      </div>
-    </div>
-  );
+  return <LoadingScreen message="Página no encontrada. Redirigiendo..." />;
 }

@@ -36,7 +36,7 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
       items: [
         {
           title: `Generar ${config?.sing_heading_reclamos}`,
-          url: "/dashboard/reclamos/crear",
+          url: "/dashboard/owner/crear-reclamo",
           disabled: !isCompanyActive,
         },
         {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,10 +14,6 @@ const ROLE_ROUTES: Record<UserRole, string> = {
   profesional: "/dashboard/profesional",
 };
 
-/**
- * Hook para manejar el routing basado en el rol del usuario
- * Redirige automáticamente al dashboard correspondiente según el rol
- */
 export function useRoleRouting() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
@@ -28,7 +24,6 @@ export function useRoleRouting() {
       if (route) {
         router.replace(route);
       } else {
-        // Si el rol no está mapeado, redirigir a login
         router.replace("/login");
       }
     }
@@ -37,9 +32,6 @@ export function useRoleRouting() {
   return { user, isLoading };
 }
 
-/**
- * Obtiene la ruta del dashboard para un rol específico
- */
 export function getDashboardRoute(role: UserRole): string {
   return ROLE_ROUTES[role] || "/login";
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CompanyStatsOverview } from "../shared/company-stats-overview";
@@ -48,8 +48,7 @@ export function OperadorDashboard({ user }: OperadorDashboardProps) {
           </CardHeader>
         </Card>
 
-
-        {isCompanyActive ? (
+{isCompanyActive ? (
           <>
             <CompanyStatsOverview />
             <CompanyUpcomingReclamos userRole="operador" />

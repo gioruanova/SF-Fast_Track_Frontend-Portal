@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import {
@@ -127,9 +127,7 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
     }
   };
 
-  
-
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.company_nombre.trim() || !formData.company_email.trim() || !formData.company_phone.trim()) {

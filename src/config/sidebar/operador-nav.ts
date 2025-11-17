@@ -30,7 +30,7 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
       items: [
         {
           title: `Generar ${config?.sing_heading_reclamos}`,
-          url: "/dashboard/reclamos/crear",
+          url: "/dashboard/operador/crear-reclamo",
           disabled: !isCompanyActive,
         },
         {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,10 +51,7 @@ export function ProfessionalPlatformMessagesManagement() {
   const itemsPerPage = 5;
   const [openDialogId, setOpenDialogId] = useState<number | null>(null);
 
-
-
-
-  const fetchMessages = useCallback(async () => {
+const fetchMessages = useCallback(async () => {
     if (companyConfig?.company?.company_estado === 0) {
       setMessages([]);
       setLoading(false);

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,8 +116,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
   const endIndex = startIndex + itemsPerPage;
   const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
 
-
-  useEffect(() => {
+useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
 

@@ -1,10 +1,10 @@
-export interface VideoConfig {
+﻿export interface VideoConfig {
   file_id: string | number;
   file_name: string;
   file_title: string;
-  file_duration: number; // Duración en segundos
-  file_role: string[]; // Roles del usuario que pueden ver el video (ej: ["owner", "operador", "profesional", "all"])
-  fil_tag: boolean; // Tag del video (ej: true, false)
+  file_duration: number; 
+  file_role: string[]; 
+  fil_tag: boolean; 
 }
 
 export const videosConfig: VideoConfig[] = [
@@ -90,25 +90,14 @@ export const videosConfig: VideoConfig[] = [
     fil_tag: true
   },
 
-
 ];
 
-/**
- * Filtra los videos según el rol del usuario
- * @param userRole - Rol del usuario
- * @returns Array de videos filtrados por rol
- */
 export function getVideosByRole(userRole: string): VideoConfig[] {
   return videosConfig.filter(video =>
     video.file_role.includes(userRole) || video.file_role.includes("all")
   );
 }
 
-/**
- * Obtiene un video por su ID
- * @param fileId - ID del video
- * @returns Video configurado o undefined si no existe
- */
 export function getVideoById(fileId: string | number): VideoConfig | undefined {
   return videosConfig.find(video => video.file_id === fileId);
 }

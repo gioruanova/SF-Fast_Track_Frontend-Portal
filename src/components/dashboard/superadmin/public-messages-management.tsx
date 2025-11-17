@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,7 +52,6 @@ interface MessageCategory {
   updated_at: string;
 }
 
-
 export function PublicMessagesManagement() {
   const [messages, setMessages] = useState<PublicMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,8 +65,7 @@ export function PublicMessagesManagement() {
   const [editingCategory, setEditingCategory] = useState<MessageCategory | null>(null);
   const [categoryName, setCategoryName] = useState("");
 
-
-  const fetchMessages = async () => {
+const fetchMessages = async () => {
     try {
       setLoading(true);
       const response = await apiClient.get(SUPER_API.GET_PUBLIC_MESSAGES);
@@ -85,8 +83,7 @@ export function PublicMessagesManagement() {
       setLoading(false);
     }
 
-
-  };
+};
 
   const markAsRead = async (messageId: number) => {
     try {
@@ -255,8 +252,7 @@ export function PublicMessagesManagement() {
     setIsEditCategoryOpen(true);
   };
 
-
-  useEffect(() => {
+useEffect(() => {
     fetchMessages();
     fetchCategories();
   }, []);
@@ -643,8 +639,7 @@ export function PublicMessagesManagement() {
         </CardContent>
       </Card>
 
-
-      <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
+<Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Categoría</DialogTitle>
