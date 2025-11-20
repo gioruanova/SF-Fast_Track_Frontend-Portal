@@ -17,7 +17,6 @@ import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
 import { useAuth } from "@/context/AuthContext"
 import { ARGENTINA_PROVINCIAS } from "@/lib/constants"
-import { geocodeAddress } from "@/lib/geocoding"
 
 interface Cliente {
   cliente_id: number
@@ -26,8 +25,6 @@ interface Cliente {
   cliente_phone: string
   cliente_email: string
   cliente_direccion: string
-  cliente_lat?: number
-  cliente_lng?: number
   cliente_active: boolean
 
 }
@@ -212,33 +209,14 @@ const fetchClientes = useCallback(async () => {
       ? clienteFormData.cliente_direccion.trim()
       : buildDireccion(direccionFields) + ", Argentina"
     
-    let coordenadas: { lat: number; lng: number } | null = null
-    if (companyConfig?.requiere_domicilio === 1) {
-      try {
-        coordenadas = await geocodeAddress(direccionCompleta)
-      } catch {
-        
-      }
-    }
-    
-    const formDataToSend: typeof clienteFormData & { cliente_lat?: number; cliente_lng?: number } = {
+    const formDataToSend: typeof clienteFormData = {
       ...clienteFormData,
       cliente_direccion: direccionCompleta
-    }
-    
-    if (coordenadas) {
-      formDataToSend.cliente_lat = coordenadas.lat
-      formDataToSend.cliente_lng = coordenadas.lng
     }
 
     try {
       if (isEditing && editingCliente) {
         const updateData = buildUpdateData(formDataToSend)
-        
-        if (coordenadas) {
-          updateData.cliente_lat = coordenadas.lat
-          updateData.cliente_lng = coordenadas.lng
-        }
         
         if (Object.keys(updateData).length === 0) {
           toast.info("No se detectaron cambios para actualizar")
