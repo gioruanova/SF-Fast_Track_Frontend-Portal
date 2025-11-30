@@ -11,7 +11,7 @@ import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
@@ -104,9 +104,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
     try {
       setIsSubmitting(true);
 
-      const endpoint = userRole === "profesional"
-        ? CLIENT_API.RECLAMO_GESTION_PROFESIONAL.replace("{id}", reclamo.reclamo_id.toString())
-        : CLIENT_API.RECLAMO_GESTION_ADMIN.replace("{id}", reclamo.reclamo_id.toString());
+      const endpoint = API_ROUTES.ACTUALIZAR_RECLAMO.replace("{id}", reclamo.reclamo_id.toString());
 
       const payload: {
         reclamo_estado: string;
@@ -166,7 +164,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
     try {
       setIsSendingReminder(true);
 
-      const endpoint = CLIENT_API.ENVIAR_RECORDATORIO_RECLAMO.replace(":reclamo_id", reclamo.reclamo_id.toString());
+      const endpoint = API_ROUTES.ENVIAR_RECORDATORIO_RECLAMO.replace("{reclamo_id}", reclamo.reclamo_id.toString());
 
       await apiClient.put(endpoint);
 

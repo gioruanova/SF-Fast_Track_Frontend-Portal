@@ -1,6 +1,5 @@
 "use client";
 
-import { RouteGuard } from "@/components/auth/route-guard";
 import { DashboardContent } from "../layout";
 
 export default function SuperadminLayout({
@@ -9,11 +8,9 @@ export default function SuperadminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RouteGuard allowedRoles={["superadmin"]}>
-      <DashboardContent>
-        {children}
-      </DashboardContent>
-    </RouteGuard>
+    <DashboardContent>
+      {children}
+    </DashboardContent>
   );
 }
 

@@ -1,14 +1,13 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { apiClient } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/api_routes";
 
 interface ContactValues {
   company_phone: string;
@@ -34,45 +33,43 @@ export function OwnerCompanyContactSheet({ isOpen, onClose, values, onSaved }: O
     }
   }, [isOpen, values]);
 
-  const apiClient = useMemo(() => axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: { "Content-Type": "application/json" },
-  }), []);
+  const handleChange = useCallback((field: keyof ContactValues, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
-  const handleChange = (field: keyof ContactValues, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-  };
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+      const trimmedEmail = form.company_email.trim();
+      if (!trimmedEmail) {
+        toast.error("El email es requerido");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        toast.error("El formato del email no es válido");
+        return;
+      }
 
-    if (!form.company_email.trim()) {
-      toast.error("El email es requerido");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.company_email)) {
-      toast.error("El formato del email no es válido");
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      await apiClient.put(CLIENT_API.UPDATE_COMPANY, {
-        company_phone: form.company_phone || null,
-        company_email: form.company_email,
-        company_whatsapp: form.company_whatsapp || null,
-        company_telegram: form.company_telegram || null,
-      });
-      toast.success("Datos actualizados correctamente");
-      await onSaved();
-      onClose();
-    } catch {
-      toast.error("No se pudo actualizar. Intenta nuevamente");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      try {
+        setIsSubmitting(true);
+        await apiClient.put(API_ROUTES.COMPANY_UPDATE_OWNER, {
+          company_phone: form.company_phone || null,
+          company_email: trimmedEmail,
+          company_whatsapp: form.company_whatsapp || null,
+          company_telegram: form.company_telegram || null,
+        });
+        toast.success("Datos actualizados correctamente");
+        await onSaved();
+        onClose();
+      } catch {
+        toast.error("No se pudo actualizar. Intenta nuevamente");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [form, onSaved, onClose]
+  );
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>

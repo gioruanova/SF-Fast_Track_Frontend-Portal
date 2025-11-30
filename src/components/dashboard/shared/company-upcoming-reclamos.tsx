@@ -8,7 +8,7 @@ import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detai
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
-import { useReclamos } from "@/hooks/useReclamos";
+import { useReclamos } from "@/hooks/reclamos/useReclamos";
 import Link from "next/link";
 
 interface ReclamoData {

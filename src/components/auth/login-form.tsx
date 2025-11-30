@@ -51,7 +51,8 @@ export function LoginForm({
 
     try {
       await login(formData.email, formData.password);
-    } catch {
+    } catch (error) {
+      console.error("Error en login:", error);
     }
   };
 

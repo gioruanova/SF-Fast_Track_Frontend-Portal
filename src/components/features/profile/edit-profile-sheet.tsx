@@ -28,8 +28,7 @@ import { toast } from "sonner"
 import { Edit, Eye, EyeOff, AlertTriangle, Lock, Loader2 } from "lucide-react"
 import axios from "axios"
 import { config } from "@/lib/config"
-import { CLIENT_API } from "@/lib/clientApi/config"
-import { SUPER_API } from "@/lib/superApi/config"
+import { API_ROUTES } from "@/lib/api_routes"
 import { isCompanyUser } from "@/types/auth"
 
 interface EditProfileSheetProps {
@@ -117,7 +116,7 @@ if (isCompanyUser(user) && (user.user_role === "owner" || user.user_role === "op
     }
 
 try {
-      const endpoint = SUPER_API.GET_USERS
+      const endpoint = API_ROUTES.GET_USERS
       const response = await apiClient.get(endpoint)
       const users: UserData[] = response.data
 
@@ -232,11 +231,10 @@ try {
       }
 
 if (isCompanyUser(user) && (user.user_role === "owner" || user.user_role === "operador")) {
-        await apiClient.put(CLIENT_API.PROFILE_MANAGE, updateData)
+        await apiClient.put(API_ROUTES.PROFILE, updateData)
       } else {
         
-        const endpoint = SUPER_API.USERS_EDIT
-        const url = endpoint.replace("{id}", user.user_id.toString())
+        const url = API_ROUTES.USERS_EDIT.replace("{id}", user.user_id.toString())
         await apiClient.put(url, updateData)
       }
 

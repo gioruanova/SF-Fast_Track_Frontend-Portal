@@ -15,7 +15,6 @@ export const config = {
 };
 
 export const slugs = {
-  publicApi: "publicApi",
   customersApi: "customersApi",
   superApi: "superApi",
 }

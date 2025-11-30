@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState } from "react"
 import {
   BadgeCheck,
   ChevronsUpDown,
@@ -35,20 +35,17 @@ export function NavUser() {
   const { isMobile } = useSidebar()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
-  const isCompanyActive = useMemo(() => 
-    companyConfig?.company?.company_estado === 1,
-    [companyConfig?.company?.company_estado]
-  );
+  const isCompanyActive = companyConfig?.company?.company_estado === 1;
 
-  const handleLogout = useCallback(async () => {
+  async function handleLogout() {
     try {
       await logout()
     } catch (error) {
       console.error("Error al cerrar sesión:", error)
     }
-  }, [logout])
+  }
 
-  const getInitials = (name?: string) => {
+  function getInitials(name?: string) {
     if (!name) return "U"
     return name
       .split(" ")
@@ -58,16 +55,16 @@ export function NavUser() {
       .slice(0, 2)
   }
 
-  const displayName = useMemo(() => {
+  function getDisplayName() {
     if (!user) return "Usuario"
     const userName = 'user_name' in user ? user.user_name : undefined
     if (userName) {
       return userName
     }
     return user.user_email?.split('@')[0] || "Usuario"
-  }, [user])
+  }
 
-  const roleInfo = useMemo(() => {
+  function getRoleInfo() {
     if (!user) return "Usuario"
     if (isSuperAdmin(user)) {
       return "Super Administrador"
@@ -76,7 +73,10 @@ export function NavUser() {
       return `${user.company_name} - ${user.user_role}`
     }
     return "Usuario"
-  }, [user])
+  }
+
+  const displayName = getDisplayName()
+  const roleInfo = getRoleInfo()
 
   if (!user) return null
 
@@ -113,7 +113,7 @@ export function NavUser() {
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarFallback className="rounded-lg">
-                      {getInitials(displayName)}
+                      {getInitials(getDisplayName())}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">

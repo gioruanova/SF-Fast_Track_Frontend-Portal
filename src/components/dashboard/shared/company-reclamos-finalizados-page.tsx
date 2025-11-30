@@ -11,7 +11,7 @@ import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detai
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
@@ -69,7 +69,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
   const fetchReclamos = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
+      const response = await apiClient.get(API_ROUTES.GET_RECLAMOS);
 
       const finishedReclamos = response.data
         .filter((r: ReclamoData) => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO")
@@ -142,7 +142,7 @@ useEffect(() => {
     try {
       setDownloadingType(type);
 
-      const endpoint = CLIENT_API.RECLAMO_DESCARGA.replace('{type}', type);
+      const endpoint = API_ROUTES.RECLAMO_DESCARGA.replace('{type}', type);
       const response = await apiClient.get(endpoint, {
         responseType: 'blob',
       });

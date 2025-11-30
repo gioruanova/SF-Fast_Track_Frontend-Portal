@@ -4,10 +4,10 @@ import { useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { config } from '@/lib/config';
-import { PUBLIC_API } from '@/lib/publicApi/config';
-import { CLIENT_API } from '@/lib/clientApi/config';
+import { API_ROUTES } from '@/lib/api_routes';
 import { User, isCompanyUser } from '@/types/auth';
 import { CompanyConfigData } from '@/types/company';
+import { CompanyConfigService } from '@/services/company/companyConfigService';
 
 interface UseAuthProps {
   setUser: (user: User | null) => void;
@@ -52,34 +52,34 @@ export function useAuth({
     return client;
   }, []);
 
-  const fetchCompanyConfig = useCallback(async () => {
+  const companyConfigService = useMemo(() => new CompanyConfigService(apiClient), [apiClient]);
+
+  const loadCompanyConfig = useCallback(async () => {
     try {
-      const configResponse = await apiClient.get(CLIENT_API.COMPANY_CONFIG);
-      if (configResponse.data) {
-        setCompanyConfig(configResponse.data);
-      }
-    } catch (err) {
-      console.error("Error obteniendo configuración de empresa:", err);
+      const config = await companyConfigService.getConfig();
+      setCompanyConfig(config);
+    } catch (error) {
+      console.error("Error obteniendo configuración de empresa:", error);
       setCompanyConfig(null);
     }
-  }, [apiClient, setCompanyConfig]);
+  }, [companyConfigService, setCompanyConfig]);
 
   const refreshCompanyConfig = useCallback(async () => {
-    await fetchCompanyConfig();
-  }, [fetchCompanyConfig]);
+    await loadCompanyConfig();
+  }, [loadCompanyConfig]);
 
   const handleProfileResponse = useCallback(async (userData: User) => {
     setUser(userData);
     if (isCompanyUser(userData)) {
-      await fetchCompanyConfig();
+      await loadCompanyConfig();
     }
-  }, [setUser, fetchCompanyConfig]);
+  }, [setUser, loadCompanyConfig]);
 
   const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
+      const profileResponse = await apiClient.get(API_ROUTES.PROFILE);
 
       if (profileResponse.data?.user_id) {
         await handleProfileResponse(profileResponse.data);
@@ -91,10 +91,10 @@ export function useAuth({
 
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         try {
-          const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
+          const refreshResponse = await apiClient.get(API_ROUTES.REFRESH);
 
           if (refreshResponse.data.success) {
-            const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
+            const profileResponse = await apiClient.get(API_ROUTES.PROFILE);
 
             if (profileResponse.data?.user_id) {
               await handleProfileResponse(profileResponse.data);
@@ -191,11 +191,11 @@ export function useAuth({
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("El formato del email no es válido");
       if (password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres");
 
-      const loginResponse = await apiClient.post(PUBLIC_API.LOGIN, { email, password });
+      const loginResponse = await apiClient.post(API_ROUTES.LOGIN, { email, password });
 
       if (loginResponse.data.success) {
         try {
-          const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
+          const profileResponse = await apiClient.get(API_ROUTES.PROFILE);
 
           if (profileResponse.data?.user_id) {
             await handleProfileResponse(profileResponse.data);
@@ -221,18 +221,20 @@ export function useAuth({
 
   const logout = useCallback(async () => {
     try {
-      await apiClient.get(PUBLIC_API.LOGOUT);
+      setIsLoading(true);
+      await apiClient.get(API_ROUTES.LOGOUT);
       setUser(null);
       setCompanyConfig(null);
     } catch {
       setUser(null);
       setCompanyConfig(null);
+    } finally {
+      setIsLoading(false);
     }
-  }, [apiClient, setUser, setCompanyConfig]);
+  }, [apiClient, setUser, setCompanyConfig, setIsLoading]);
 
   return {
     apiClient,
-    fetchCompanyConfig,
     refreshCompanyConfig,
     checkAuth,
     getErrorMessage,

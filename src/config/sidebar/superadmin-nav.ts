@@ -1,7 +1,6 @@
 ﻿import {
     Users,
     Shield,
-    SquareCheck,
     Wrench,
     House,
     Briefcase,
@@ -30,11 +29,6 @@ export const superAdminNavItems: NavItem[] = [
         title: "Especialidades",
         url: "/dashboard/superadmin/especialidades",
         icon: Wrench,
-    },
-    {
-        title: "Reclamos",
-        url: "/dashboard/superadmin/reclamos",
-        icon: SquareCheck,
     },
     {
         title: "Clientes Recurrentes",

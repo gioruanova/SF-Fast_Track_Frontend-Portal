@@ -1,32 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp, BriefcaseBusiness, SquareCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDashboard } from "@/context/DashboardContext";
-import { CLIENT_API } from "@/lib/clientApi/config";
 import { useAuth } from "@/context/AuthContext";
-import { useReclamos } from "@/hooks/useReclamos";
-import { apiClient } from "@/lib/apiClient";
-
-interface UserData {
-  user_id: number;
-  user_role: string;
-  user_status: number;
-}
-
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-}
-
-interface ClienteData {
-  cliente_id: number;
-}
+import { useReclamos } from "@/hooks/reclamos/useReclamos";
+import { useUsers } from "@/hooks/users/useUsers";
+import { useClientes } from "@/hooks/clientes/useClientes";
+import { useEspecialidades } from "@/hooks/especialidades/useEspecialidades";
+import { USER_STATUS } from "@/types/users";
 
 const CHART_COLORS = [
   "#8b5cf6",
@@ -40,76 +25,90 @@ const CHART_COLORS = [
 ];
 
 export function CompanyStatsOverview() {
-  const { refreshTrigger } = useDashboard();
   const { companyConfig } = useAuth();
   const { reclamos: reclamosData } = useReclamos();
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
-  const [clientes, setClientes] = useState<ClienteData[]>([]);
+  const { users: allUsers, isLoading: isLoadingUsers } = useUsers();
+  const { especialidades, isLoading: isLoadingEspecialidades } = useEspecialidades();
+  const { clientes, isLoading: isLoadingClientes } = useClientes();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [usersRes, especialidadesRes, clientesRes] = await Promise.all([
-          apiClient.get(CLIENT_API.GET_USERS),
-          apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
-          apiClient.get(CLIENT_API.GET_CLIENTES),
-        ]);
+  const isLoading = isLoadingUsers || isLoadingEspecialidades || isLoadingClientes;
 
-        setUsers(usersRes.data);
-        setEspecialidades(especialidadesRes.data);
-        setClientes(clientesRes.data);
-      } catch (error) {
-        console.error("Error obteniendo datos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const users = useMemo(() => {
+    return allUsers.map(u => ({
+      user_id: u.user_id,
+      user_role: u.user_role,
+      user_status: u.user_status
+    }));
+  }, [allUsers]);
 
-    fetchData();
-  }, [refreshTrigger]);
+  const activeUsers = useMemo(() => 
+    users.filter(u => u.user_status === USER_STATUS.ACTIVO).length
+  , [users]);
 
-  const activeUsers = users.filter(u => u.user_status === 1).length;
-  const inactiveUsers = users.filter(u => u.user_status === 0).length;
+  const inactiveUsers = useMemo(() => 
+    users.filter(u => u.user_status === USER_STATUS.BLOQUEADO).length
+  , [users]);
+
   const totalUsers = users.length;
 
-  const ownerUsers = users.filter(u => u.user_role === "owner").length;
-  const operadorUsers = users.filter(u => u.user_role === "operador").length;
-  const profesionalUsers = users.filter(u => u.user_role === "profesional").length;
+  const ownerUsers = useMemo(() => 
+    users.filter(u => u.user_role === "owner").length
+  , [users]);
 
-  const statusData = [
+  const operadorUsers = useMemo(() => 
+    users.filter(u => u.user_role === "operador").length
+  , [users]);
+
+  const profesionalUsers = useMemo(() => 
+    users.filter(u => u.user_role === "profesional").length
+  , [users]);
+
+  const statusData = useMemo(() => [
     { name: "Activos", value: activeUsers, fill: "#10b981" },
     { name: "Inactivos", value: inactiveUsers, fill: "#ef4444" },
-  ];
+  ], [activeUsers, inactiveUsers]);
 
-  const rolesData = [
+  const rolesData = useMemo(() => [
     { name: `${companyConfig?.plu_heading_owner}`, value: ownerUsers, fill: "#8b5cf6" },
     { name: `${companyConfig?.plu_heading_operador}`, value: operadorUsers, fill: "#3b82f6" },
     { name: `${companyConfig?.plu_heading_profesional}`, value: profesionalUsers, fill: "#f59e0b" },
-  ];
+  ], [companyConfig?.plu_heading_owner, companyConfig?.plu_heading_operador, companyConfig?.plu_heading_profesional, ownerUsers, operadorUsers, profesionalUsers]);
 
-  const especialidadesGrouped = especialidades.reduce((acc, esp) => {
-    const existing = acc.find(item => item.name === esp.nombre_especialidad);
-    if (existing) {
-      existing.value += 1;
-    } else {
-      acc.push({
-        name: esp.nombre_especialidad,
-        value: 1,
-        fill: CHART_COLORS[acc.length % CHART_COLORS.length],
-      });
-    }
-    return acc;
-  }, [] as Array<{ name: string; value: number; fill: string }>);
+  const especialidadesGrouped = useMemo(() => {
+    return especialidades.reduce((acc, esp) => {
+      const existing = acc.find(item => item.name === esp.nombre_especialidad);
+      if (existing) {
+        existing.value += 1;
+      } else {
+        acc.push({
+          name: esp.nombre_especialidad,
+          value: 1,
+          fill: CHART_COLORS[acc.length % CHART_COLORS.length],
+        });
+      }
+      return acc;
+    }, [] as Array<{ name: string; value: number; fill: string }>);
+  }, [especialidades]);
 
-  const especialidadesData = especialidadesGrouped;
+  const especialidadesChartConfig = useMemo(() => {
+    return especialidadesGrouped.reduce((acc, esp) => {
+      acc[esp.name.toLowerCase()] = {
+        label: esp.name,
+        color: esp.fill,
+      };
+      return acc;
+    }, {} as ChartConfig);
+  }, [especialidadesGrouped]);
 
   const totalClientes = clientes.length;
   const totalReclamos = reclamosData.length;
-  const reclamosEnActividad = reclamosData.filter(r => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO").length;
-  const reclamosFinalizados = reclamosData.filter(r => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO").length;
+  const reclamosEnActividad = useMemo(() => 
+    reclamosData.filter(r => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO").length
+  , [reclamosData]);
+  const reclamosFinalizados = useMemo(() => 
+    reclamosData.filter(r => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO").length
+  , [reclamosData]);
 
   if (isLoading) {
     return (
@@ -307,25 +306,19 @@ export function CompanyStatsOverview() {
               </CardHeader>
               <CardContent className="flex justify-center pb-0">
                 <ChartContainer
-                  config={especialidadesGrouped.reduce((acc, esp) => {
-                    acc[esp.name.toLowerCase()] = {
-                      label: esp.name,
-                      color: esp.fill,
-                    };
-                    return acc;
-                  }, {} as ChartConfig)}
+                  config={especialidadesChartConfig}
                   className="mx-auto aspect-square h-[250px]"
                 >
                   <PieChart>
                     <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                     <Pie
-                      data={especialidadesData}
+                      data={especialidadesGrouped}
                       dataKey="value"
                       nameKey="name"
                       innerRadius={60}
                       strokeWidth={5}
                     >
-                      {especialidadesData.map((entry, index) => (
+                      {especialidadesGrouped.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
                       <Label

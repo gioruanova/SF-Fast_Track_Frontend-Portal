@@ -30,7 +30,7 @@ import { Mail, Building, Shield, Eye, EyeOff, Edit, Lock, Loader2, AlertTriangle
 import { toast } from "sonner"
 import axios from "axios"
 import { config } from "@/lib/config"
-import { SUPER_API } from "@/lib/superApi/config"
+import { API_ROUTES } from "@/lib/api_routes"
 import { EditProfileSheet } from "./edit-profile-sheet"
 
 interface UserProfileSheetProps {
@@ -95,7 +95,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
         },
       })
 
-      const endpoint = SUPER_API.USERS_EDIT.replace("{id}", user.user_id.toString())
+      const endpoint = API_ROUTES.USERS_EDIT.replace("{id}", user.user_id.toString())
 
       await apiClient.put(endpoint, {
         user_password: passwordData.newPassword

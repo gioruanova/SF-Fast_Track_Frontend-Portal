@@ -1,31 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useDashboard } from "@/context/DashboardContext";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { SUPER_API } from "@/lib/superApi/config";
+import { useSuperadminStats } from "@/hooks/superadmin/useSuperadminStats";
 import { format, subDays, subMonths, isAfter, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-interface ReclamoData {
-  reclamo_id: number;
-  created_at: string;
-  reclamo_estado: string;
-}
 
 type FilterType = "7d" | "30d" | "3m" | "1y";
 
@@ -41,26 +24,9 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ReclamosChart() {
-  const { refreshTrigger } = useDashboard();
-  const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { reclamos, isLoading } = useSuperadminStats();
   const [filter, setFilter] = useState<FilterType>("1y");
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await apiClient.get(SUPER_API.GET_RECLAMOS);
-        setReclamos(response.data);
-      } catch (error) {
-        console.error("Error obteniendo reclamos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [refreshTrigger]);
 
   const chartData = useMemo(() => {
     if (!reclamos.length) return [];

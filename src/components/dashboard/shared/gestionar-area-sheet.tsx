@@ -1,30 +1,14 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Settings, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
 import { useAuth } from "@/context/AuthContext";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-}
+import { useEspecialidades } from "@/hooks/especialidades/useEspecialidades";
+import { useProfesionalEspecialidad } from "@/hooks/profesional-especialidad/useProfesionalEspecialidad";
 
 interface ProfesionalData {
   user_id: number;
@@ -49,104 +33,64 @@ interface GestionarAreaSheetProps {
 export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheetProps) {
   const { companyConfig } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingAsignacion, setDeletingAsignacion] = useState<string | null>(null);
 
-  const fetchEspecialidades = async () => {
-    try {
-      setIsLoading(true);
-      const response = await apiClient.get(CLIENT_API.GET_ESPECIALIDADES);
-      setEspecialidades(response.data);
-    } catch {
-      toast.error("Error al cargar las especialidades");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    especialidades,
+    isLoading: especialidadesLoading,
+    fetchEspecialidades,
+  } = useEspecialidades({ autoFetch: false });
+
+  const {
+    createAsignacion,
+    deleteAsignacion,
+    isLoading: asignacionesLoading,
+  } = useProfesionalEspecialidad({ autoFetch: false });
+
+  const isLoading = especialidadesLoading || asignacionesLoading;
 
   useEffect(() => {
     if (isOpen) {
       fetchEspecialidades();
     }
-  }, [isOpen]);
+  }, [isOpen, fetchEspecialidades]);
 
   const handleCrearAsignacion = async () => {
     if (!selectedEspecialidad) {
-      toast.error(`Selecciona una ${companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}`);
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    const success = await createAsignacion({
+      profesional_id: profesional.user_id,
+      especialidad_id: parseInt(selectedEspecialidad),
+    });
 
-      const payload = {
-        profesional_id: profesional.user_id,
-        especialidad_id: parseInt(selectedEspecialidad)
-      };
-
-await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
-
-toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asignada correctamente`);
+    if (success) {
       onUpdate();
       setIsOpen(false);
       setSelectedEspecialidad("");
-    } catch (error: unknown) {
-      console.error("Error completo:", error);
-      const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string };
-      console.error("Error response:", axiosError.response?.data);
-      console.error("Error status:", axiosError.response?.status);
-
-      if (axiosError.response?.status === 400) {
-        const errorMessage = axiosError.response?.data?.error || "Datos inválidos";
-        toast.error(errorMessage);
-      } else if (axiosError.response?.status === 404) {
-        const errorMessage = axiosError.response?.data?.error || "Profesional o especialidad no encontrados";
-        toast.error(errorMessage);
-      } else if (axiosError.response?.status === 409) {
-        toast.error("La especialidad ya está asignada al profesional");
-      } else {
-        toast.error(`Error al asignar la especialidad: ${axiosError.response?.data?.error || axiosError.message}`);
-      }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  const handleEliminarAsignacion = async (idAsignacion: string) => {
-    try {
-      setIsSubmitting(true);
+  const handleEliminarAsignacion = async (asignacionId: string) => {
+    const success = await deleteAsignacion(parseInt(asignacionId));
 
-      const url = CLIENT_API.ELIMINAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
-
-await apiClient.delete(url);
-
-toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} eliminada correctamente`);
+    if (success) {
       onUpdate();
       setDeletingAsignacion(null);
-    } catch (error: unknown) {
-      console.error("Error completo:", error);
-      const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string };
-      console.error("Error response:", axiosError.response?.data);
-      console.error("Error status:", axiosError.response?.status);
-
-      if (axiosError.response?.status === 404) {
-        const errorMessage = axiosError.response?.data?.error || "Asignación no encontrada";
-        toast.error(errorMessage);
-      } else {
-        toast.error(`Error al eliminar la especialidad: ${axiosError.response?.data?.error || axiosError.message}`);
-      }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-const especialidadesDisponibles = especialidades.filter(esp =>
-    esp.estado_especialidad === 1 &&
-    !profesional.especialidades?.some(profEsp => profEsp.id_especialidad === esp.id_especialidad)
-  );
+  const especialidadesDisponibles = useMemo(() => {
+    return especialidades.filter(
+      (esp) =>
+        esp.estado_especialidad === 1 &&
+        !profesional.especialidades?.some(
+          (profEsp) => profEsp.id_especialidad === esp.id_especialidad
+        )
+    );
+  }, [especialidades, profesional.especialidades]);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -226,12 +170,12 @@ const especialidadesDisponibles = especialidades.filter(esp =>
               {selectedEspecialidad && (
                 <Button
                   onClick={handleCrearAsignacion}
-                  disabled={isSubmitting}
+                  disabled={asignacionesLoading}
                   size="sm"
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-1" />
-                  {isSubmitting ? "Asignando..." : "Asignar"}
+                  {asignacionesLoading ? "Asignando..." : "Asignar"}
                 </Button>
               )}
             </div>
@@ -245,20 +189,30 @@ const especialidadesDisponibles = especialidades.filter(esp =>
                   ¿Estás seguro de que quieres eliminar esta asignación? Esta acción no se puede deshacer.
                 </p>
                 <ul>
-                  <li className="text-xs text-red-400 list-disc ml-4 mb-2">Tenga en cuenta que al hacer el actualizacion, cualquier {companyConfig?.sing_heading_reclamos.toLowerCase()} con el nombre actual, no se vera afectado</li>
-                  <li className="text-xs text-red-400 list-disc ml-4">Cualquier {companyConfig?.sing_heading_profesional.toLowerCase()} que actualmente tenga {companyConfig?.plu_heading_reclamos.toLowerCase()} con este nombre, tampoco veran el cambio</li>
+                  <li className="text-xs text-red-400 list-disc ml-4 mb-2">
+                    Tenga en cuenta que al hacer la actualización, cualquier{" "}
+                    {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} con el
+                    nombre actual, no se verá afectado
+                  </li>
+                  <li className="text-xs text-red-400 list-disc ml-4">
+                    Cualquier{" "}
+                    {companyConfig?.sing_heading_profesional?.toLowerCase() || "profesional"} que
+                    actualmente tenga{" "}
+                    {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} con este
+                    nombre, tampoco verán el cambio
+                  </li>
                 </ul>
                 <div className="flex gap-2">
 
                   <Button
                     onClick={() => handleEliminarAsignacion(deletingAsignacion)}
-                    disabled={isSubmitting}
+                    disabled={asignacionesLoading}
                     size="sm"
                     variant="destructive"
                     className="flex-1"
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
-                    {isSubmitting ? "Eliminando..." : "Eliminar"}
+                    {asignacionesLoading ? "Eliminando..." : "Eliminar"}
                   </Button>
                   <Button
                     variant="outline"

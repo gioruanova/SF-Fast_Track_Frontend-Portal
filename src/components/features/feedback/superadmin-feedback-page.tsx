@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,15 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { FeedbackDetailSheet } from "@/components/features/feedback/feedback-detail-sheet";
 import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { SUPER_API } from "@/lib/superApi/config";
+import { apiClient } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/api_routes";
+import { getFeedbackDeleteEndpoint } from "@/lib/apiHelpers";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import { UserPagination } from "@/components/features/usuarios/shared/UserPagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,14 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 interface FeedbackData {
   feedback_id: number;
@@ -63,10 +56,10 @@ export function SuperadminFeedbackPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(SUPER_API.GET_FEEDBACKS);
+      const response = await apiClient.get(API_ROUTES.GET_FEEDBACKS);
 
       const sortedFeedbacks = response.data.sort((a: FeedbackData, b: FeedbackData) => {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -79,11 +72,11 @@ export function SuperadminFeedbackPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, []);
 
   const totalPages = Math.ceil(feedbacks.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -110,12 +103,12 @@ export function SuperadminFeedbackPage() {
 
     try {
       setIsDeleting(true);
-      const endpoint = SUPER_API.DELETE_FEEDBACK.replace("{feedback_id}", feedbackToDelete.feedback_id.toString());
+      const endpoint = getFeedbackDeleteEndpoint(feedbackToDelete.feedback_id);
       
       await apiClient.delete(endpoint);
       
       toast.success("Feedback eliminado correctamente");
-      fetchData();
+      await fetchData();
       setIsDeleteDialogOpen(false);
       setFeedbackToDelete(null);
     } catch (error) {
@@ -224,51 +217,14 @@ export function SuperadminFeedbackPage() {
                 </Table>
               </div>
 
-              <div className="flex flex-col gap-4 mt-6">
-                <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
-                  Mostrando {startIndex + 1}-{Math.min(endIndex, feedbacks.length)} de {feedbacks.length} feedbacks
-                </div>
-
-                {totalPages > 1 && (
-                  <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="text-xs md:text-sm px-2 md:px-3"
-                    >
-                      <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
-                      <span className="hidden sm:inline ml-1">Anterior</span>
-                    </Button>
-
-                    <div className="flex flex-wrap items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(page)}
-                          className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
-                        >
-                          {page}
-                        </Button>
-                      ))}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="text-xs md:text-sm px-2 md:px-3"
-                    >
-                      <span className="hidden sm:inline mr-1">Siguiente</span>
-                      <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
+              <UserPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                startIndex={startIndex}
+                endIndex={endIndex}
+                totalItems={feedbacks.length}
+                onPageChange={setCurrentPage}
+              />
             </>
           )}
         </CardContent>
@@ -303,4 +259,3 @@ export function SuperadminFeedbackPage() {
     </>
   );
 }
-

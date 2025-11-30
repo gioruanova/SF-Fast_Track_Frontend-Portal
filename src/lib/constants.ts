@@ -26,5 +26,3 @@ export const ARGENTINA_PROVINCIAS = [
   { value: "tucuman", label: "Tucumán" },
 ] as const;
 
-export type ProvinciaValue = typeof ARGENTINA_PROVINCIAS[number]["value"];
-

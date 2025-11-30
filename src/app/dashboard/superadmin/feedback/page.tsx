@@ -5,13 +5,13 @@ import { DashboardProvider } from "@/context/DashboardContext";
 import { SuperadminFeedbackPage } from "@/components/features/feedback/superadmin-feedback-page";
 import { useAuth } from "@/context/AuthContext";
 import { isSuperAdmin } from "@/types/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FeedbackPage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
-  if (!user || !isSuperAdmin(user)) {
-    return null;
-  }
+  const isValidUser = user && isSuperAdmin(user);
+  const canRenderContent = isValidUser && !isLoading;
 
   return (
     <>
@@ -24,9 +24,17 @@ export default function FeedbackPage() {
       />
       
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">
-        <DashboardProvider>
-          <SuperadminFeedbackPage />
-        </DashboardProvider>
+        {canRenderContent ? (
+          <DashboardProvider>
+            <SuperadminFeedbackPage />
+          </DashboardProvider>
+        ) : (
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        )}
       </div>
     </>
   );

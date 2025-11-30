@@ -1,6 +1,5 @@
 "use client";
 
-import { RouteGuard } from "@/components/auth/route-guard";
 import { DashboardContent } from "../layout";
 
 export default function OwnerLayout({
@@ -9,11 +8,9 @@ export default function OwnerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RouteGuard allowedRoles={["owner"]}>
-      <DashboardContent>
-        {children}
-      </DashboardContent>
-    </RouteGuard>
+    <DashboardContent>
+      {children}
+    </DashboardContent>
   );
 }
 

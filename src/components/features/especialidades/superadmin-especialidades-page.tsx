@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,30 +19,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Power, PowerOff, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Power,
+  PowerOff,
+  Search,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { EspecialidadFormSheet } from "@/components/features/especialidades/especialidad-form-sheet";
-import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { SUPER_API } from "@/lib/superApi/config";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  company_id: number;
-  company_nombre: string;
-  estado_especialidad: number;
-  created_at: string;
-  updated_at: string;
-}
+import { useEspecialidades } from "@/hooks/especialidades/useEspecialidades";
+import { apiClient } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/api_routes";
+import { Especialidad } from "@/types/especialidades";
 
 interface CompanyData {
   company_id: number;
@@ -50,63 +41,62 @@ interface CompanyData {
 }
 
 export function SuperadminEspecialidadesPage() {
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
   const [companies, setCompanies] = useState<CompanyData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCompany, setFilterCompany] = useState<string>("all");
   const [filterEstado, setFilterEstado] = useState<string>("all");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedEspecialidad, setSelectedEspecialidad] = useState<EspecialidadData | null>(null);
+  const [selectedEspecialidad, setSelectedEspecialidad] = useState<Especialidad | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const [especialidadesRes, companiesRes] = await Promise.all([
-        apiClient.get(SUPER_API.GET_ESPECIALIDADES),
-        apiClient.get(SUPER_API.GET_COMPANIES),
-      ]);
-
-      const especialidadesData = especialidadesRes.data.map((esp: unknown) => {
-        const espData = esp as { company_id: number; [key: string]: unknown };
-        const company = companiesRes.data.find((c: unknown) => (c as { company_id: number; [key: string]: unknown }).company_id === espData.company_id);
-        return {
-          ...espData,
-          company_nombre: company?.company_nombre || "Empresa no encontrada",
-        };
-      });
-
-      setEspecialidades(especialidadesData);
-      setCompanies(companiesRes.data);
-    } catch {
-      toast.error("Error al cargar los datos");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    especialidades,
+    isLoading,
+    fetchEspecialidades,
+    toggleEspecialidadStatus,
+  } = useEspecialidades({ autoFetch: true });
 
   useEffect(() => {
-    fetchData();
+    const fetchCompanies = async () => {
+      try {
+        const response = await apiClient.get<CompanyData[]>(API_ROUTES.GET_COMPANIES);
+        setCompanies(response.data);
+      } catch {
+      }
+    };
+    fetchCompanies();
   }, []);
 
-  const filteredEspecialidades = especialidades.filter((esp) => {
-    const matchesSearch = 
-      esp.nombre_especialidad.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      esp.company_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      esp.id_especialidad.toString().includes(searchTerm) ||
-      esp.company_id.toString().includes(searchTerm);
+  const especialidadesWithCompanyNames = useMemo(() => {
+    return especialidades.map((esp) => {
+      const company = companies.find((c) => c.company_id === esp.company_id);
+      return {
+        ...esp,
+        company_nombre: company?.company_nombre || "Empresa no encontrada",
+      };
+    });
+  }, [especialidades, companies]);
 
-    const matchesCompany = filterCompany === "all" || 
-      esp.company_id.toString() === filterCompany;
+  const filteredEspecialidades = useMemo(() => {
+    return especialidadesWithCompanyNames.filter((esp) => {
+      const matchesSearch =
+        esp.nombre_especialidad.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        esp.company_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        esp.id_especialidad.toString().includes(searchTerm) ||
+        esp.company_id.toString().includes(searchTerm);
 
-    const matchesEstado = filterEstado === "all" ||
-      (filterEstado === "active" && esp.estado_especialidad === 1) ||
-      (filterEstado === "inactive" && esp.estado_especialidad === 0);
+      const matchesCompany =
+        filterCompany === "all" || esp.company_id.toString() === filterCompany;
 
-    return matchesSearch && matchesCompany && matchesEstado;
-  });
+      const matchesEstado =
+        filterEstado === "all" ||
+        (filterEstado === "active" && esp.estado_especialidad === 1) ||
+        (filterEstado === "inactive" && esp.estado_especialidad === 0);
+
+      return matchesSearch && matchesCompany && matchesEstado;
+    });
+  }, [especialidadesWithCompanyNames, searchTerm, filterCompany, filterEstado]);
 
   const totalPages = Math.ceil(filteredEspecialidades.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -118,33 +108,10 @@ export function SuperadminEspecialidadesPage() {
   }, [searchTerm, filterCompany, filterEstado]);
 
   const handleToggleEstado = async (especialidadId: number, currentEstado: number) => {
-    try {
-      const newEstado = currentEstado === 1 ? 0 : 1;
-      
-      const enableUrl = SUPER_API.ENABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
-      const disableUrl = SUPER_API.DISABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
-      
-      if (newEstado === 1) {
-        await apiClient.put(enableUrl);
-      } else {
-        await apiClient.put(disableUrl);
-      }
-      
-      setEspecialidades(prev => 
-        prev.map(esp => 
-          esp.id_especialidad === especialidadId 
-            ? { ...esp, estado_especialidad: newEstado }
-            : esp
-        )
-      );
-      
-      toast.success(newEstado === 1 ? "Especialidad activada" : "Especialidad desactivada");
-    } catch {
-      toast.error("Error al cambiar el estado");
-    }
+    await toggleEspecialidadStatus(especialidadId, currentEstado);
   };
 
-  const handleEdit = (especialidad: EspecialidadData) => {
+  const handleEdit = (especialidad: Especialidad) => {
     setSelectedEspecialidad(especialidad);
     setIsSheetOpen(true);
   };
@@ -160,7 +127,7 @@ export function SuperadminEspecialidadesPage() {
   };
 
   const handleSuccess = () => {
-    fetchData();
+    fetchEspecialidades();
   };
 
   return (
@@ -263,7 +230,9 @@ export function SuperadminEspecialidadesPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
-                        <span className="font-medium">{especialidad.company_nombre}</span>
+                        <span className="font-medium">
+                          {especialidad.company_nombre}
+                        </span>
                         <span className="text-sm text-muted-foreground">
                           ID: {especialidad.company_id}
                         </span>
@@ -273,11 +242,13 @@ export function SuperadminEspecialidadesPage() {
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
                           especialidad.estado_especialidad === 1
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                         }`}
                       >
-                        {especialidad.estado_especialidad === 1 ? 'Activa' : 'Inactiva'}
+                        {especialidad.estado_especialidad === 1
+                          ? "Activa"
+                          : "Inactiva"}
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
@@ -293,9 +264,22 @@ export function SuperadminEspecialidadesPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleToggleEstado(especialidad.id_especialidad, especialidad.estado_especialidad)}
-                          className={especialidad.estado_especialidad === 1 ? 'text-destructive hover:text-destructive' : 'text-green-600 hover:text-green-600'}
-                          title={especialidad.estado_especialidad === 1 ? 'Desactivar especialidad' : 'Activar especialidad'}
+                          onClick={() =>
+                            handleToggleEstado(
+                              especialidad.id_especialidad,
+                              especialidad.estado_especialidad
+                            )
+                          }
+                          className={
+                            especialidad.estado_especialidad === 1
+                              ? "text-destructive hover:text-destructive"
+                              : "text-green-600 hover:text-green-600"
+                          }
+                          title={
+                            especialidad.estado_especialidad === 1
+                              ? "Desactivar especialidad"
+                              : "Activar especialidad"
+                          }
                         >
                           {especialidad.estado_especialidad === 1 ? (
                             <PowerOff className="h-4 w-4" />

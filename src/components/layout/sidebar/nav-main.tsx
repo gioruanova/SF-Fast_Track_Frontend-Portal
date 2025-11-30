@@ -1,7 +1,7 @@
 "use client"
 
-import { useCallback } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ChevronRight, type LucideIcon } from "lucide-react"
 
 import {
@@ -41,37 +41,53 @@ export function NavMain({
   label?: string
 }) {
   const { isMobile, setOpenMobile } = useSidebar();
-  const router = useRouter();
-
-  const handleNavigation = useCallback((url: string, disabled?: boolean) => {
-    if (disabled) {
-      return;
-    }
-    
-    router.push(url);
-    if (isMobile) {
-      setOpenMobile(false);
-    }
-  }, [router, isMobile, setOpenMobile]);
+  const pathname = usePathname();
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => {
+        {items.map((item, index) => {
           const hasSubItems = item.items && item.items.length > 0;
+          const itemKey = item.title || `item-${index}-${item.url}`;
 
           if (!hasSubItems) {
+            const isActive = pathname === item.url;
+            
+            if (item.disabled) {
+              return (
+                <SidebarMenuItem key={itemKey}>
+                  <SidebarMenuButton 
+                    tooltip={item.title}
+                    className="opacity-50 cursor-not-allowed"
+                    disabled
+                  >
+                    {item.icon && <item.icon />}
+                    <span className="flex-1">{item.title || 'Sin título'}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            }
+
             return (
-              <SidebarMenuItem key={item.title}>
+              <SidebarMenuItem key={itemKey}>
                 <SidebarMenuButton 
                   tooltip={item.title}
-                  onClick={() => handleNavigation(item.url, item.disabled)}
-                  className={`cursor-pointer ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  disabled={item.disabled}
+                  asChild
+                  isActive={isActive}
                 >
-                  {item.icon && <item.icon />}
-                  <span className="flex-1">{item.title}</span>
+                  <Link 
+                    href={item.url}
+                    prefetch={true}
+                    onClick={() => {
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      }
+                    }}
+                  >
+                    {item.icon && <item.icon />}
+                    <span className="flex-1">{item.title || 'Sin título'}</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             );
@@ -79,7 +95,7 @@ export function NavMain({
 
           return (
             <Collapsible
-              key={item.title}
+              key={itemKey}
               asChild
               defaultOpen={item.isActive}
               className="group/collapsible"
@@ -92,22 +108,50 @@ export function NavMain({
                     disabled={item.disabled}
                   >
                     {item.icon && <item.icon />}
-                    <span className="flex-1">{item.title}</span>
+                    <span className="flex-1">{item.title || 'Sin título'}</span>
                     <ChevronRight className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton 
-                          onClick={() => handleNavigation(subItem.url, subItem.disabled)}
-                          className={`cursor-pointer ${subItem.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          <span>{subItem.title}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {item.items?.map((subItem, subIndex) => {
+                      const subItemKey = subItem.title || `subitem-${index}-${subIndex}-${subItem.url}`;
+                      const isSubActive = pathname === subItem.url;
+                      
+                      if (subItem.disabled) {
+                        return (
+                          <SidebarMenuSubItem key={subItemKey}>
+                            <SidebarMenuSubButton 
+                              className="opacity-50 cursor-not-allowed"
+                              aria-disabled="true"
+                            >
+                              <span>{subItem.title || 'Sin título'}</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      }
+
+                      return (
+                        <SidebarMenuSubItem key={subItemKey}>
+                          <SidebarMenuSubButton 
+                            asChild
+                            isActive={isSubActive}
+                          >
+                            <Link 
+                              href={subItem.url}
+                              prefetch={true}
+                              onClick={() => {
+                                if (isMobile) {
+                                  setOpenMobile(false);
+                                }
+                              }}
+                            >
+                              <span>{subItem.title || 'Sin título'}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>

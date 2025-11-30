@@ -12,46 +12,53 @@ import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
 
 export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[] => {
-  const isCompanyActive = config?.company?.company_estado === 1;
+  const isCompanyActive = config === null ? true : config?.company?.company_estado === 1;
+  
+  const pluReclamos = config?.plu_heading_reclamos || "Reclamos";
+  const singReclamos = config?.sing_heading_reclamos || "reclamo";
+  const pluEspecialidad = config?.plu_heading_especialidad || "Especialidades";
+  const pluProfesional = config?.plu_heading_profesional || "Profesionales";
+  const pluSolicitante = config?.plu_heading_solicitante || "Solicitantes";
 
   return [
     {
       title: "Inicio",
       url: "/dashboard/operador",
       icon: House,
+      disabled: false,
     },
     {
-      title: `${config?.plu_heading_reclamos}`,
+      title: pluReclamos,
       url: "#",
       icon: SquareCheck,
       isActive: !isCompanyActive ? false : true,
       disabled: !isCompanyActive,
       items: [
         {
-          title: `Generar ${config?.sing_heading_reclamos}`,
+          title: `Generar ${singReclamos}`,
           url: "/dashboard/operador/crear-reclamo",
           disabled: !isCompanyActive,
         },
         {
-          title: `${config?.plu_heading_reclamos} en curso`,
+          title: `${pluReclamos} en curso`,
           url: "/dashboard/operador/trabajar-reclamos",
           disabled: !isCompanyActive,
         },
         {
-          title: `Historial de ${config?.plu_heading_reclamos?.toLowerCase()}`,
+          title: `Historial de ${pluReclamos.toLowerCase()}`,
           url: "/dashboard/operador/historial-reclamos",
           disabled: !isCompanyActive,
         },
       ],
     },
     {
-      title: `${config?.plu_heading_especialidad}`,
+      title: pluEspecialidad,
       url: "/dashboard/operador/especialidades",
       icon: Wrench,
       disabled: !isCompanyActive,
     },
     {
-      title: `${config?.plu_heading_profesional}`,
+      title: pluProfesional,
       url: "/dashboard/operador/profesionales",
       icon: ShieldUser,
       disabled: !isCompanyActive,
@@ -63,7 +70,7 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
       disabled: !isCompanyActive,
     },
     {
-      title: `${config?.plu_heading_solicitante}`,
+      title: pluSolicitante,
       url: "/dashboard/operador/clientes",
       icon: Briefcase,
       disabled: !isCompanyActive,

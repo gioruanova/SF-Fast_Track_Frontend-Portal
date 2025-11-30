@@ -14,16 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import axios from "axios";
-import { config } from "@/lib/config";
-import { SUPER_API } from "@/lib/superApi/config";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { API_ROUTES } from "@/lib/api_routes";
+import { getCompanyUpdateEndpoint } from "@/lib/apiHelpers";
+import { apiClient } from "@/lib/apiClient";
 
 interface CompanyDataBackend {
   company_id?: number;
@@ -160,7 +153,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       setIsSubmitting(true);
 
       if (company && originalData) {
-        const endpoint = SUPER_API.COMPANY_EDIT.replace("{id}", company.company_id!.toString());
+        const endpoint = getCompanyUpdateEndpoint(company.company_id!);
         
         const changedFields: Record<string, string | number | boolean> = {};
         (Object.keys(formData) as Array<keyof CompanyData>).forEach((key) => {
@@ -191,7 +184,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           limite_especialidades: formData.limite_especialidades,
           reminder_manual: formData.reminder_manual,
         };
-        await apiClient.post(SUPER_API.COMPANY_CREATE, createPayload);
+        await apiClient.post(API_ROUTES.COMPANY_CREATE, createPayload);
         toast.success("Empresa creada correctamente");
       }
 

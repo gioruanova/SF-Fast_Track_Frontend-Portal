@@ -1,296 +1,137 @@
-﻿"use client"
+﻿"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import { Search, Plus, Edit, X, ChevronLeft, ChevronRight, Mail, UserX, UserCheck } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import axios from "axios"
-import { config } from "@/lib/config"
-import { CLIENT_API } from "@/lib/clientApi/config"
-import { useAuth } from "@/context/AuthContext"
-import { ARGENTINA_PROVINCIAS } from "@/lib/constants"
-
-interface Cliente {
-  cliente_id: number
-  cliente_complete_name: string
-  cliente_dni: string
-  cliente_phone: string
-  cliente_email: string
-  cliente_direccion: string
-  cliente_active: boolean
-
-}
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Edit, X, ChevronLeft, ChevronRight, Mail, UserX, UserCheck } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/context/AuthContext";
+import { ARGENTINA_PROVINCIAS } from "@/lib/constants";
+import { useClientes } from "@/hooks/clientes/useClientes";
+import { useClienteForm } from "@/hooks/clientes/useClienteForm";
+import { ClienteRecurrente } from "@/types/clientes";
+import { toast } from "sonner";
 
 interface ClientesPageProps {
-  userRole: "owner" | "operador"
+  userRole: "owner" | "operador";
 }
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
 export function ClientesPage({}: ClientesPageProps) {
-  const { companyConfig } = useAuth()
-  const [clientes, setClientes] = useState<Cliente[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const { companyConfig } = useAuth();
+  const { clientes, isLoading, createCliente, updateCliente, toggleClienteStatus } = useClientes();
+  const {
+    formData,
+    setFormData,
+    direccionFields,
+    setDireccionFields,
+    resetForm,
+    loadClienteData,
+    validateForm,
+    buildCreateData,
+    buildUpdateData,
+  } = useClienteForm();
 
-  const [isClienteSheetOpen, setIsClienteSheetOpen] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-  const [clienteFormData, setClienteFormData] = useState({
-    cliente_complete_name: "",
-    cliente_dni: "",
-    cliente_phone: "",
-    cliente_email: "",
-    cliente_direccion: ""
-  })
-
-  const [direccionFields, setDireccionFields] = useState({
-    calle: "",
-    numero: "",
-    ciudad: "",
-    provincia: "",
-    codigo_postal: ""
-  })
-
-const fetchClientes = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      const response = await apiClient.get(CLIENT_API.GET_CLIENTES)
-      setClientes(response.data || [])
-    } catch {
-      toast.error("Error al cargar clientes")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchClientes()
-  }, [fetchClientes]) 
-
-  const buildDireccion = useCallback((fields: typeof direccionFields) => {
-    const partes: string[] = []
-    
-    if (fields.calle.trim() && fields.numero.trim()) {
-      partes.push(`${fields.calle.trim()} ${fields.numero.trim()}`)
-    } else if (fields.calle.trim()) {
-      partes.push(fields.calle.trim())
-    }
-    
-    if (fields.ciudad.trim()) partes.push(fields.ciudad.trim())
-    
-    if (fields.provincia.trim()) {
-      let provinciaNormalizada = fields.provincia.trim()
-      if (provinciaNormalizada.includes("Ciudad Autonoma") || provinciaNormalizada.includes("Bs As")) {
-        provinciaNormalizada = "Buenos Aires"
-      }
-      partes.push(provinciaNormalizada)
-    }
-    
-    return partes.join(", ")
-  }, [])
-
+  const [isClienteSheetOpen, setIsClienteSheetOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCliente, setEditingCliente] = useState<ClienteRecurrente | null>(null);
 
   const handleCreateCliente = () => {
-    setIsEditing(false)
-    setEditingCliente(null)
-    setClienteFormData({
-      cliente_complete_name: "",
-      cliente_dni: "",
-      cliente_phone: "",
-      cliente_email: "",
-      cliente_direccion: ""
-    })
-    setDireccionFields({
-      calle: "",
-      numero: "",
-      ciudad: "",
-      provincia: "",
-      codigo_postal: ""
-    })
-    setIsClienteSheetOpen(true)
-  }
+    setIsEditing(false);
+    setEditingCliente(null);
+    resetForm();
+    setIsClienteSheetOpen(true);
+  };
 
-  const handleEditCliente = (cliente: Cliente) => {
-    setIsEditing(true)
-    setEditingCliente(cliente)
-    setClienteFormData({
-      cliente_complete_name: cliente.cliente_complete_name,
-      cliente_dni: cliente.cliente_dni,
-      cliente_phone: cliente.cliente_phone,
-      cliente_email: cliente.cliente_email,
-      cliente_direccion: cliente.cliente_direccion
-    })
-    setIsClienteSheetOpen(true)
-  }
-
-  const validateFormData = useCallback((): string | null => {
-    if (!clienteFormData.cliente_complete_name ||
-      !clienteFormData.cliente_dni ||
-      !clienteFormData.cliente_phone ||
-      !clienteFormData.cliente_email) {
-      return "Los campos nombre, DNI, teléfono y email son obligatorios"
-    }
-
-    if (companyConfig?.requiere_domicilio) {
-      if (isEditing) {
-        if (!clienteFormData.cliente_direccion.trim()) {
-          return "La dirección es obligatoria"
-        }
-      } else {
-        if (!direccionFields.calle.trim() ||
-          !direccionFields.numero.trim() ||
-          !direccionFields.ciudad.trim() ||
-          !direccionFields.provincia.trim()) {
-          return "Los campos calle, número, ciudad y provincia son obligatorios"
-        }
-      }
-    }
-
-    return null
-  }, [clienteFormData, direccionFields, companyConfig, isEditing])
-
-  const buildUpdateData = useCallback((formData: typeof clienteFormData) => {
-    if (!editingCliente) return {}
-
-    const updateData: Record<string, unknown> = {}
-
-    if (formData.cliente_complete_name !== editingCliente.cliente_complete_name) {
-      updateData.cliente_complete_name = formData.cliente_complete_name
-    }
-    if (formData.cliente_dni !== editingCliente.cliente_dni) {
-      updateData.cliente_dni = formData.cliente_dni
-    }
-    if (formData.cliente_phone !== editingCliente.cliente_phone) {
-      updateData.cliente_phone = formData.cliente_phone
-    }
-    if (formData.cliente_email !== editingCliente.cliente_email) {
-      updateData.cliente_email = formData.cliente_email
-    }
-    if (formData.cliente_direccion !== editingCliente.cliente_direccion) {
-      updateData.cliente_direccion = formData.cliente_direccion
-    }
-
-    return updateData
-  }, [editingCliente])
-
-  const getErrorMessage = useCallback((error: unknown): string => {
-    const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string }
-    return axiosError?.response?.data?.error ||
-      axiosError?.message ||
-      `Error al guardar el ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`
-  }, [companyConfig])
+  const handleEditCliente = (cliente: ClienteRecurrente) => {
+    setIsEditing(true);
+    setEditingCliente(cliente);
+    loadClienteData(cliente);
+    setIsClienteSheetOpen(true);
+  };
 
   const handleSaveCliente = async () => {
-    const validationError = validateFormData()
+    const validationError = validateForm(isEditing);
     if (validationError) {
-      toast.error(validationError)
-      return
+      toast.error(validationError);
+      return;
     }
 
-    const direccionCompleta = isEditing
-      ? clienteFormData.cliente_direccion.trim()
-      : buildDireccion(direccionFields) + ", Argentina"
-    
-    const formDataToSend: typeof clienteFormData = {
-      ...clienteFormData,
-      cliente_direccion: direccionCompleta
-    }
-
-    try {
-      if (isEditing && editingCliente) {
-        const updateData = buildUpdateData(formDataToSend)
-        
-        if (Object.keys(updateData).length === 0) {
-          toast.info("No se detectaron cambios para actualizar")
-          return
-        }
-
-        await apiClient.put(
-          CLIENT_API.UPDATE_CLIENTE.replace('{cliente_id}', editingCliente.cliente_id.toString()),
-          updateData
-        )
-        toast.success(`${companyConfig?.sing_heading_solicitante} actualizado correctamente`)
-      } else {
-        await apiClient.post(CLIENT_API.CREATE_CLIENTE, formDataToSend)
-        toast.success(`${companyConfig?.sing_heading_solicitante} creado correctamente`)
+    if (isEditing && editingCliente) {
+      const updateData = buildUpdateData(editingCliente);
+      
+      if (Object.keys(updateData).length === 0) {
+        toast.info("No se detectaron cambios para actualizar");
+        return;
       }
 
-      setIsClienteSheetOpen(false)
-      setEditingCliente(null)
-      setIsEditing(false)
-      fetchClientes()
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error))
+      const success = await updateCliente(editingCliente.cliente_id, updateData);
+      if (success) {
+        setIsClienteSheetOpen(false);
+        setEditingCliente(null);
+        setIsEditing(false);
+        resetForm();
+      }
+    } else {
+      const createData = buildCreateData();
+      const success = await createCliente(createData);
+      if (success) {
+        setIsClienteSheetOpen(false);
+        resetForm();
+      }
     }
-  }
+  };
 
-  const handleToggleClienteStatus = async (cliente: Cliente) => {
-    try {
-      const endpoint = cliente.cliente_active
-        ? CLIENT_API.DESACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString())
-        : CLIENT_API.ACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString())
-      
-      const message = cliente.cliente_active
-        ? `${companyConfig?.sing_heading_solicitante} desactivado correctamente`
-        : `${companyConfig?.sing_heading_solicitante} activado correctamente`
+  const handleToggleClienteStatus = async (cliente: ClienteRecurrente) => {
+    const isActive = cliente.cliente_active === 1;
+    await toggleClienteStatus(cliente.cliente_id, isActive);
+  };
 
-      await apiClient.put(endpoint)
-      toast.success(message)
-      fetchClientes()
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error))
-    }
-  }
-
-  const getStatusBadge = (active: boolean) => {
+  const getStatusBadge = (active: number) => {
+    const isActive = active === 1;
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${active
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-          }`}
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
+          isActive
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+        }`}
       >
-        {active ? 'Activo' : 'Inactivo'}
+        {isActive ? 'Activo' : 'Inactivo'}
       </span>
-    )
-  }
+    );
+  };
 
   const clearSearch = () => {
-    setSearchTerm("")
-  }
+    setSearchTerm("");
+  };
 
-  const filteredClientes = clientes.filter(cliente => {
-    const matchesSearch = cliente.cliente_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cliente.cliente_dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cliente.cliente_phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cliente.cliente_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cliente.cliente_direccion.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClientes = useMemo(() => {
+    return clientes.filter(cliente => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        cliente.cliente_complete_name.toLowerCase().includes(searchLower) ||
+        (cliente.cliente_dni || "").toLowerCase().includes(searchLower) ||
+        (cliente.cliente_phone || "").toLowerCase().includes(searchLower) ||
+        (cliente.cliente_email || "").toLowerCase().includes(searchLower) ||
+        (cliente.cliente_direccion || "").toLowerCase().includes(searchLower)
+      );
+    });
+  }, [clientes, searchTerm]);
 
-    return matchesSearch
-  })
-
-  const totalPages = Math.ceil(filteredClientes.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedClientes = filteredClientes.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredClientes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedClientes = filteredClientes.slice(startIndex, endIndex);
 
   return (
     <>
@@ -378,12 +219,12 @@ const fetchClientes = useCallback(async () => {
                       </TableCell>
                       {companyConfig?.requiere_domicilio === 1 && (
                         <TableCell title={cliente.cliente_direccion}>
-                          {cliente.cliente_direccion.length > 20
+                          {cliente.cliente_direccion && cliente.cliente_direccion.length > 20
                             ? `${cliente.cliente_direccion.substring(0, 20)}...`
                             : cliente.cliente_direccion}
                         </TableCell>
                       )}
-                    
+                      
                       <TableCell className="text-center">{getStatusBadge(cliente.cliente_active)}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -399,10 +240,10 @@ const fetchClientes = useCallback(async () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleToggleClienteStatus(cliente)}
-                            className={cliente.cliente_active ? "text-red-600" : "text-green-600"}
-                            title={cliente.cliente_active ? `Desactivar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}` : `Activar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
+                            className={cliente.cliente_active === 1 ? "text-red-600" : "text-green-600"}
+                            title={cliente.cliente_active === 1 ? `Desactivar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}` : `Activar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
                           >
-                            {cliente.cliente_active ? (
+                            {cliente.cliente_active === 1 ? (
                               <UserX className="h-4 w-4" />
                             ) : (
                               <UserCheck className="h-4 w-4" />
@@ -481,8 +322,8 @@ const fetchClientes = useCallback(async () => {
               <Label htmlFor="complete_name">Nombre Completo *</Label>
               <Input
                 id="complete_name"
-                value={clienteFormData.cliente_complete_name}
-                onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_complete_name: e.target.value }))}
+                value={formData.cliente_complete_name}
+                onChange={(e) => setFormData(prev => ({ ...prev, cliente_complete_name: e.target.value }))}
                 placeholder={`Nombre completo del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
                 required
               />
@@ -491,8 +332,8 @@ const fetchClientes = useCallback(async () => {
               <Label htmlFor="dni">DNI/CUIT<span className="text-red-500">*</span></Label>
               <Input
                 id="dni"
-                value={clienteFormData.cliente_dni}
-                onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_dni: e.target.value }))}
+                value={formData.cliente_dni}
+                onChange={(e) => setFormData(prev => ({ ...prev, cliente_dni: e.target.value }))}
                 placeholder={`DNI del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
                 required
               />
@@ -501,8 +342,8 @@ const fetchClientes = useCallback(async () => {
               <Label htmlFor="phone">Teléfono<span className="text-red-500">*</span></Label>
               <Input
                 id="phone"
-                value={clienteFormData.cliente_phone}
-                onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_phone: e.target.value }))}
+                value={formData.cliente_phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, cliente_phone: e.target.value }))}
                 placeholder={`Teléfono del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
                 required
               />
@@ -512,8 +353,8 @@ const fetchClientes = useCallback(async () => {
               <Input
                 id="email"
                 type="email"
-                value={clienteFormData.cliente_email}
-                onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_email: e.target.value }))}
+                value={formData.cliente_email}
+                onChange={(e) => setFormData(prev => ({ ...prev, cliente_email: e.target.value }))}
                 placeholder={`Email del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
                 required
               />
@@ -528,8 +369,8 @@ const fetchClientes = useCallback(async () => {
                   <div className="space-y-2">
                     <Input
                       id="direccion"
-                      value={clienteFormData.cliente_direccion}
-                      onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_direccion: e.target.value }))}
+                      value={formData.cliente_direccion || ""}
+                      onChange={(e) => setFormData(prev => ({ ...prev, cliente_direccion: e.target.value }))}
                       placeholder={`Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
                       required
                     />
@@ -631,5 +472,5 @@ const fetchClientes = useCallback(async () => {
         </SheetContent>
       </Sheet>
     </>
-  )
+  );
 }

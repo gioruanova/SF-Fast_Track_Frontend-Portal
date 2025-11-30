@@ -1,32 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDashboard } from "@/context/DashboardContext";
-import { SUPER_API } from "@/lib/superApi/config";
-import { apiClient } from "@/lib/apiClient";
-
-interface UserData {
-  user_id: number;
-  user_role: string;
-  user_status: number;
-}
-
-interface CompanyData {
-  company_id: number;
-  company_nombre: string;
-  company_estado: number;
-}
-
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-}
+import { useSuperadminStats } from "@/hooks/superadmin/useSuperadminStats";
 
 const CHART_COLORS = [
   "#8b5cf6",
@@ -40,34 +20,8 @@ const CHART_COLORS = [
 ];
 
 export function StatsOverview() {
-  const { refreshTrigger } = useDashboard();
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [companies, setCompanies] = useState<CompanyData[]>([]);
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
+  const { users, companies, especialidades, clientes, isLoading } = useSuperadminStats();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [usersRes, companiesRes, especialidadesRes] = await Promise.all([
-          apiClient.get(SUPER_API.GET_USERS),
-          apiClient.get(SUPER_API.GET_COMPANIES),
-          apiClient.get(SUPER_API.GET_ESPECIALIDADES),
-        ]);
-
-        setUsers(usersRes.data);
-        setCompanies(companiesRes.data);
-        setEspecialidades(especialidadesRes.data);
-      } catch (error) {
-        console.error("Error obteniendo datos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [refreshTrigger]);
 
   const activeCompanies = companies.filter(c => c.company_estado === 1).length;
   const inactiveCompanies = companies.filter(c => c.company_estado === 0).length;
@@ -75,28 +29,28 @@ export function StatsOverview() {
 
   const nonSuperAdminUsers = users.filter(u => u.user_role !== "superadmin");
 
-  const activeUsers = nonSuperAdminUsers.filter(u => u.user_status === 1).length;
-  const inactiveUsers = nonSuperAdminUsers.filter(u => u.user_status === 0).length;
-  const totalUsers = nonSuperAdminUsers.length;
-
   const ownerUsers = nonSuperAdminUsers.filter(u => u.user_role === "owner").length;
   const operadorUsers = nonSuperAdminUsers.filter(u => u.user_role === "operador").length;
   const profesionalUsers = nonSuperAdminUsers.filter(u => u.user_role === "profesional").length;
+
+  const activeClientes = clientes.filter(c => c.cliente_active === 1).length;
+  const inactiveClientes = clientes.filter(c => c.cliente_active === 0).length;
+  const totalClientes = clientes.length;
 
   const companyStatusData = [
     { name: "Activas", value: activeCompanies, fill: "#10b981" },
     { name: "Inactivas", value: inactiveCompanies, fill: "#ef4444" },
   ];
 
-  const statusData = [
-    { name: "Activos", value: activeUsers, fill: "#10b981" },
-    { name: "Inactivos", value: inactiveUsers, fill: "#ef4444" },
-  ];
-
   const rolesData = [
     { name: "Owners", value: ownerUsers, fill: "#8b5cf6" },
     { name: "Operadores", value: operadorUsers, fill: "#3b82f6" },
     { name: "Profesionales", value: profesionalUsers, fill: "#f59e0b" },
+  ];
+
+  const clientesData = [
+    { name: "Activos", value: activeClientes, fill: "#10b981" },
+    { name: "Inactivos", value: inactiveClientes, fill: "#ef4444" },
   ];
 
   const especialidadesGrouped = especialidades.reduce((acc, esp) => {
@@ -209,53 +163,6 @@ export function StatsOverview() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle>Estado de Usuarios</CardTitle>
-                <CardDescription>Activos vs Inactivos</CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center pb-4">
-                <ChartContainer
-                  config={{
-                    activos: { label: "Activos", color: "#10b981" },
-                    inactivos: { label: "Inactivos", color: "#ef4444" },
-                  }}
-                  className="aspect-square w-full max-w-[250px]"
-                >
-                  <PieChart>
-                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                    <Pie
-                      data={statusData}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={60}
-                      strokeWidth={5}
-                    >
-                      {statusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                      <Label
-                        content={({ viewBox }) => {
-                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                            return (
-                              <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-                                <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
-                                  {totalUsers}
-                                </tspan>
-                                <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
-                                  Total
-                                </tspan>
-                              </text>
-                            );
-                          }
-                        }}
-                      />
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
                 <CardTitle>Usuarios por Rol</CardTitle>
                 <CardDescription>Distribución de roles</CardDescription>
               </CardHeader>
@@ -290,6 +197,53 @@ export function StatsOverview() {
                                 </tspan>
                                 <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
                                   Usuarios
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
+                      />
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle>Clientes Activos</CardTitle>
+                <CardDescription>Activos vs Inactivos</CardDescription>
+              </CardHeader>
+              <CardContent className="flex justify-center pb-4">
+                <ChartContainer
+                  config={{
+                    activos: { label: "Activos", color: "#10b981" },
+                    inactivos: { label: "Inactivos", color: "#ef4444" },
+                  }}
+                  className="aspect-square w-full max-w-[250px]"
+                >
+                  <PieChart>
+                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                    <Pie
+                      data={clientesData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      strokeWidth={5}
+                    >
+                      {clientesData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                                <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
+                                  {totalClientes}
+                                </tspan>
+                                <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
+                                  Total
                                 </tspan>
                               </text>
                             );

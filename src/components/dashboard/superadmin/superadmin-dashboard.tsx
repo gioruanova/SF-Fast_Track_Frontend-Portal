@@ -2,15 +2,15 @@
 
 import { DashboardProvider } from "@/context/DashboardContext";
 import { StatsOverview } from "./stats-overview";
+import { CompanyStatsTable } from "./company-stats-table";
 import { ReclamosChart } from "./reclamos-chart";
-import { SuperadminUpcomingReclamos } from "./upcoming-reclamos";
 
 export function SuperadminDashboard() {
   return (
     <DashboardProvider>
       <div className="space-y-4">
         <StatsOverview />
-        <SuperadminUpcomingReclamos />
+        <CompanyStatsTable />
         <ReclamosChart />
       </div>
     </DashboardProvider>

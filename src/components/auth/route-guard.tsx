@@ -1,52 +1,64 @@
 ﻿"use client";
 
-import { ReactNode, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { LoadingScreen } from "@/components/ui/loading-screen";
-import { User } from "@/types/auth";
+import { isCompanyUser } from "@/types/auth";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useRef, startTransition } from "react";
+import { getDashboardRoute } from "@/lib/auth/routes";
 
 interface RouteGuardProps {
-  children: ReactNode;
-  allowedRoles?: User["user_role"][];
-  redirectTo?: string;
+  children: React.ReactNode;
+  allowedRoles: Array<"superadmin" | "owner" | "operador" | "profesional">;
+  requireCompanyConfig?: boolean;
 }
 
 export function RouteGuard({ 
   children, 
-  allowedRoles,
-  redirectTo 
+  allowedRoles, 
+  requireCompanyConfig = false 
 }: RouteGuardProps) {
-  const { user, isLoading } = useAuth();
+  const { user, companyConfig, isLoading } = useAuth();
   const router = useRouter();
-
-  const hasAccess = useMemo(() => {
-    if (isLoading) return null;
-    if (!user) return false;
-    if (allowedRoles && allowedRoles.length > 0) {
-      return allowedRoles.includes(user.user_role);
-    }
-    return true;
-  }, [user, isLoading, allowedRoles]);
+  const pathname = usePathname();
+  const hasRedirected = useRef(false);
+  const lastPathname = useRef(pathname);
 
   useEffect(() => {
-    if (hasAccess === false) {
-      if (!user) {
-        router.replace(redirectTo || "/login");
-      } else {
-        router.replace("/");
-      }
+    if (pathname !== lastPathname.current) {
+      hasRedirected.current = false;
+      lastPathname.current = pathname;
     }
-  }, [hasAccess, user, router, redirectTo]);
+  }, [pathname]);
 
-  if (isLoading || hasAccess === null) {
-    return <LoadingScreen message="Verificando permisos..." />;
-  }
+  useEffect(() => {
+    if (isLoading || hasRedirected.current) {
+      return;
+    }
 
-  if (!hasAccess) {
-    return null;
-  }
+    if (!user) {
+      hasRedirected.current = true;
+      startTransition(() => {
+        router.replace("/login");
+      });
+      return;
+    }
+
+    if (!allowedRoles.includes(user.user_role)) {
+      hasRedirected.current = true;
+      startTransition(() => {
+        router.replace(getDashboardRoute(user.user_role));
+      });
+      return;
+    }
+
+    if (requireCompanyConfig && isCompanyUser(user) && !companyConfig) {
+      hasRedirected.current = true;
+      startTransition(() => {
+        router.replace(getDashboardRoute(user.user_role));
+      });
+      return;
+    }
+  }, [user, companyConfig, isLoading, allowedRoles, requireCompanyConfig, router]);
 
   return <>{children}</>;
 }
-

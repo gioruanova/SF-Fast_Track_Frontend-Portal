@@ -12,23 +12,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { MessageCircleHeartIcon, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { apiClient } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/api_routes";
 import {
   SidebarGroup,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 interface FeedbackSheetProps {
   open?: boolean;
@@ -40,7 +31,6 @@ export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOn
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const isControlled = controlledOpen !== undefined;
@@ -55,20 +45,24 @@ export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOn
 
     try {
       setIsSending(true);
-      setError(null);
       setSuccess(false);
 
-      await apiClient.post(CLIENT_API.FEEDBACK, {
-        message_content: message,
+      await apiClient.post(API_ROUTES.FEEDBACK_CREATE, {
+        message_content: message.trim(),
       });
 
       toast.success("Feedback enviado correctamente");
       setMessage("");
-      if (isControlled && controlledOnOpenChange) {
-        controlledOnOpenChange(false);
-      } else {
-        setInternalOpen(false);
-      }
+      setSuccess(true);
+      
+      setTimeout(() => {
+        if (isControlled && controlledOnOpenChange) {
+          controlledOnOpenChange(false);
+        } else {
+          setInternalOpen(false);
+        }
+        setSuccess(false);
+      }, 2000);
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       const errorMessage = error.response?.data?.error || "Error al enviar feedback";
@@ -86,7 +80,6 @@ export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOn
     }
     if (!open) {
       setMessage("");
-      setError(null);
       setSuccess(false);
     }
   };
@@ -111,8 +104,10 @@ export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOn
       <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle>FasTrack quiere conocer tu opinión...</SheetTitle>
-          <SheetDescription>Tu retroalimentacion es de suma importancia para nosotros.
-            Construimos esta aplicación a través de tu opinión y mejoramos el sistema según tus necesidades e inquietudes.</SheetDescription>
+          <SheetDescription>
+            Tu retroalimentación es de suma importancia para nosotros.
+            Construimos esta aplicación a través de tu opinión y mejoramos el sistema según tus necesidades e inquietudes.
+          </SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
@@ -136,18 +131,12 @@ export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOn
                   id="feedback"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Escribi tu mensaje aquí..."
+                  placeholder="Escribe tu mensaje aquí..."
                   className="mt-4 w-full min-h-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                   disabled={isSending}
                   required
                 />
               </div>
-
-              {error && (
-                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
-                  {error}
-                </div>
-              )}
 
               <Button
                 type="submit"
@@ -170,4 +159,3 @@ export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOn
     </Sheet>
   );
 }
-

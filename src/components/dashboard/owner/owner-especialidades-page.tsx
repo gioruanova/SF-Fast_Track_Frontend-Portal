@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,67 +19,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Power, PowerOff, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Power,
+  PowerOff,
+  Search,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { OwnerEspecialidadFormSheet } from "@/components/dashboard/owner/owner-especialidad-form-sheet";
-import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { useEspecialidades } from "@/hooks/especialidades/useEspecialidades";
 import { useAuth } from "@/context/AuthContext";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-  company_id: number;
-}
+import { Especialidad } from "@/types/especialidades";
 
 export function OwnerEspecialidadesPage() {
   const { companyConfig } = useAuth();
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterEstado, setFilterEstado] = useState<string>("all");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedEspecialidad, setSelectedEspecialidad] = useState<EspecialidadData | null>(null);
+  const [selectedEspecialidad, setSelectedEspecialidad] = useState<Especialidad | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await apiClient.get(CLIENT_API.GET_ESPECIALIDADES);
-      setEspecialidades(response.data);
-    } catch {
-      toast.error("Error al cargar los datos");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    especialidades,
+    isLoading,
+    fetchEspecialidades,
+    toggleEspecialidadStatus,
+  } = useEspecialidades({ autoFetch: true });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const filteredEspecialidades = useMemo(() => {
+    return especialidades.filter((esp) => {
+      const matchesSearch =
+        esp.nombre_especialidad.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        esp.id_especialidad.toString().includes(searchTerm);
 
-  const filteredEspecialidades = especialidades.filter((esp) => {
-    const matchesSearch = 
-      esp.nombre_especialidad.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      esp.id_especialidad.toString().includes(searchTerm);
+      const matchesEstado =
+        filterEstado === "all" ||
+        (filterEstado === "active" && esp.estado_especialidad === 1) ||
+        (filterEstado === "inactive" && esp.estado_especialidad === 0);
 
-    const matchesEstado = filterEstado === "all" ||
-      (filterEstado === "active" && esp.estado_especialidad === 1) ||
-      (filterEstado === "inactive" && esp.estado_especialidad === 0);
-
-    return matchesSearch && matchesEstado;
-  });
+      return matchesSearch && matchesEstado;
+    });
+  }, [especialidades, searchTerm, filterEstado]);
 
   const totalPages = Math.ceil(filteredEspecialidades.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -91,33 +75,10 @@ export function OwnerEspecialidadesPage() {
   }, [searchTerm, filterEstado]);
 
   const handleToggleEstado = async (especialidadId: number, currentEstado: number) => {
-    try {
-      const newEstado = currentEstado === 1 ? 0 : 1;
-      
-      const enableUrl = CLIENT_API.ENABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
-      const disableUrl = CLIENT_API.DISABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
-      
-      if (newEstado === 1) {
-        await apiClient.put(enableUrl);
-      } else {
-        await apiClient.put(disableUrl);
-      }
-      
-      setEspecialidades(prev => 
-        prev.map(esp => 
-          esp.id_especialidad === especialidadId 
-            ? { ...esp, estado_especialidad: newEstado }
-            : esp
-        )
-      );
-      
-      toast.success(newEstado === 1 ? "Especialidad activada" : "Especialidad desactivada");
-    } catch {
-      toast.error("Error al cambiar el estado");
-    }
+    await toggleEspecialidadStatus(especialidadId, currentEstado);
   };
 
-  const handleEdit = (especialidad: EspecialidadData) => {
+  const handleEdit = (especialidad: Especialidad) => {
     setSelectedEspecialidad(especialidad);
     setIsSheetOpen(true);
   };
@@ -133,7 +94,7 @@ export function OwnerEspecialidadesPage() {
   };
 
   const handleSuccess = () => {
-    fetchData();
+    fetchEspecialidades();
   };
 
   return (

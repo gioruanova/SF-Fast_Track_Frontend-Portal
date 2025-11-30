@@ -9,10 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCreateReclamo } from "@/hooks/useCreateReclamo";
-import { useCreateReclamoSubmit } from "@/hooks/useCreateReclamoSubmit";
+import { useCreateReclamo } from "@/hooks/reclamos/useCreateReclamo";
+import { useCreateReclamoSubmit } from "@/hooks/reclamos/useCreateReclamoSubmit";
+import { useReclamoFormValidation } from "@/hooks/reclamos/useReclamoFormValidation";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { ValidationMessage } from "./validation-message";
+import {
+  getClientesRoute,
+  getProfesionalesRoute,
+} from "@/lib/routes/dashboard-routes";
+import { getDashboardRoute } from "@/lib/auth/routes";
 
 export function CreateReclamoForm() {
   const { user, companyConfig } = useAuth();
@@ -35,13 +42,25 @@ export function CreateReclamoForm() {
 
   const { createReclamo, isSubmitting, error, clearError } = useCreateReclamoSubmit();
 
-  const selectedCliente = clientesOptions.find(c => c.cliente_id === formData.cliente_id);
+  const selectedCliente = clientesOptions.find(
+    (c) => c.cliente_id === formData.cliente_id
+  );
+
+  const {
+    hasClientesActivos,
+    hasEspecialidadesActivas,
+    hasAsignacionesParaEspecialidad,
+    isFormDisabled,
+  } = useReclamoFormValidation();
 
   const handleCancel = useCallback(() => {
     resetForm();
     clearError();
-    const dashboardUrl = user?.user_role === "owner" ? "/dashboard/owner" : "/dashboard/operador";
-    router.push(dashboardUrl);
+    if (user?.user_role) {
+      router.push(getDashboardRoute(user.user_role));
+    } else {
+      router.push("/login");
+    }
   }, [resetForm, clearError, router, user]);
 
   const validateForm = useCallback(() => {
@@ -113,8 +132,8 @@ export function CreateReclamoForm() {
         toast.success(`¡Reclamo creado exitosamente! El ${companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} ha sido creado correctamente`);
         resetForm();
         clearError();
-        const dashboardUrl = user?.user_role === "owner" ? "/dashboard/owner" : "/dashboard/operador";
-        router.push(dashboardUrl);
+        const trabajarReclamosUrl = user?.user_role === "owner" ? "/dashboard/owner/trabajar-reclamos" : "/dashboard/operador/trabajar-reclamos";
+        router.push(trabajarReclamosUrl);
       } else {
         toast.error(`Error al crear el reclamo: ${result.message}`);
       }
@@ -273,104 +292,128 @@ export function CreateReclamoForm() {
             <Label htmlFor="cliente">
               {companyConfig?.sing_heading_solicitante || "Cliente"} <span className="text-destructive">*</span>
             </Label>
-            <Select
-              value={formData.cliente_id?.toString() || ""}
-              onValueChange={(value) => handleClienteChange(parseInt(value))}
-              disabled={loadingClientes}
-            >
-              <SelectTrigger id="cliente" className="cursor-pointer w-full">
-                <SelectValue placeholder={loadingClientes ? `Cargando ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...`} />
-              </SelectTrigger>
-              <SelectContent className="cursor-pointer">
-                {clientesOptions
-                  .filter((cliente) => cliente?.cliente_id && cliente?.cliente_complete_name)
-                  .map((cliente) => (
-                    <SelectItem key={cliente.cliente_id} value={cliente.cliente_id.toString()} className="cursor-pointer">
-                      {cliente.cliente_complete_name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-
-            {selectedCliente && (
-              <div className="mt-3 p-3 bg-muted rounded-md space-y-1 text-sm text-muted-foreground">
-                <div><strong>ID:</strong> {selectedCliente.cliente_id}</div>
-                <div><strong>Nombre:</strong> {selectedCliente.cliente_complete_name}</div>
-                {selectedCliente.cliente_phone && (
-                  <div><strong>Teléfono:</strong> {selectedCliente.cliente_phone}</div>
-                )}
-                {selectedCliente.cliente_email && (
-                  <div><strong>Email:</strong> {selectedCliente.cliente_email}</div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="especialidad">
-              {companyConfig?.sing_heading_especialidad || "Especialidad"} <span className="text-destructive">*</span>
-            </Label>
-
-            {especialidadesOptions.length <= 0 ? (
-              <>{user?.user_role === "operador" ? (
-                <span>Contacte a su administrador</span>
-              ) : (
-                <span>No hay especialidades disponibles. Puede gestionarlas en la sección <a href="/dashboard/owner/especialidades" className="text-primary">{companyConfig?.plu_heading_especialidad}</a>.</span>
-              )}</>
+            
+            {!hasClientesActivos && !loadingClientes ? (
+              <ValidationMessage
+                message={`No se registran ${companyConfig?.plu_heading_solicitante || "clientes"} activos/as.`}
+                actionLink={{
+                  text: "Ingresar AQUÍ",
+                  href: getClientesRoute(user?.user_role),
+                }}
+              />
             ) : (
-              <Select
-                value={formData.especialidad_id?.toString() || ""}
-                onValueChange={(value) => handleEspecialidadChange(parseInt(value))}
-                disabled={loadingEspecialidades}
-              >
-                <SelectTrigger id="especialidad" className="cursor-pointer w-full">
-                  <SelectValue placeholder={loadingEspecialidades ? `Cargando ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...`} />
-                </SelectTrigger>
-                <SelectContent className="cursor-pointer">
-                  {especialidadesOptions
-                    .filter((especialidad) => especialidad?.especialidad_id && especialidad?.nombre_especialidad)
-                    .map((especialidad) => (
-                      <SelectItem key={especialidad.especialidad_id} value={especialidad.especialidad_id.toString()} className="cursor-pointer">
-                        {especialidad.nombre_especialidad}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              <>
+                <Select
+                  value={formData.cliente_id?.toString() || ""}
+                  onValueChange={(value) => handleClienteChange(parseInt(value))}
+                  disabled={loadingClientes || !hasClientesActivos}
+                >
+                  <SelectTrigger id="cliente" className="cursor-pointer w-full">
+                    <SelectValue placeholder={loadingClientes ? `Cargando ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...`} />
+                  </SelectTrigger>
+                  <SelectContent className="cursor-pointer">
+                    {clientesOptions
+                      .filter((cliente) => cliente?.cliente_id && cliente?.cliente_complete_name)
+                      .map((cliente) => (
+                        <SelectItem key={cliente.cliente_id} value={cliente.cliente_id.toString()} className="cursor-pointer">
+                          {cliente.cliente_complete_name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+
+                {selectedCliente && (
+                  <div className="mt-3 p-3 bg-muted rounded-md space-y-1 text-sm text-muted-foreground">
+                    <div><strong>ID:</strong> {selectedCliente.cliente_id}</div>
+                    <div><strong>Nombre:</strong> {selectedCliente.cliente_complete_name}</div>
+                    {selectedCliente.cliente_phone && (
+                      <div><strong>Teléfono:</strong> {selectedCliente.cliente_phone}</div>
+                    )}
+                    {selectedCliente.cliente_email && (
+                      <div><strong>Email:</strong> {selectedCliente.cliente_email}</div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {formData.especialidad_id && (
+          {hasClientesActivos && (
+            <div className="space-y-2">
+              <Label htmlFor="especialidad">
+                {companyConfig?.sing_heading_especialidad || "Especialidad"} <span className="text-destructive">*</span>
+              </Label>
+
+              {!hasEspecialidadesActivas && !loadingEspecialidades ? (
+                <ValidationMessage
+                  message={`No hay especialidades activas. Contacte a su ${companyConfig?.sing_heading_owner || "administrador"} para más información.`}
+                />
+              ) : (
+                <Select
+                  value={formData.especialidad_id?.toString() || ""}
+                  onValueChange={(value) => handleEspecialidadChange(parseInt(value))}
+                  disabled={loadingEspecialidades || !hasEspecialidadesActivas}
+                >
+                  <SelectTrigger id="especialidad" className="cursor-pointer w-full">
+                    <SelectValue placeholder={loadingEspecialidades ? `Cargando ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...`} />
+                  </SelectTrigger>
+                  <SelectContent className="cursor-pointer">
+                    {especialidadesOptions
+                      .filter((especialidad) => especialidad?.especialidad_id && especialidad?.nombre_especialidad)
+                      .map((especialidad) => (
+                        <SelectItem key={especialidad.especialidad_id} value={especialidad.especialidad_id.toString()} className="cursor-pointer">
+                          {especialidad.nombre_especialidad}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
+
+          {formData.especialidad_id && hasEspecialidadesActivas && (
             <div className="space-y-2">
               <Label htmlFor="profesional">
                 {companyConfig?.sing_heading_profesional || "Profesional"} <span className="text-destructive">*</span>
               </Label>
-              <Select
-                value={formData.profesional_id?.toString() || ""}
-                onValueChange={(value) => updateField("profesional_id", parseInt(value))}
-                disabled={loadingAsignaciones}
-              >
-                <SelectTrigger id="profesional" className="cursor-pointer w-full">
-                  <SelectValue placeholder={loadingAsignaciones ? `Cargando ${companyConfig?.sing_heading_profesional?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_profesional?.toLowerCase()}...`} />
-                </SelectTrigger>
-                <SelectContent className="cursor-pointer">
-                  {profesionalesDisponibles
-                    .filter((asignacion) => asignacion?.profesional_id && asignacion?.profesional_nombre)
-                    .map((asignacion) => (
-                      <SelectItem
-                        key={asignacion.profesional_id}
-                        value={asignacion.profesional_id.toString()}
-                        className="cursor-pointer"
-                      >
-                        {asignacion.profesional_nombre}
-                        {asignacion.cantidadBloqueos !== undefined && asignacion.cantidadBloqueos > 0 && (
-                          <span className="ml-2 text-xs text-muted-foreground">
-                            ({asignacion.cantidadBloqueos} bloqueos)
-                          </span>
-                        )}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              
+              {!hasAsignacionesParaEspecialidad && !loadingAsignaciones ? (
+                <ValidationMessage
+                  message={`No hay especialista disponible para esa especialidad. Para gestionar sus ${companyConfig?.plu_heading_profesional || "profesionales"} y sus ${companyConfig?.plu_heading_especialidad || "especialidades"},`}
+                  actionLink={{
+                    text: "Ingrese AQUÍ",
+                    href: getProfesionalesRoute(user?.user_role),
+                  }}
+                />
+              ) : (
+                <Select
+                  value={formData.profesional_id?.toString() || ""}
+                  onValueChange={(value) => updateField("profesional_id", parseInt(value))}
+                  disabled={loadingAsignaciones || !hasAsignacionesParaEspecialidad}
+                >
+                  <SelectTrigger id="profesional" className="cursor-pointer w-full">
+                    <SelectValue placeholder={loadingAsignaciones ? `Cargando ${companyConfig?.sing_heading_profesional?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_profesional?.toLowerCase()}...`} />
+                  </SelectTrigger>
+                  <SelectContent className="cursor-pointer">
+                    {profesionalesDisponibles
+                      .filter((asignacion) => asignacion?.profesional_id && asignacion?.profesional_nombre)
+                      .map((asignacion) => (
+                        <SelectItem
+                          key={asignacion.profesional_id}
+                          value={asignacion.profesional_id.toString()}
+                          className="cursor-pointer"
+                        >
+                          {asignacion.profesional_nombre}
+                          {asignacion.cantidadBloqueos !== undefined && asignacion.cantidadBloqueos > 0 && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              ({asignacion.cantidadBloqueos} bloqueos)
+                            </span>
+                          )}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           )}
 
@@ -504,32 +547,36 @@ export function CreateReclamoForm() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="titulo">
-              Título <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="titulo"
-              placeholder={tituloPlaceholder}
-              defaultValue={formData.reclamo_titulo}
-              onChange={handleTituloChange}
-              disabled={especialidadesOptions.length <= 0}
-            />
-          </div>
+          {hasClientesActivos && hasEspecialidadesActivas && hasAsignacionesParaEspecialidad && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="titulo">
+                  Título <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="titulo"
+                  placeholder={tituloPlaceholder}
+                  defaultValue={formData.reclamo_titulo}
+                  onChange={handleTituloChange}
+                  disabled={isFormDisabled}
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="detalle">
-              Descripción <span className="text-destructive">*</span>
-            </Label>
-            <Textarea
-              id="detalle"
-              placeholder={detallePlaceholder}
-              defaultValue={formData.reclamo_detalle}
-              onChange={handleDetalleChange}
-              rows={4}
-              disabled={especialidadesOptions.length <= 0}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="detalle">
+                  Descripción <span className="text-destructive">*</span>
+                </Label>
+                <Textarea
+                  id="detalle"
+                  placeholder={detallePlaceholder}
+                  defaultValue={formData.reclamo_detalle}
+                  onChange={handleDetalleChange}
+                  rows={4}
+                  disabled={isFormDisabled}
+                />
+              </div>
+            </>
+          )}
 
           {error && (
             <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
@@ -543,7 +590,7 @@ export function CreateReclamoForm() {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || especialidadesOptions.length <= 0}
+              disabled={isSubmitting || isFormDisabled}
               className="flex-1"
             >
               {isSubmitting ? (

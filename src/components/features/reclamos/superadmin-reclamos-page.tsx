@@ -24,7 +24,7 @@ import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detai
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
-import { SUPER_API } from "@/lib/superApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { Badge } from "@/components/ui/badge";
 
 const apiClient = axios.create({
@@ -80,8 +80,8 @@ export function SuperadminReclamosPage() {
     try {
       setIsLoading(true);
       const [reclamosRes] = await Promise.all([
-        apiClient.get(SUPER_API.GET_RECLAMOS),
-        apiClient.get(SUPER_API.GET_COMPANIES),
+        apiClient.get(API_ROUTES.GET_RECLAMOS),
+        apiClient.get(API_ROUTES.GET_COMPANIES),
       ]);
 
       const sortedReclamos = reclamosRes.data.sort((a: ReclamoData, b: ReclamoData) => {

@@ -1,147 +1,12 @@
-﻿"use client"
+﻿"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { Building, Users, UserCheck, UserX, TrendingUp, TrendingDown } from "lucide-react"
-import axios from "axios"
-import { config } from "@/lib/config"
-import { SUPER_API } from "@/lib/superApi/config"
-
-interface ClienteRecurrente {
-  cliente_id: number
-  cliente_complete_name: string
-  cliente_dni: string
-  cliente_phone: string
-  cliente_email: string
-  cliente_direccion: string
-  // Latitud y longitud - no son obligatorios > a implementar en proximos relesases
-  cliente_lat?: number
-  cliente_lng?: number
-  cliente_active: boolean
-  company_name?: string
-  company_id?: number
-  total_reclamos?: number
-  ultimo_reclamo?: string
-}
-
-interface EmpresaStats {
-  company_id: number
-  company_name: string
-  total_clientes: number
-  clientes_activos: number
-  clientes_inactivos: number
-  porcentaje_activos: number
-  total_reclamos: number
-}
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Building, Users, UserCheck, UserX, TrendingUp, TrendingDown } from "lucide-react";
+import { useSuperadminClientes } from "@/hooks/clientes/useSuperadminClientes";
 
 export function SuperadminClientesPage() {
-  const [clientes, setClientes] = useState<ClienteRecurrente[]>([])
-  const [empresasStats, setEmpresasStats] = useState<EmpresaStats[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  const loadClientes = useCallback(async () => {
-    try {
-      setIsLoading(true)
-
-      const [clientesResponse, empresasResponse, reclamosResponse] = await Promise.all([
-        apiClient.get(SUPER_API.GET_CLIENTES),
-        apiClient.get(SUPER_API.GET_COMPANIES),
-        apiClient.get(SUPER_API.GET_RECLAMOS)
-      ])
-
-      const clientesData = clientesResponse.data || []
-      const empresasData = empresasResponse.data || []
-      const reclamosData = reclamosResponse.data || []
-
-      const reclamosPorCliente = new Map<string, number>()
-      reclamosData.forEach((reclamo: { cliente_complete_name?: string; company_name?: string }) => {
-        if (reclamo.cliente_complete_name) {
-          const nombreCliente = reclamo.cliente_complete_name.trim().toLowerCase()
-          reclamosPorCliente.set(nombreCliente, (reclamosPorCliente.get(nombreCliente) || 0) + 1)
-        }
-      })
-
-      const reclamosPorEmpresa = new Map<string, number>()
-      reclamosData.forEach((reclamo: { company_name?: string }) => {
-        if (reclamo.company_name) {
-          const nombreEmpresa = reclamo.company_name.trim()
-          reclamosPorEmpresa.set(nombreEmpresa, (reclamosPorEmpresa.get(nombreEmpresa) || 0) + 1)
-        }
-      })
-
-      const clientesConReclamos = clientesData.map((cliente: ClienteRecurrente) => {
-        const nombreCliente = cliente.cliente_complete_name.trim().toLowerCase()
-        const totalReclamos = reclamosPorCliente.get(nombreCliente) || 0
-        return {
-          ...cliente,
-          total_reclamos: totalReclamos
-        }
-      })
-
-      setClientes(clientesConReclamos)
-
-      const empresasMap = new Map<number, string>()
-      empresasData.forEach((empresa: { company_id: number; company_nombre: string }) => {
-        empresasMap.set(empresa.company_id, empresa.company_nombre)
-      })
-
-      const empresaMap = new Map<number, ClienteRecurrente[]>()
-
-      clientesConReclamos.forEach((cliente: ClienteRecurrente) => {
-        if (cliente.company_id) {
-          if (!empresaMap.has(cliente.company_id)) {
-            empresaMap.set(cliente.company_id, [])
-          }
-          empresaMap.get(cliente.company_id)!.push(cliente)
-        }
-      })
-
-      const statsArray: EmpresaStats[] = Array.from(empresaMap.entries()).map(([companyId, clientesEmpresa]) => {
-        const activos = clientesEmpresa.filter(c => c.cliente_active).length
-        const inactivos = clientesEmpresa.filter(c => !c.cliente_active).length
-        const nombreEmpresa = empresasMap.get(companyId) || `Empresa ${companyId}`
-        const totalReclamos = reclamosPorEmpresa.get(nombreEmpresa) || clientesEmpresa.reduce((sum, c) => sum + (c.total_reclamos || 0), 0)
-
-        return {
-          company_id: companyId,
-          company_name: nombreEmpresa,
-          total_clientes: clientesEmpresa.length,
-          clientes_activos: activos,
-          clientes_inactivos: inactivos,
-          porcentaje_activos: clientesEmpresa.length > 0 ? Math.round((activos / clientesEmpresa.length) * 100) : 0,
-          total_reclamos: totalReclamos
-        }
-      })
-
-      statsArray.sort((a, b) => b.total_clientes - a.total_clientes)
-
-      setEmpresasStats(statsArray)
-    } catch (error: unknown) {
-      console.error("Error al cargar clientes:", error)
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: unknown } }
-        console.error("Error details:", axiosError.response?.data)
-      }
-      toast.error("Error al cargar los clientes recurrentes")
-    } finally {
-      setIsLoading(false)
-    }
-
-  }, [])
-
-  useEffect(() => {
-    loadClientes()
-  }, [loadClientes]) 
+  const {  empresasStats, isLoading, stats } = useSuperadminClientes();
 
   if (isLoading) {
     return (
@@ -151,7 +16,7 @@ export function SuperadminClientesPage() {
           <p className="text-muted-foreground">Cargando clientes recurrentes...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -159,7 +24,6 @@ export function SuperadminClientesPage() {
       <CardHeader className="border-b border-border pb-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <CardTitle className="text-2xl">Clientes por empresa</CardTitle>
-
         </div>
       </CardHeader>
 
@@ -171,7 +35,7 @@ export function SuperadminClientesPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{clientes.length}</div>
+              <div className="text-2xl font-bold">{stats.totalClientes}</div>
             </CardContent>
           </Card>
 
@@ -182,7 +46,7 @@ export function SuperadminClientesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-500">
-                {clientes.filter(c => c.cliente_active).length}
+                {stats.clientesActivos}
               </div>
             </CardContent>
           </Card>
@@ -194,7 +58,7 @@ export function SuperadminClientesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-muted-foreground">
-                {clientes.filter(c => !c.cliente_active).length}
+                {stats.clientesInactivos}
               </div>
             </CardContent>
           </Card>
@@ -206,7 +70,7 @@ export function SuperadminClientesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {empresasStats.length}
+                {stats.totalEmpresas}
               </div>
             </CardContent>
           </Card>
@@ -298,16 +162,10 @@ export function SuperadminClientesPage() {
               <p className="text-muted-foreground text-center">
                 No se encontraron clientes recurrentes para mostrar estadísticas por empresa.
               </p>
-              <div className="mt-4 text-sm text-muted-foreground">
-                <p>Total de clientes cargados: {clientes.length}</p>
-                <p>Empresas encontradas: {empresasStats.length}</p>
-                <p>Clientes con company_id: {clientes.filter(c => c.company_id).length}</p>
-                <p>Clientes sin company_id: {clientes.filter(c => !c.company_id).length}</p>
-              </div>
             </CardContent>
           </Card>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

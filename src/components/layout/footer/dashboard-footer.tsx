@@ -1,10 +1,7 @@
 ﻿"use client";
 
-import { useMemo } from "react";
-
 export function DashboardFooter() {
-  
-  const currentYear = useMemo(() => new Date().getFullYear(), []);
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="text-foreground flex justify-center gap-1 text-center pb-4 text-sm">

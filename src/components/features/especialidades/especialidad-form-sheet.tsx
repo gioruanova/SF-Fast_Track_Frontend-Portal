@@ -19,39 +19,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { SUPER_API } from "@/lib/superApi/config";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { apiClient } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/api_routes";
+import { useEspecialidadForm } from "@/hooks/especialidades/useEspecialidadForm";
+import { Especialidad } from "@/types/especialidades";
 
 interface CompanyData {
   company_id: number;
   company_nombre: string;
 }
 
-interface EspecialidadFormData {
-  company_id: number;
-  nombre_especialidad: string;
-}
-
 interface EspecialidadFormSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  especialidad?: {
-    id_especialidad: number;
-    nombre_especialidad: string;
-    company_id: number;
-    company_nombre: string;
-    estado_especialidad: number;
-  } | null;
+  especialidad?: Especialidad | null;
 }
 
 export function EspecialidadFormSheet({
@@ -61,107 +43,33 @@ export function EspecialidadFormSheet({
   especialidad,
 }: EspecialidadFormSheetProps) {
   const [companies, setCompanies] = useState<CompanyData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<EspecialidadFormData>({
-    company_id: 0,
-    nombre_especialidad: "",
-  });
 
-  const isEditing = !!especialidad;
+  const {
+    formData,
+    isLoading,
+    isEditing,
+    handleChange,
+    handleSubmit,
+  } = useEspecialidadForm({
+    especialidad: especialidad || undefined,
+    onSuccess,
+    onClose,
+    requiresCompanyId: true,
+  });
 
   useEffect(() => {
     if (isOpen) {
       fetchCompanies();
-      if (especialidad) {
-        setFormData({
-          company_id: especialidad.company_id,
-          nombre_especialidad: especialidad.nombre_especialidad,
-        });
-      } else {
-        setFormData({
-          company_id: 0,
-          nombre_especialidad: "",
-        });
-      }
     }
-  }, [isOpen, especialidad]);
+  }, [isOpen]);
 
   const fetchCompanies = async () => {
     try {
-      const response = await apiClient.get(SUPER_API.GET_COMPANIES);
+      const response = await apiClient.get<CompanyData[]>(API_ROUTES.GET_COMPANIES);
       setCompanies(response.data);
     } catch {
       toast.error("Error al cargar las empresas");
     }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.company_id || !formData.nombre_especialidad.trim()) {
-      toast.error("Todos los campos son requeridos");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-
-      if (isEditing) {
-        await apiClient.put(
-          SUPER_API.EDIT_ESPECIALIDADES.replace("{id_especialidad}", especialidad.id_especialidad.toString()),
-          {
-            nombre_especialidad: formData.nombre_especialidad,
-          }
-        );
-        toast.success("Especialidad actualizada correctamente");
-      } else {
-        await apiClient.post(SUPER_API.CREATE_ESPECIALIDADES, {
-          company_id: formData.company_id,
-          nombre_especialidad: formData.nombre_especialidad,
-        });
-        toast.success("Especialidad creada correctamente");
-      }
-
-      onSuccess();
-      onClose();
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const errorMessage = error.response.data?.error || error.response.data?.message;
-        const status = error.response.status;
-        
-        switch (status) {
-          case 400:
-            if (errorMessage.includes("nombre_especialidad")) {
-              toast.error("El nombre de la especialidad es requerido");
-            } else {
-              toast.error("Datos inválidos. Verifica la información ingresada.");
-            }
-            break;
-          case 404:
-            toast.error("Especialidad no encontrada");
-            break;
-          case 409:
-            toast.error("Ya existe una especialidad con ese nombre en esta empresa");
-            break;
-          case 500:
-            toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
-            break;
-          default:
-            toast.error(errorMessage || "Error al guardar la especialidad.");
-        }
-      } else {
-        toast.error("Error de conexión. Verifica tu conexión a internet.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleChange = (field: keyof EspecialidadFormData, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
   };
 
   return (
@@ -184,8 +92,10 @@ export function EspecialidadFormSheet({
             <div className="space-y-2">
               <Label htmlFor="company_id">Empresa</Label>
               <Select
-                value={formData.company_id > 0 ? formData.company_id.toString() : ""}
-                onValueChange={(value) => handleChange("company_id", parseInt(value))}
+                value={formData.company_id ? formData.company_id.toString() : ""}
+                onValueChange={(value) =>
+                  handleChange("company_id", parseInt(value))
+                }
                 disabled={isEditing}
               >
                 <SelectTrigger className="w-full cursor-pointer">
@@ -193,8 +103,8 @@ export function EspecialidadFormSheet({
                 </SelectTrigger>
                 <SelectContent>
                   {companies.map((company) => (
-                    <SelectItem 
-                      key={company.company_id} 
+                    <SelectItem
+                      key={company.company_id}
                       value={company.company_id.toString()}
                       className="cursor-pointer"
                     >
@@ -211,11 +121,15 @@ export function EspecialidadFormSheet({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nombre_especialidad">Nombre de la Especialidad</Label>
+              <Label htmlFor="nombre_especialidad">
+                Nombre de la Especialidad
+              </Label>
               <Input
                 id="nombre_especialidad"
                 value={formData.nombre_especialidad}
-                onChange={(e) => handleChange("nombre_especialidad", e.target.value)}
+                onChange={(e) =>
+                  handleChange("nombre_especialidad", e.target.value)
+                }
                 placeholder="Ej: Pintura, Plomería, Electricidad..."
                 required
                 disabled={isLoading}

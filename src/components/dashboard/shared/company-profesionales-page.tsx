@@ -11,9 +11,10 @@ import { GestionarAreaSheet } from "./gestionar-area-sheet";
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
+import { User, USER_STATUS } from "@/types/users";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -23,27 +24,8 @@ const apiClient = axios.create({
   },
 });
 
-interface ProfesionalData {
-  user_id: number;
-  user_complete_name: string;
-  user_email: string;
-  user_phone: string;
-  user_dni: string;
-  user_role: string;
-  user_status: number;
-  created_at: string;
+interface ProfesionalData extends User {
   last_login?: string;
-  especialidades?: Array<{
-    id_asignacion: number;
-    id_usuario: number;
-    company_id: number;
-    id_especialidad: number;
-    created_at: string;
-    updated_at: string;
-    Especialidad: {
-      nombre_especialidad: string;
-    };
-  }>;
 }
 
 interface CompanyProfesionalesPageProps {
@@ -62,7 +44,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
   const fetchProfesionales = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(CLIENT_API.GET_USERS);
+      const response = await apiClient.get(API_ROUTES.GET_USERS);
 
       const profesionalesData = response.data.filter((user: ProfesionalData) =>
         user.user_role === "profesional"
@@ -87,8 +69,8 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
       prof.user_dni.includes(searchTerm);
 
     const matchesEstado = filterEstado === "all" ||
-      (filterEstado === "active" && prof.user_status === 1) ||
-      (filterEstado === "inactive" && prof.user_status === 0);
+      (filterEstado === "active" && prof.user_status === USER_STATUS.ACTIVO) ||
+      (filterEstado === "inactive" && prof.user_status === USER_STATUS.BLOQUEADO);
 
     return matchesSearch && matchesEstado;
   });
@@ -226,12 +208,12 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
                       </TableCell>
                       <TableCell className="text-center">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${profesional.user_status === 1
+                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${profesional.user_status === USER_STATUS.ACTIVO
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                             }`}
                         >
-                          {profesional.user_status === 1 ? 'Activo' : 'Inactivo'}
+                          {profesional.user_status === USER_STATUS.ACTIVO ? 'Activo' : 'Inactivo'}
                         </span>
                       </TableCell>
                       <TableCell>
